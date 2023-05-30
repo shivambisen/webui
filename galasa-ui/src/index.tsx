@@ -1,3 +1,7 @@
+/*
+ * Copyright contributors to the Galasa project
+ */
+
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.scss';

@@ -1,3 +1,7 @@
+/*
+ * Copyright contributors to the Galasa project
+ */
+
 import React from 'react';
 import { render, screen } from '@testing-library/react';
 import App from './App';
