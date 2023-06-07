@@ -8,7 +8,9 @@ import './App.scss';
 class App extends Component {
   render() {
     return (
-      <span>Galasa Ecosystem (Experimental)</span>
+      <>
+        <h1>Galasa Ecosystem (Experimental)</h1>
+      </>
     );
   }
 }
