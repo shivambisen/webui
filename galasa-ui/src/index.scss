@@ -1,6 +1,8 @@
 /*
  * Copyright contributors to the Galasa project
  */
+ // Bring in all the styles for Carbon in your root/global stylesheet
+@use '@carbon/react';
  
  @import 'carbon-components/scss/globals/scss/styles.scss';
 
