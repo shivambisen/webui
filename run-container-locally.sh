@@ -47,28 +47,9 @@ bold() { printf "${bold}%s${reset}\n" "$@"
 note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$@"
 }
 
+cd ${BASEDIR}/galasa-ui
 
-function check_npm_tool_available {
-    which npm
-    rc=$?
-    if [[ "${rc}" != "0" ]]; then
-        error "npm tool is not available on your path. Install npm and re-try"
-        exit 1
-    fi
-    success "npm tool is available. OK"
-}
-
-function install_js_libraries {
-    cd ${BASEDIR}/galasa-ui
-    npm install --force
-    rc=$?
-    if [[ "${rc}" != "0" ]]; then
-        error "npm install failed."
-        exit 1
-    fi
-    success "npm installed libraries. OK"
-}
-
-check_npm_tool_available
-install_js_libraries
-success "Project set up for local builds."
+INTERNAL_PORT=8080
+EXTERNAL_PORT=8090
+info "Launching web ui. Find it in a browser at http://localhost:${EXTERNAL_PORT}"
+docker run -it -p ${EXTERNAL_PORT}:${INTERNAL_PORT} galasa-web-ui

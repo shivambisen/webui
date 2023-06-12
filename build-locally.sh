@@ -108,4 +108,28 @@ if [[ "${build_type}" == "clean" ]]; then
     clean
 fi
 
+function run_tests {
+    cd ${BASEDIR}/galasa-ui
+    npm test -- --watchAll=false
+    rc=$?
+    if [[ "${rc}" != "0" ]]; then
+        error "Failing tests."
+        exit 1
+    fi
+    success "Unit tests all pass OK."
+}
+
+function do_build {
+    cd ${BASEDIR}/galasa-ui
+    npm run build
+    rc=$?
+    if [[ "${rc}" != "0" ]]; then
+        error "Failed to build."
+        exit 1
+    fi
+    success "Built OK."
+}
+
+run_tests
+do_build
 success "Project built OK."
