@@ -1,5 +1,13 @@
-dist/
+
+# Don't ever check-in node modules..
 **/node_modules/
-**/public/
-**/build/
+
+# Metadata that macos finder/explorer puts into folders it visits.
 .DS_STORE
+
+# Built artifacts shouldn't be checked-in.
+build/
+
+# In case people try npm install from the root instead of in the galasa-ui folder...
+/package.json
+/package-lock.json
