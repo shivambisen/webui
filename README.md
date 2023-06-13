@@ -15,5 +15,14 @@ This is the home of the web user-interface for Galasa.
 ## To build locally
 - Run the `build-locally.sh` script
 
+## To run development server locally
+- Run the `run-locally.sh` script
+
+## To build docker image locally
+- Run the `build-container-locally.sh` script
+
+## To run docker image locally
+- Run the `run-container-locally.sh` script
+
 ## How to contribute
 See the [contributions.md](./CONTRIBUTIONS.md) file for terms and instructions.
