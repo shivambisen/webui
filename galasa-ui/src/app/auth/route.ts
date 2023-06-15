@@ -1,3 +1,6 @@
+/*
+ * Copyright contributors to the Galasa project
+ */
 import { NextResponse } from "next/server";
 import { Issuer, generators } from "openid-client";
 
