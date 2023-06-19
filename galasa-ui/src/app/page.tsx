@@ -1,7 +1,7 @@
 /*
  * Copyright contributors to the Galasa project
  */
-const HomePage = () => {
+export default function HomePage() {
   return (
     <div>
       <p>Galasa Ecosystem (Experimental)</p>
@@ -9,4 +9,3 @@ const HomePage = () => {
   );
 };
 
-export default HomePage;
