@@ -17,15 +17,20 @@ const isAuthenticated = (request: NextRequest) => {
 
 // Checks whether a given JWT is expired, returning true if so, and false otherwise.
 const isTokenExpired = (jwt: string) => {
-  const decodedJwt = jwtDecode<JwtPayload>(jwt);
-  const jwtExpiry = decodedJwt.exp;
-
   let isExpired = true;
-  if (jwtExpiry) {
-    // A JWT's expiry time is a Unix timestamp (number of seconds since the Unix Epoch),
-    // so the format of the current time must match to calculate the correct difference.
-    const currentTimeInEpochSeconds = dayjs().unix();
-    isExpired = dayjs(jwtExpiry).diff(currentTimeInEpochSeconds) <= 0;
+
+  try {
+    const decodedJwt = jwtDecode<JwtPayload>(jwt);
+    const jwtExpiry = decodedJwt.exp;
+
+    if (jwtExpiry) {
+      // A JWT's expiry time is a Unix timestamp (number of seconds since the Unix Epoch),
+      // so the format of the current time must match to calculate the correct difference.
+      const currentTimeInEpochSeconds = dayjs().unix();
+      isExpired = dayjs(jwtExpiry).diff(currentTimeInEpochSeconds) <= 0;
+    }
+  } catch (err) {
+    // Do nothing - the JWT is invalid, so it will be marked as expired to force re-authentication.
   }
   return isExpired;
 };
@@ -41,7 +46,7 @@ export function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Match all request paths except for the ones starting with /auth
+    // Match all request paths except for the ones starting with /auth.
     '/((?!auth).*)',
   ],
 };

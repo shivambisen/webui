@@ -1,17 +1,23 @@
 /*
  * Copyright contributors to the Galasa project
  */
+export const dynamic = 'force-dynamic';
+
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 import { Issuer, generators } from 'openid-client';
 
-// Set up the OpenID client for the WebUI as registered with Dex
+// Get an OpenID client for the WebUI as registered with Dex
 export const getOpenIdClient = async () => {
-  return Issuer.discover(process.env.DEX_ISSUER ?? 'http://127.0.0.1:5556/dex').then(
+  const issuerUrl = process.env.DEX_ISSUER ?? 'http://127.0.0.1:5556/dex';
+  const callbackUrl = process.env.DEX_CLIENT_CALLBACK ?? 'http://localhost:3000/auth/callback';
+
+  return Issuer.discover(issuerUrl).then(
     (dexIssuer) =>
       new dexIssuer.Client({
         client_id: 'galasa-webui',
-        client_secret: 'example-webui-client-secret',
-        redirect_uris: ['http://localhost:3000/auth/callback'],
+        client_secret: process.env.DEX_CLIENT_SECRET,
+        redirect_uri: [callbackUrl],
         response_types: ['code'],
       })
   );
@@ -24,6 +30,9 @@ export async function GET(request: Request) {
     scope: 'openid email profile offline_access',
     state,
   });
+
+  // Save the state parameter in a cookie so that it can be checked during the callback to the webui.
+  cookies().set('state', state);
 
   return NextResponse.redirect(authUrl);
 }
