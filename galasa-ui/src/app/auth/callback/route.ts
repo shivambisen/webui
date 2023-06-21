@@ -1,6 +1,7 @@
 /*
  * Copyright contributors to the Galasa project
  */
+// Stop this route from being pre-rendered
 export const dynamic = 'force-dynamic';
 
 import { NextResponse } from 'next/server';
