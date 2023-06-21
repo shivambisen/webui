@@ -1,3 +1,6 @@
+/*
+ * Copyright contributors to the Galasa project
+ */
 import HomePage from '@/app/page';
 import { render, screen } from '@testing-library/react';
 

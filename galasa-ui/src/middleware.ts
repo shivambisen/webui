@@ -1,4 +1,3 @@
-import dayjs from 'dayjs';
 import jwtDecode, { JwtPayload } from 'jwt-decode';
 import { NextResponse, NextRequest } from 'next/server';
 
@@ -20,14 +19,15 @@ const isTokenExpired = (jwt: string) => {
   let isExpired = true;
 
   try {
-    const decodedJwt = jwtDecode<JwtPayload>(jwt);
+    const decodedJwt = jwtDecode(jwt) as JwtPayload;
     const jwtExpiry = decodedJwt.exp;
 
     if (jwtExpiry) {
+      const currentTimeEpochMilliseconds = Date.now()
+
       // A JWT's expiry time is a Unix timestamp (number of seconds since the Unix Epoch),
       // so the format of the current time must match to calculate the correct difference.
-      const currentTimeInEpochSeconds = dayjs().unix();
-      isExpired = dayjs(jwtExpiry).diff(currentTimeInEpochSeconds) <= 0;
+      isExpired = ((jwtExpiry * 1000) - currentTimeEpochMilliseconds) <= 0;
     }
   } catch (err) {
     // Do nothing - the JWT is invalid, so it will be marked as expired to force re-authentication.
