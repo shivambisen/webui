@@ -1,3 +1,6 @@
+/*
+ * Copyright contributors to the Galasa project
+ */
 import jwtDecode, { JwtPayload } from 'jwt-decode';
 import { NextResponse, NextRequest } from 'next/server';
 

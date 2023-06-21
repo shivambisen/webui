@@ -15,7 +15,7 @@ export async function GET(request: Request) {
 
   // Get the returned token set (which includes a JWT) from Dex
   const callbackParams = openIdClient.callbackParams(request.url);
-  const tokenSet = await openIdClient.callback(process.env.DEX_CLIENT_CALLBACK, callbackParams, { state });
+  const tokenSet = await openIdClient.callback(`${process.env.WEBUI_HOST_URL}/auth/callback`, callbackParams, { state });
 
   // The state cookie is no longer needed, so we can delete it.
   if (state) {

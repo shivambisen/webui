@@ -11,7 +11,7 @@ import { Issuer, generators } from 'openid-client';
 // Get an OpenID client for the WebUI as registered with Dex
 export const getOpenIdClient = async () => {
   const issuerUrl = process.env.DEX_ISSUER ?? 'http://127.0.0.1:5556/dex';
-  const callbackUrl = process.env.DEX_CLIENT_CALLBACK ?? 'http://localhost:3000/auth/callback';
+  const callbackUrl = `${process.env.WEBUI_HOST_URL}/auth/callback`;
 
   return Issuer.discover(issuerUrl).then(
     (dexIssuer) =>
