@@ -1,7 +1,7 @@
 FROM node:18-alpine
 
 # Never run anything in a docker container as the root user if you can help it.
-RUN useradd --create-home --shell /bin/bash galasa
+RUN adduser -D --shell /bin/bash galasa
 
 # Our application sits in the the following folder...
 WORKDIR /home/galasa
