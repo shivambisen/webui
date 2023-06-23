@@ -1,4 +1,4 @@
-FROM node:18
+FROM node:18-alpine
 
 # Never run anything in a docker container as the root user if you can help it.
 RUN useradd --create-home --shell /bin/bash galasa
