@@ -6,7 +6,6 @@ export const dynamic = 'force-dynamic';
 
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { NextResponse } from 'next/server';
 import { Issuer, generators } from 'openid-client';
 
 // Get an OpenID client for the WebUI as registered with Dex

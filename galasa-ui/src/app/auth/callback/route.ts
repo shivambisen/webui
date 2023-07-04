@@ -24,7 +24,7 @@ export async function GET(request: Request) {
 
   // Set the ID token cookie
   if (tokenSet.id_token) {
-    cookies().set('id_token', tokenSet.id_token, { secure: true });
+    cookies().set('id_token', tokenSet.id_token);
   }
   redirect('/');
 }
