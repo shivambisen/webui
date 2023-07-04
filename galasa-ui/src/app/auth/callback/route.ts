@@ -4,11 +4,11 @@
 // Stop this route from being pre-rendered
 export const dynamic = 'force-dynamic';
 
-import { NextResponse } from 'next/server';
 import { getOpenIdClient } from '../route';
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 
-// GET request handler for requests to /callback
+// GET request handler for requests to /auth/callback
 export async function GET(request: Request) {
   const openIdClient = await getOpenIdClient();
   const state = cookies().get('state')?.value;
@@ -26,6 +26,5 @@ export async function GET(request: Request) {
   if (tokenSet.id_token) {
     cookies().set('id_token', tokenSet.id_token, { secure: true });
   }
-
-  return NextResponse.redirect(new URL('/', request.url));
+  redirect('/');
 }

@@ -5,6 +5,7 @@
 export const dynamic = 'force-dynamic';
 
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { NextResponse } from 'next/server';
 import { Issuer, generators } from 'openid-client';
 
@@ -35,5 +36,5 @@ export async function GET(request: Request) {
   // Save the state parameter in a cookie so that it can be checked during the callback to the webui.
   cookies().set('state', state);
 
-  return NextResponse.redirect(authUrl);
+  redirect(authUrl);
 }
