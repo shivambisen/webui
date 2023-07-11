@@ -4,12 +4,10 @@
 'use client';
 
 import TokenRequestModal from '@/components/Modals';
-import { Button } from '@carbon/react';
-import { useState } from 'react';
 
 export default function HomePage() {
   return (
-    <div>
+    <div id="content">
       <TokenRequestModal />
     </div>
   );
