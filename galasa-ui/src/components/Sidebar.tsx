@@ -3,15 +3,16 @@
  */
 'use client';
 
-import { SideNav, SideNavItems, SideNavLink } from '@carbon/react';
+import { SideNav, SideNavItems, SideNavItem} from '@carbon/react';
 
 export default function Sidebar (){
   return (
     <SideNav aria-label="Sidebar">
       <SideNavItems>
-        <SideNavLink href="#">Home</SideNavLink>
-        <SideNavLink href="#">About</SideNavLink>
-        <SideNavLink href="#">Contact</SideNavLink>
+        <SideNavItem >Token Management</SideNavItem>
+        <SideNavItem >You are logged in as:</SideNavItem>
+        <SideNavItem >Previous login</SideNavItem>
+        <SideNavItem >Your access roles:</SideNavItem>
       </SideNavItems>
     </SideNav>
   );
