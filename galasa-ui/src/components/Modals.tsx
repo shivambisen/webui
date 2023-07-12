@@ -7,7 +7,7 @@
  import { useState } from 'react';
 
 import { TextInput } from '@carbon/react';
-import TokenTable from './Table';
+import { TokenTable } from './Table';
 
 const headers = [
   {
@@ -45,15 +45,11 @@ const rows = [
   const [submit, setSubmit] = useState(submitState);
   const submitTokenRequest = (state: boolean) => {
     setSubmit(state);
-/* TO DO 
- * This below line is needed in the return to make the table work
- * (Not implemented yet due to document rendering issues)
- * <TokenTable headers={headers} rows={rows} />
- */  
   };
   return (
     <>
       <Button onClick={() => setOpen(true)}>Request Access Token</Button>
+      <TokenTable headers={headers} rows={rows} />
       <Modal
         modalHeading="Request a new Personal Access Token"
         modalLabel="Access Tokens"

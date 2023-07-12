@@ -19,7 +19,6 @@ test('renders Galasa Modal Token Request', () => {
 
 test('renders Galasa Modal Token Request Submit Modal Open', () => {
   const buttonElement = screen.getByText(/Request Access Token/i);
-  screen.
   const requestModalElement = screen.getByText(/Request a new Personal Access Token/i);
   const responseModalElement = screen.getByText(/Your new access token is:/i);
   expect(buttonElement).toBeInTheDocument();

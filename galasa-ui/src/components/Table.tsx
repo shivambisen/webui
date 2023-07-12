@@ -5,6 +5,7 @@
 import React from 'react';
 import { Table } from '@carbon/react';
 import { TableHead, TableRow, TableHeader, TableBody, TableCell } from '@carbon/react';
+import dynamic from 'next/dynamic';
 
 
 export function rowData (row: {id: string; tokenName: string; scope: string; expires: string;}){
@@ -21,8 +22,7 @@ export function headerData(header: {key: string;header: string;}){
     return(<TableHeader key={header.key}>{header.header}</TableHeader>)
 }
 
-
-export function TokenTable({headers, rows}: 
+function CreateTokenTable({headers, rows}:
     {
         headers: {key: string;header: string;}[],
         rows: {id: string; tokenName: string; scope: string; expires: string;}[]
@@ -43,3 +43,6 @@ export function TokenTable({headers, rows}:
   );
 };
 
+export const TokenTable = dynamic(() => Promise.resolve(CreateTokenTable), {
+  ssr: false,
+});
