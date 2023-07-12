@@ -6,8 +6,9 @@
  import { Button, Modal, Dropdown } from '@carbon/react';
  import { useState } from 'react';
 
-import { TextInput } from '@carbon/react';
+import { TextInput, PasswordInput } from '@carbon/react';
 import { TokenTable } from './Table';
+import { Form } from '@carbon/react';
 
 const headers = [
   {
@@ -44,6 +45,13 @@ const rows = [
   const [open, setOpen] = useState(openState);
   const [submit, setSubmit] = useState(submitState);
   const submitTokenRequest = (state: boolean) => {
+    let name = (document.getElementById("name-txtinput") as HTMLInputElement).value;
+    let secret = (document.getElementById("password-txtinput") as HTMLInputElement).value;
+    let codedsecret = '';
+    for(var i=0;i<secret.length;i++) {codedsecret += ''+secret.charCodeAt(i).toString(16);}
+    console.log(name);
+    console.log(secret);
+    console.log(codedsecret);
     setSubmit(state);
   };
   return (
@@ -61,16 +69,9 @@ const rows = [
           setOpen(false)
           submitTokenRequest(true)
         }}>
-        <TextInput data-modal-primary-focus id="text-input-1" labelText="Token Name" style={{ marginBottom: '1rem'}} />
-        <Dropdown id="drop" label="Scope" titleText="Scope" items={[{
-      id: 'one',
-      label: 'ALL',
-      name: 'ALL'
-    }, {
-      id: 'two',
-      label: 'Local',
-      name: 'Local'
-    }]} />
+        <TextInput data-modal-primary-focus id="name-txtinput" labelText="Token Name" style={{ marginBottom: '1rem'}} />
+        <PasswordInput data-modal-primary-focus id="password-txtinput" labelText="Password"
+            helperText="The password you would like to use with this token" style={{ marginBottom: '1rem'}} />
       </Modal>
       <Modal
         open={submit}
