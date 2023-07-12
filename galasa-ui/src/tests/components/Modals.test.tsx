@@ -13,3 +13,13 @@ test('renders Galasa Modal Token Request', () => {
   expect(requestModalElement).toBeInTheDocument();
   expect(responseModalElement).toBeInTheDocument();
 });
+
+test('renders Galasa Modal Token Request', () => {
+  render(<TokenRequestModal />);
+  const buttonElement = screen.getByText(/Request Access Token/i);
+  const requestModalElement = screen.getByText(/Request a new Personal Access Token/i);
+  const responseModalElement = screen.getByText(/Your new access token is:/i);
+  expect(buttonElement).toBeInTheDocument();
+  expect(requestModalElement).toBeInTheDocument();
+  expect(responseModalElement).toBeInTheDocument();
+});

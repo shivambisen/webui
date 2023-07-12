@@ -2,7 +2,7 @@
  * Copyright contributors to the Galasa project
  */
 import TokenRequestModal from '@/components/Modals';
-import PageHeader from '@/components/pageHeader';
+import PageHeader from '@/components/PageHeader';
 import { render, screen } from '@testing-library/react';
 
 test('renders Galasa Ecosystem header', () => {

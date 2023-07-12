@@ -1,7 +1,7 @@
 /*
  * Copyright contributors to the Galasa project
  */
-import PageHeader from '@/components/pageHeader';
+import PageHeader from '@/components/PageHeader';
 import Sidebar from '@/components/Sidebar';
 import '../styles/global.scss';
 
