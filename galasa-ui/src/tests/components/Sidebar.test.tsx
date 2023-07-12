@@ -4,8 +4,11 @@
 import Sidebar from '@/components/Sidebar';
 import { render, screen } from '@testing-library/react';
 
+beforeEach (()=>{
+  render(<Sidebar />);
+});
+
 test('renders Galasa Modal Token Request', () => {
-    render(<Sidebar />);
     const tokenManagementEelement = screen.getByText(/Token Management/i);
     const loginElement = screen.getByText(/You are logged in as:/i);
     const previousLoginElement = screen.getByText(/Previous login/i);

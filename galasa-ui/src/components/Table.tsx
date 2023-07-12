@@ -22,7 +22,7 @@ export function headerData(header: {key: string;header: string;}){
 }
 
 
-export default function TokenTable({headers, rows}: 
+export function TokenTable({headers, rows}: 
     {
         headers: {key: string;header: string;}[],
         rows: {id: string; tokenName: string; scope: string; expires: string;}[]
