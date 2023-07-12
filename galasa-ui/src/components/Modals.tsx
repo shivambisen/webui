@@ -44,14 +44,23 @@ const rows = [
  export default function TokenRequestModal({openState, submitState}:{openState:boolean, submitState:boolean}) {
   const [open, setOpen] = useState(openState);
   const [submit, setSubmit] = useState(submitState);
-  const submitTokenRequest = (state: boolean) => {
-    let name = (document.getElementById("name-txtinput") as HTMLInputElement).value;
-    let secret = (document.getElementById("password-txtinput") as HTMLInputElement).value;
-    let codedsecret = '';
-    for(var i=0;i<secret.length;i++) {codedsecret += ''+secret.charCodeAt(i).toString(16);}
-    console.log(name);
-    console.log(secret);
-    console.log(codedsecret);
+  const [token, setToken] = useState('');
+
+  const submitTokenRequest = async (state: boolean) => {
+    const name = (document.getElementById("name-txtinput") as HTMLInputElement).value;
+    const secret = (document.getElementById("password-txtinput") as HTMLInputElement).value;
+    const codedSecret = Buffer.from(secret).toString('base64');
+    
+    // Call out to auth/token with the payload for the name and secret for dex
+    const tokenUrl = './auth/token';
+    const res = await fetch(tokenUrl, {
+      method: "POST",
+      body: JSON.stringify({name: name, secret: codedSecret,}),
+      headers: {"Content-type": "application/json; charset=UTF-8"}});
+    const json = await res.json();
+    
+    setToken(json.secret);
+    
     setSubmit(state);
   };
   return (
@@ -79,7 +88,7 @@ const rows = [
         modalLabel="Access Tokens"
         modalHeading="Your new access token is:"
         onRequestClose={() => setSubmit(false)}>
-        <p> A new access token</p>
+        <p> {token}</p>
       </Modal>
     </>
   );

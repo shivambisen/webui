@@ -2,8 +2,7 @@
  * Copyright contributors to the Galasa project
  */
 
-import { headerData, rowData } from '@/components/Table';
-import TokenTable from '@/components/Table';
+import { headerData, rowData ,CreateTokenTable} from '@/components/Table';
 import { TableRow, TableCell, TableHeader } from '@carbon/react';
 import { render, screen } from '@testing-library/react';
 
@@ -18,7 +17,7 @@ test('renders Galasa Token Table', () => {
     {id: '1234', tokenName: 'tkn1Example', scope: 'ALL', expires: '2023-10-22'},
     {id: '5678', tokenName: 'tkn2Example', scope: 'Local', expires: '2023-09-31'}
   ];
-  render(<TokenTable headers={headers} rows={rows} />);
+  render(<CreateTokenTable headers={headers} rows={rows} />);
   const headerToken = screen.getByText(/Token/i);
   const headerScope = screen.getByText(/Scope/i);
   const row1TokenName = screen.getByText(/tkn1Example/i);
