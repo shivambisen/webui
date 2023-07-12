@@ -47,9 +47,9 @@ bold() { printf "${bold}%s${reset}\n" "$@"
 note() { printf "\n${underline}${bold}${blue}Note:${reset} ${blue}%s${reset}\n" "$@"
 }
 
-#-----------------------------------------------------------------------------------------                   
+#-----------------------------------------------------------------------------------------
 # Functions
-#-----------------------------------------------------------------------------------------                   
+#-----------------------------------------------------------------------------------------
 function usage {
     info "Syntax: build-locally.sh [OPTIONS]"
     cat << EOF
@@ -63,12 +63,12 @@ EOF
 }
 
 #--------------------------------------------------------------------------
-# 
+#
 # Main script logic
 #
 #--------------------------------------------------------------------------
 
-#-----------------------------------------------------------------------------------------                   
+#-----------------------------------------------------------------------------------------
 # Process parameters
 #-----------------------------------------------------------------------------------------
 function process_parameters {
@@ -93,11 +93,12 @@ function process_parameters {
     if [[ "${build_type}" == "" ]]; then
         error "Need to use either the --clean or --delta parameter."
         usage
-        exit 1  
+        exit 1
     fi
 }
 
 function clean {
+    rm -rf ${BASEDIR}/galasa-ui/src/generated
     success "Cleaned up OK"
 }
 
@@ -107,6 +108,22 @@ process_parameters $*
 if [[ "${build_type}" == "clean" ]]; then
     clean
 fi
+
+function generate_grpc_types {
+    cd ${BASEDIR}/galasa-ui
+    npm install
+    NODE_BIN_DIR="${BASEDIR}/galasa-ui/node_modules/.bin"
+
+    ${NODE_BIN_DIR}/proto-loader-gen-types ${BASEDIR}/galasa-ui/src/grpc/dex.proto \
+        -O ${BASEDIR}/galasa-ui/src/generated/grpc \
+        --grpcLib=@grpc/grpc-js
+    rc=$?
+    if [[ "${rc}" != "0" ]]; then
+        error "Failed to generate gRPC types."
+        exit 1
+    fi
+    success "Generated gRPC types OK."
+}
 
 function run_tests {
     cd ${BASEDIR}/galasa-ui
@@ -130,6 +147,7 @@ function do_build {
     success "Built OK."
 }
 
+generate_grpc_types
 run_tests
 do_build
 success "Project built OK."

@@ -3,7 +3,7 @@
  */
 import { loadPackageDefinition, credentials } from '@grpc/grpc-js';
 import { loadSync } from '@grpc/proto-loader';
-import { ProtoGrpcType } from './dex';
+import { ProtoGrpcType } from '@/generated/grpc/dex';
 
 const PROTO_PATH = './src/grpc/dex.proto';
 

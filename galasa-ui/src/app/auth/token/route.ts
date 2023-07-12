@@ -2,8 +2,8 @@
  * Copyright contributors to the Galasa project
  */
 
-import { CreateClientReq } from '@/grpc/api/CreateClientReq';
-import { CreateClientResp__Output } from '@/grpc/api/CreateClientResp';
+import { CreateClientReq } from '@/generated/grpc/api/CreateClientReq';
+import { CreateClientResp__Output } from '@/generated/grpc/api/CreateClientResp';
 import { client } from '@/grpc/client';
 import { UnaryCallback } from '@grpc/grpc-js/build/src/client';
 import { NextResponse } from 'next/server';

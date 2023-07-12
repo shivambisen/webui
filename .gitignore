@@ -28,3 +28,6 @@ yarn-error.log*
 .vercel
 *.tsbuildinfo
 next-env.d.ts
+
+# Auto-generated source files
+**/generated
