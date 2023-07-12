@@ -8,7 +8,7 @@ import TokenRequestModal from '@/components/Modals';
 export default function HomePage() {
   return (
     <div id="content">
-      <TokenRequestModal />
+      <TokenRequestModal openState={false} submitState={false}/>
     </div>
   );
 };

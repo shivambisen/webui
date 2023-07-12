@@ -34,15 +34,15 @@ const rows = [
   {
       id: '5678',
       tokenName: 'tkn2Example',
-      scope: 'Local',
+      scope: 'ALL',
       expires: '2023-09-31',
   },
 ];
 
 
- export default function TokenRequestModal() {
-  const [open, setOpen] = useState(false);
-  const [submit, setSubmit] = useState(false);
+ export default function TokenRequestModal({openState, submitState}:{openState:boolean, submitState:boolean}) {
+  const [open, setOpen] = useState(openState);
+  const [submit, setSubmit] = useState(submitState);
   const submitTokenRequest = (state: boolean) => {
     setSubmit(state);
 /* TO DO 
