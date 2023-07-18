@@ -114,7 +114,7 @@ function generate_grpc_types {
     npm install
     NODE_BIN_DIR="${BASEDIR}/galasa-ui/node_modules/.bin"
 
-    ${NODE_BIN_DIR}/proto-loader-gen-types ${BASEDIR}/galasa-ui/src/grpc/dex.proto \
+    ${NODE_BIN_DIR}/proto-loader-gen-types ${BASEDIR}/galasa-ui/src/utils/grpc/dex.proto \
         -O ${BASEDIR}/galasa-ui/src/generated/grpc \
         --grpcLib=@grpc/grpc-js
     rc=$?

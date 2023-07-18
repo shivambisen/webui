@@ -1,14 +1,15 @@
 /*
  * Copyright contributors to the Galasa project
  */
-'use client';
-
-import TokenRequestModal from '@/components/Modals';
+import TokenRequestModal from '@/components/TokenRequestModal';
+import TokenResponseModal from '@/components/TokenResponseModal';
+import { cookies } from 'next/headers';
 
 export default function HomePage() {
   return (
     <div id="content">
-      <TokenRequestModal openState={false} submitState={false}/>
+      <TokenRequestModal openState={false} />
+      <TokenResponseModal refreshToken={cookies().get('refresh_token')?.value ?? ''} />
     </div>
   );
 };
