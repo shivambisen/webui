@@ -8,7 +8,7 @@ import { cookies } from 'next/headers';
 export default function HomePage() {
   return (
     <div id="content">
-      <TokenRequestModal openState={false} />
+      <TokenRequestModal />
       <TokenResponseModal refreshToken={cookies().get('refresh_token')?.value ?? ''} />
     </div>
   );

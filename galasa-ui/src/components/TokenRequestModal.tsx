@@ -5,9 +5,9 @@
 
 import { Button, Modal } from '@carbon/react';
 import { useState } from 'react';
-
 import { TextInput, PasswordInput } from '@carbon/react';
 import { TokenTable } from './Table';
+import { InlineNotification } from '@carbon/react';
 
 const headers = [
   {
@@ -39,8 +39,9 @@ const rows = [
   },
 ];
 
-export default function TokenRequestModal({ openState }: { openState: boolean }) {
-  const [open, setOpen] = useState(openState);
+export default function TokenRequestModal() {
+  const [open, setOpen] = useState(false);
+  const [error, setError] = useState('');
 
   const submitTokenRequest = async () => {
     const name = (document.getElementById('name-txtinput') as HTMLInputElement).value;
@@ -55,9 +56,13 @@ export default function TokenRequestModal({ openState }: { openState: boolean })
       headers: { 'Content-type': 'application/json; charset=UTF-8' },
     });
 
-    // Redirect to authenticate with Dex
     const responseJson = await response.json();
-    document.location.replace(responseJson.url);
+    if (responseJson.error) {
+      setError(responseJson.error);
+    } else {
+      // Redirect to authenticate with Dex
+      window.location.replace(responseJson.url);
+    }
   };
   return (
     <>
@@ -69,9 +74,11 @@ export default function TokenRequestModal({ openState }: { openState: boolean })
         primaryButtonText="Submit"
         secondaryButtonText="Cancel"
         open={open}
-        onRequestClose={() => setOpen(false)}
-        onRequestSubmit={async () => {
+        onRequestClose={() => {
           setOpen(false);
+          setError('');
+        }}
+        onRequestSubmit={async () => {
           await submitTokenRequest();
         }}
       >
@@ -83,6 +90,15 @@ export default function TokenRequestModal({ openState }: { openState: boolean })
           helperText="The secret you would like to use with this token"
           style={{ marginBottom: '1rem' }}
         />
+        {error && (
+          <InlineNotification
+            title="Error Requesting Access Token"
+            subtitle={error}
+            kind="error"
+            onCloseButtonClick={() => setError('')}
+            lowContrast
+          />
+        )}
       </Modal>
     </>
   );
