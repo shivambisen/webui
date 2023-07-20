@@ -42,7 +42,24 @@ const rows = [
 export default function TokenRequestModal() {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState('');
-
+  const [tokenInvalid, setTokenInvalid] = useState(false);
+  const [secretInvalid, setSecretInvalid] = useState(false);
+  
+  //Handle change events to the input fields to check that Token Name and/or Secret do not have special characters or whitespace
+  const handleTokenChange = (element: { target: { value: any; }; }) => {
+    setTokenInvalid(checkInputisValid(element.target.value));
+  };
+  const handleSecretChange = (element: { target: { value: any; }; }) => {
+    setSecretInvalid(checkInputisValid(element.target.value));
+  };
+  const checkInputisValid = (inputValue: string) => {
+    var isValid = true;
+    // Prevent invalid from showing when the input value of is empty
+    if (inputValue.length > 0){
+      isValid = /^[a-zA-Z0-9]+$/.test(inputValue);
+    }
+    return !isValid;
+  };
   const submitTokenRequest = async () => {
     const name = (document.getElementById('name-txtinput') as HTMLInputElement).value;
     const secret = (document.getElementById('secret-txtinput') as HTMLInputElement).value;
@@ -82,12 +99,23 @@ export default function TokenRequestModal() {
           await submitTokenRequest();
         }}
       >
-        <TextInput data-modal-primary-focus id="name-txtinput" labelText="Token Name" style={{ marginBottom: '1rem' }} />
+        <TextInput 
+          data-modal-primary-focus 
+          id="name-txtinput" 
+          labelText="Token Name" 
+          style={{ marginBottom: '1rem' }} 
+          onChange={handleTokenChange}
+          invalid = {tokenInvalid}
+          invalidText = "Please check that the Token Name supplied does not contain any special characters or spaces(?,.!@#$*&)"
+        />
         <PasswordInput
           data-modal-primary-focus
           id="secret-txtinput"
           labelText="Secret"
           helperText="The secret you would like to use with this token"
+          onChange={handleSecretChange}
+          invalid = {secretInvalid}
+          invalidText = "Please check that the Secret supplied does not contain any special characters or spaces(?,.!@#$*&)"
           style={{ marginBottom: '1rem' }}
         />
         {error && (
