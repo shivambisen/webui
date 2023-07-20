@@ -8,7 +8,7 @@ import { getAuthorizationUrl, getOpenIdClient } from '@/utils/auth';
 import { redirect } from 'next/navigation';
 
 // GET request handler for requests to /auth
-export async function GET(request: Request) {
+export async function GET() {
   const callbackUrl = `${process.env.WEBUI_HOST_URL}/auth/callback`;
 
   const openIdClient = await getOpenIdClient('galasa-webui', `${process.env.DEX_CLIENT_SECRET}`, callbackUrl);

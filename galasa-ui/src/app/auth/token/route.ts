@@ -2,10 +2,8 @@
  * Copyright contributors to the Galasa project
  */
 
-import { Client__Output } from '@/generated/grpc/api/Client';
-import { CreateClientReq } from '@/generated/grpc/api/CreateClientReq';
 import { getAuthorizationUrl, getOpenIdClient } from '@/utils/auth';
-import { client } from '@/utils/grpc/client';
+import { createDexClient } from '@/utils/grpc/client';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
@@ -39,24 +37,3 @@ export async function POST(request: Request) {
 
   return NextResponse.json(responseJson);
 }
-
-// Creates a new Dex client using Dex's gRPC API, wrapped in a promise to allow for blocking calls.
-const createDexClient = (name: string, secret: string, callbackUrl: string) => {
-  const clientReq: CreateClientReq = {
-    client: {
-      name,
-      secret,
-      redirectUris: [callbackUrl],
-    },
-  };
-
-  return new Promise<Client__Output | undefined>((resolve, reject) => {
-    client.CreateClient(clientReq, (err, value) => {
-      if (err == null) {
-        resolve(value?.client);
-      } else {
-        reject(err);
-      }
-    });
-  });
-};

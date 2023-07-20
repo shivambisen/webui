@@ -18,23 +18,22 @@ export async function GET(request: Request) {
 
   const openIdClient = await getOpenIdClient(`${clientId}`, clientSecret, callbackUrl);
 
-  // Get the returned token set (which includes a JWT) from Dex
-  const callbackParams = openIdClient.callbackParams(request.url);
-  const tokenSet = await openIdClient.callback(callbackUrl, callbackParams, { state });
+  try {
+    // Get the returned token set (which includes a JWT) from Dex
+    const callbackParams = openIdClient.callbackParams(request.url);
+    const tokenSet = await openIdClient.callback(callbackUrl, callbackParams, { state });
 
-  // The state cookie is no longer needed, so we can delete it.
-  if (state) {
+    // The state, clientId, and clientSecret cookies are no longer needed, so we can delete them.
     cookies().delete('state');
-  }
-
-  if (clientId && clientSecret) {
     cookies().delete('clientId');
     cookies().delete('clientSecret');
-  }
 
-  // Set the refresh token cookie
-  if (tokenSet.refresh_token) {
-    cookies().set('refresh_token', tokenSet.refresh_token);
+    // Set the refresh token cookie
+    if (tokenSet.refresh_token) {
+      cookies().set('refresh_token', tokenSet.refresh_token);
+    }
+  } catch (err) {
+    console.error(err);
   }
   redirect('/');
 }
