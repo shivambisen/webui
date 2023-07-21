@@ -81,9 +81,8 @@ export default function TokenRequestModal() {
           data-modal-primary-focus
           ref={tokenNameInputRef}
           id="name-txtinput"
-          labelText="Token Name" 
+          labelText="Token Name"
           helperText="The name of the Token you will use to access the galasa ecosystem."
-          
           onChange={onChangeInputValidation}
           invalidText="Please check that the Token Name supplied does not contain any special characters (?,.!@#$*&) or whitespace characters"
         />

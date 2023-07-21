@@ -182,12 +182,12 @@ describe('Token request modal', () => {
 
     const openModalButtonElement = screen.getByText(/Request Access Token/i);
     const modalSubmitButtonElement = screen.getByText(/Submit/i);
-    
+
     // When...
     await act(async () => {
       fireEvent.click(openModalButtonElement);
       fireEvent.click(modalSubmitButtonElement);
-    })
+    });
 
     // Then...
     expect(global.fetch).not.toHaveBeenCalled();
@@ -213,7 +213,7 @@ describe('Token request modal', () => {
     await act(async () => {
       fireEvent.click(openModalButtonElement);
       fireEvent.keyDown(modalNameInputElement, { key: 'Enter', keyCode: 13 });
-    })
+    });
 
     // Then...
     expect(global.fetch).not.toHaveBeenCalled();
@@ -240,8 +240,7 @@ describe('Token request modal', () => {
     fireEvent.input(modalNameInputElement, { target: { value: 'dummy' } });
     fireEvent.input(modalSecretInputElement, { target: { value: 'shhh' } });
     fireEvent.keyDown(modalNameInputElement, { key: 'Enter', keyCode: 13 });
-    
-    
+
     // Then...
     await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
     expect(window.location.replace).toHaveBeenCalledWith('/auth/token');
@@ -263,13 +262,13 @@ describe('Token request modal', () => {
     const openModalButtonElement = screen.getByText(/Request Access Token/i);
     const modalNameInputElement = screen.getByLabelText(/Token Name/i);
     const modalSubmitButtonElement = screen.getByText(/Submit/i);
-    
+
     // When...
     await act(async () => {
       fireEvent.click(openModalButtonElement);
       fireEvent.input(modalNameInputElement, { target: { value: 'dummy' } });
       fireEvent.click(modalSubmitButtonElement);
-    })
+    });
 
     // Then...
     expect(global.fetch).not.toHaveBeenCalled();
@@ -291,7 +290,7 @@ describe('Token request modal', () => {
     const openModalButtonElement = screen.getByText(/Request Access Token/i);
     const modalSecretInputElement = screen.getByLabelText(/Secret/i);
     const modalSubmitButtonElement = screen.getByText(/Submit/i);
-    
+
     // When...
     await act(async () => {
       fireEvent.click(openModalButtonElement);

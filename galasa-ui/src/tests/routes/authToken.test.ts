@@ -47,8 +47,6 @@ beforeEach(() => {
   mockStateGenerator.mockImplementation(() => ({
     state: jest.fn(),
   }));
-
-  // Mock the gRPC client
 });
 
 afterEach(() => {
