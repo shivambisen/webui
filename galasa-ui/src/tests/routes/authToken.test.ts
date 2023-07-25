@@ -1,8 +1,12 @@
-/**
+/*
  * Copyright contributors to the Galasa project
- * @jest-environment node
+ *
+ * SPDX-License-Identifier: EPL-2.0
  */
 
+/* 
+* @jest-environment node
+*/
 import * as AuthTokenRoute from '@/app/auth/token/route';
 import * as Auth from '@/utils/auth';
 import * as GrpcClient from '@/utils/grpc/client';
