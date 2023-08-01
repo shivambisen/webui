@@ -5,8 +5,8 @@
  */
 
 /* 
-* @jest-environment node
-*/
+ * @jest-environment node
+ */
 import * as AuthCallbackRoute from '@/app/auth/callback/route';
 import * as Auth from '@/utils/auth';
 import * as NextNavigation from 'next/navigation';
