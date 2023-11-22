@@ -23,5 +23,18 @@ code {
   display: inline-block;
   position: relative;
   margin-top: 3rem;
-  margin-left: 16rem;
+  // Temporarily removed left margin since the sidebar is not implemented yet
+  // margin-left: 16rem;
+}
+
+//--------------------------------------------------------------------------
+// Utility classes
+//--------------------------------------------------------------------------
+$spaceSizes: (1, 2, 3);
+
+@each $space in $spaceSizes {
+  .margin-y-#{$space} {
+    margin-top: #{$space}rem;
+    margin-bottom: #{$space}rem;
+  }
 }

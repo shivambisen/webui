@@ -67,18 +67,13 @@ describe('POST /auth/token', () => {
     );
 
     // When...
-    const authTokenPostRequest = new Request('http://dummy/post', {
-      method: 'POST',
-      body: JSON.stringify({ name: 'testToken', secret: Buffer.from('abc').toString('base64') }),
-      headers: { 'Content-type': 'application/json; charset=UTF-8' },
-    });
-    const response = await AuthTokenRoute.POST(authTokenPostRequest);
+    const response = await AuthTokenRoute.POST();
     const responseJson = await response.json();
 
     // Then...
     expect(responseJson.url).toEqual('dex-issuer/auth');
     expect(responseJson.error).toBeUndefined();
-    expect(createDexClientSpy).toHaveBeenCalledWith('testToken', 'abc', expect.stringContaining('/auth/token/callback'));
+    expect(createDexClientSpy).toHaveBeenCalledWith(expect.stringContaining('/auth/token/callback'));
   });
 
   it('returns the index page URL if the Dex client failed to get created', async () => {
@@ -95,18 +90,13 @@ describe('POST /auth/token', () => {
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation(() => {});
 
     // When...
-    const authTokenPostRequest = new Request('http://dummy/post', {
-      method: 'POST',
-      body: JSON.stringify({ name: 'testToken', secret: Buffer.from('abc').toString('base64') }),
-      headers: { 'Content-type': 'application/json; charset=UTF-8' },
-    });
-    const response = await AuthTokenRoute.POST(authTokenPostRequest);
+    const response = await AuthTokenRoute.POST();
     const responseJson = await response.json();
 
     // Then...
     expect(responseJson.url).toEqual('/');
     expect(responseJson.error).toEqual(dummyError.message);
     expect(consoleErrorSpy).toHaveBeenCalledWith(dummyError);
-    expect(createDexClientSpy).toHaveBeenCalledWith('testToken', 'abc', expect.stringContaining('/auth/token/callback'));
+    expect(createDexClientSpy).toHaveBeenCalledWith(expect.stringContaining('/auth/token/callback'));
   });
 });
