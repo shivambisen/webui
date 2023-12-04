@@ -30,11 +30,20 @@ code {
 //--------------------------------------------------------------------------
 // Utility classes
 //--------------------------------------------------------------------------
-$spaceSizes: (1, 2, 3);
+$spaceSizes: (1, 2, 3, 5, 8, 13);
 
 @each $space in $spaceSizes {
+  .padding-x-#{$space} {
+    padding-left: #{$space}rem;
+    padding-right: #{$space}rem;
+  }
+
   .margin-y-#{$space} {
     margin-top: #{$space}rem;
     margin-bottom: #{$space}rem;
+  }
+
+  .margin-top-#{$space} {
+    margin-top: #{$space}rem;
   }
 }

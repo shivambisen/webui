@@ -40,34 +40,39 @@ export default function TokenResponseModal({ refreshToken, clientId, clientSecre
 
   return (
     <Modal
-      size="md"
+      size="lg"
+      className="padding-x-13"
       id="token-passiveModal"
       open={isOpen}
       passiveModal
-      modalLabel="Personal Access Token Details"
-      modalHeading="A new Personal Access Token has been allocated"
+      modalHeading="Personal access token details"
       preventCloseOnClickOutside
       onRequestClose={() => {
         setOpen(false);
       }}
     >
-      <p>Copy the following properties into the galasactl.properties file, so your client tool can then access this Galasa Ecosystem.</p>
-      <CodeSnippet type="multi" feedback="Copied to clipboard">
-{
-`GALASA_ACCESS_TOKEN=${token}
+      <p>
+        Copy the following properties into the galasactl.properties file in your Galasa home directory* to allow your client tool to access the Galasa
+        Ecosystem.
+      </p>
+      <CodeSnippet type="multi">
+        {`GALASA_ACCESS_TOKEN=${token}
 GALASA_CLIENT_ID=${clientIdState}
-GALASA_SECRET=${secret}`
-}
+GALASA_SECRET=${secret}`}
       </CodeSnippet>
-      <p>If you do not have a galasactl.properties file in your GALASA_HOME directory (see the <a href='https://galasa.dev/docs'>Galasa documentation</a> for more information), run the following galasactl command:</p>
-      <CodeSnippet className="margin-y-1" type="inline">{`galasactl local init`}</CodeSnippet>
       <InlineNotification
-        title="The above information is not stored on the Galasa Ecosystem or within the web user interface."
-        subtitle="When you dismiss this panel, you will be unable to retrieve the above information."
+        title="The personal access token details are not stored and cannot be retrieved when this dialog is closed."
+        subtitle="Remember to copy the details shown above before closing this dialog."
         kind="warning"
         lowContrast
         hideCloseButton
       />
+      <p className="margin-top-1">
+        *If you do not have a galasactl.properties file in your Galasa home directory,
+        run the following command to create one:
+      </p>
+      <CodeSnippet className="margin-y-1" type="inline" align="right">{`galasactl local init`}</CodeSnippet>
+      <p>See the <a href="https://galasa.dev/docs/initialising-home-folder" target="_blank">Galasa documentation</a> for more information.</p>
     </Modal>
   );
 }

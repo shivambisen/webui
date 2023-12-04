@@ -3,7 +3,7 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
- 'use client';
+'use client';
 
 import { Button, Modal } from '@carbon/react';
 import { useRef, useState } from 'react';
@@ -39,11 +39,10 @@ export default function TokenRequestModal() {
   };
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Request Personal Access Token</Button>
+      <Button onClick={() => setOpen(true)}>Request personal access token</Button>
       <Modal
-        modalHeading="Request a new Personal Access Token"
-        modalLabel="Personal Access Token Details"
-        primaryButtonText="Submit"
+        modalHeading="Personal access token request"
+        primaryButtonText="Submit request"
         primaryButtonDisabled={submitDisabled}
         secondaryButtonText="Cancel"
         shouldSubmitOnEnter={true}
@@ -58,17 +57,24 @@ export default function TokenRequestModal() {
           }
         }}
       >
+        <p>
+          A personal access token is an alternative to using a password for authentication and can be used to allow client tools to access the Galasa Ecosystem on your behalf.
+          Keep your personal access tokens secret and treat them like passwords.
+        </p>
+        <br />
         <TextInput
           data-modal-primary-focus
           ref={tokenNameInputRef}
           id="name-txtinput"
-          labelText="Token Name"
-          helperText="The name of your new personal access token. Use this to distinguish between your tokens in the future."
+          labelText="Token name"
+          helperText="Use this to distinguish between your tokens in the future."
+          placeholder="e.g. galasactl access for my Windows machine"
           onChange={onChangeInputValidation}
         />
         {error && (
           <InlineNotification
-            title="Error Requesting Access Token"
+            className="margin-top-1"
+            title="Error requesting access token"
             subtitle={error}
             kind="error"
             onCloseButtonClick={() => setError('')}
