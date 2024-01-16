@@ -22,19 +22,28 @@ export default function TokenRequestModal() {
   };
 
   const submitTokenRequest = async () => {
-    // Call out to /auth/token
-    const tokenUrl = '/auth/token';
-    const response = await fetch(tokenUrl, {
-      method: 'POST',
-      headers: { 'Content-type': 'application/json; charset=UTF-8' },
-    });
+    try {
+      const response = await fetch('/auth/tokens', {
+        method: 'POST',
+      });
 
-    const responseJson = await response.json();
-    if (responseJson.error) {
-      setError(responseJson.error);
-    } else {
-      // Redirect to authenticate with Dex
+      if (!response.ok) {
+        throw new Error(response.statusText);
+      }
+
+      const responseJson = await response.json();
       window.location.replace(responseJson.url);
+    } catch (err) {
+      let errorMessage = '';
+
+      if (err instanceof Error) {
+        errorMessage = err.message;
+      } else {
+        errorMessage = String(err);
+      }
+
+      setError(errorMessage);
+      console.error('Failed to request a personal access token: %s', err);
     }
   };
   return (
