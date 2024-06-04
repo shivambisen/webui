@@ -67,6 +67,16 @@ None
 EOF
 }
 
+function check_exit_code () {
+    # This function takes 3 parameters in the form:
+    # $1 an integer value of the returned exit code
+    # $2 an error message to display if $1 is not equal to 0
+    if [[ "$1" != "0" ]]; then 
+        error "$2" 
+        exit 1  
+    fi
+}
+
 #--------------------------------------------------------------------------
 #
 # Main script logic
@@ -119,7 +129,8 @@ function download_node_dependencies {
     cd ${BASEDIR}/galasa-ui
 
     npm clean-install
-    rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to download node.js dependencies. rc=${rc}" ; exit 1 ; fi
+    rc=$? 
+    check_exit_code $rc  "Failed to download node.js dependencies. rc=${rc}"
     success "OK"
 }
 
@@ -133,7 +144,8 @@ function generate_rest_client {
     fi
 
     gradle --warning-mode all --info --debug generateTypeScriptClient
-    rc=$? ; if [[ "${rc}" != "0" ]]; then error "Failed to generate the TypeScript client code from the openapi.yaml file. rc=${rc}" ; exit 1 ; fi
+    rc=$? 
+    check_exit_code $rc  "Failed to generate the TypeScript client code from the openapi.yaml file. rc=${rc}"
     success "Code generation OK"
 
     h2 "Fixing compilation errors in generated code..."
@@ -177,9 +189,32 @@ function do_build {
     fi
     success "Built OK."
 }
+function check_secrets {
+    h2 "updating secrets baseline"
+    cd ${BASEDIR}
+    detect-secrets scan --exclude-files galasa-ui/package-lock.json --update .secrets.baseline
+    rc=$? 
+    check_exit_code $rc "Failed to run detect-secrets. Please check it is installed properly" 
+    success "updated secrets file"
+
+    h2 "running audit for secrets"
+    detect-secrets audit .secrets.baseline
+    rc=$? 
+    check_exit_code $rc "Failed to audit detect-secrets."
+    
+    #Check all secrets have been audited
+    secrets=$(grep -c hashed_secret .secrets.baseline)
+    audits=$(grep -c is_secret .secrets.baseline)
+    if [[ "$secrets" != "$audits" ]]; then 
+        error "Not all secrets found have been audited"
+        exit 1  
+    fi
+    success "secrets audit complete"
+}
 
 generate_rest_client
 download_node_dependencies
 run_tests
 do_build
+check_secrets
 success "Project built OK."
