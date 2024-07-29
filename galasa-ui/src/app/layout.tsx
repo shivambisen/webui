@@ -7,14 +7,17 @@ import PageHeader from '@/components/PageHeader';
 import '../styles/global.scss';
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
+
+  const galasaServiceName = process.env.NEXT_PUBLIC_GALASA_SERVICE_NAME?.trim() || "Galasa Service";
+
   return (
     <html lang="en">
       <head>
-        <title>Galasa Ecosystem</title>
+        <title>{galasaServiceName}</title>
         <meta name="description" content="Galasa Ecosystem Web UI"/>
       </head>
       <body>
-        <PageHeader />
+        <PageHeader galasaServiceName={galasaServiceName}/>
         {children}
         </body>
     </html>

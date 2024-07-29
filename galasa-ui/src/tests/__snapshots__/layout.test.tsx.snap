@@ -10,7 +10,7 @@ exports[`Layout renders the web UI layout 1`] = `
       >
         <head>
           <title>
-            Galasa Ecosystem
+            Galasa Service
           </title>
           <meta
             content="Galasa Ecosystem Web UI"
@@ -32,7 +32,7 @@ exports[`Layout renders the web UI layout 1`] = `
             <a
               class="cds--header__name"
             >
-              Galasa Ecosystem
+              Galasa Service
             </a>
           </header>
           Hello, world!
@@ -46,7 +46,7 @@ exports[`Layout renders the web UI layout 1`] = `
     >
       <head>
         <title>
-          Galasa Ecosystem
+          Galasa Service
         </title>
         <meta
           content="Galasa Ecosystem Web UI"
@@ -68,7 +68,7 @@ exports[`Layout renders the web UI layout 1`] = `
           <a
             class="cds--header__name"
           >
-            Galasa Ecosystem
+            Galasa Service
           </a>
         </header>
         Hello, world!
