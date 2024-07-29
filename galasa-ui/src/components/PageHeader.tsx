@@ -8,10 +8,8 @@
 import { Header, HeaderName , SkipToContent} from '@carbon/react';
 import styles from "../styles/Header.module.css"
 
-export default function PageHeader() {
+export default function PageHeader({galasaServiceName} : {galasaServiceName: string}) {
   
-  let galasaServiceName = process.env.NEXT_PUBLIC_GALASA_SERVICE_NAME?.trim() || "Galasa Service"
-
   return (
     <Header aria-label="Galasa Ecosystem">
       <SkipToContent />

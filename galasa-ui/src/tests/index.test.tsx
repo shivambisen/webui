@@ -14,11 +14,9 @@ jest.mock('next/headers', () => ({
 }))
 
 test('renders Galasa header', () => {
-  render(<PageHeader />);
+  render(<PageHeader galasaServiceName='Galasa Service'/>);
 
-  const galasaServiceName = process.env.NEXT_PUBLIC_GALASA_SERVICE_NAME?.trim() || "Galasa Service"
-
-  const titleElement = screen.getByText(galasaServiceName);
+  const titleElement = screen.getByText('Galasa Service');
   expect(titleElement).toBeInTheDocument();
 });
 

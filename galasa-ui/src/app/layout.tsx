@@ -17,7 +17,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="description" content="Galasa Ecosystem Web UI"/>
       </head>
       <body>
-        <PageHeader />
+        <PageHeader galasaServiceName={galasaServiceName}/>
         {children}
         </body>
     </html>
