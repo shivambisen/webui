@@ -14,7 +14,6 @@ describe('Layout', () => {
   });
 });
 
-
 afterEach(() => {
   delete process.env.NEXT_PUBLIC_GALASA_SERVICE_NAME
 })
@@ -22,15 +21,14 @@ afterEach(() => {
 test('renders Galasa Service title when env NEXT_PUBLIC_GALASA_SERVICE_NAME is null or blank string', () => {
 
   process.env.NEXT_PUBLIC_GALASA_SERVICE_NAME = "";  //mocking environment variable
+
   render(<RootLayout>
     Hello, world!
   </RootLayout>);
 
-  const galasaServiceName = process.env.NEXT_PUBLIC_GALASA_SERVICE_NAME?.trim() || "Galasa Service"
-
   const titleElement = document.querySelector('title')?.textContent
-  expect(galasaServiceName).toBe("Galasa Service")
   expect(titleElement).toBe("Galasa Service")
+
 
 });
 
@@ -39,12 +37,10 @@ test('renders custom title when env NEXT_PUBLIC_GALASA_SERVICE_NAME is not prese
   process.env.NEXT_PUBLIC_GALASA_SERVICE_NAME = 'Managers'; //mocking environment variable
   render(<RootLayout>Hello, world!</RootLayout>);
 
-  const galasaServiceName = process.env.NEXT_PUBLIC_GALASA_SERVICE_NAME?.trim() || "Galasa Service"
   const titleElement = document.querySelector('title')?.textContent
 
 
-  expect(galasaServiceName).not.toBe("Galasa Service")
-  expect(galasaServiceName).toBe(galasaServiceName)
-  expect(titleElement).toBe(galasaServiceName);
+  expect(titleElement).not.toBe("Galasa Service")
+  expect(titleElement).toBe("Managers")
 
 });
