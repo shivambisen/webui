@@ -13,9 +13,12 @@ jest.mock('next/headers', () => ({
   }))
 }))
 
-test('renders Galasa Ecosystem header', () => {
+test('renders Galasa header', () => {
   render(<PageHeader />);
-  const titleElement = screen.getByText(/Galasa Ecosystem/i);
+
+  const galasaServiceName = process.env.NEXT_PUBLIC_GALASA_SERVICE_NAME?.trim() || "Galasa Service"
+
+  const titleElement = screen.getByText(galasaServiceName);
   expect(titleElement).toBeInTheDocument();
 });
 
