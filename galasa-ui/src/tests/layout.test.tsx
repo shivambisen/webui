@@ -15,12 +15,12 @@ describe('Layout', () => {
 });
 
 afterEach(() => {
-  delete process.env.NEXT_PUBLIC_GALASA_SERVICE_NAME
+  delete process.env.GALASA_SERVICE_NAME
 })
 
 test('renders Galasa Service title when env NEXT_PUBLIC_GALASA_SERVICE_NAME is null or blank string', () => {
 
-  process.env.NEXT_PUBLIC_GALASA_SERVICE_NAME = "";  //mocking environment variable
+  process.env.GALASA_SERVICE_NAME = "";  //mocking environment variable
 
   render(<RootLayout>
     Hello, world!
@@ -34,7 +34,7 @@ test('renders Galasa Service title when env NEXT_PUBLIC_GALASA_SERVICE_NAME is n
 
 test('renders custom title when env NEXT_PUBLIC_GALASA_SERVICE_NAME is not present (not null or blank)', () => {
 
-  process.env.NEXT_PUBLIC_GALASA_SERVICE_NAME = 'Managers'; //mocking environment variable
+  process.env.GALASA_SERVICE_NAME = 'Managers'; //mocking environment variable
   render(<RootLayout>Hello, world!</RootLayout>);
 
   const titleElement = document.querySelector('title')?.textContent
