@@ -11,7 +11,7 @@ import { cookies } from 'next/headers';
 export default function HomePage() {
 
   const clientId = cookies().get(AuthCookies.CLIENT_ID)?.value ?? '';
-  const refreshToken = cookies().get(AuthCookies.REFRESH_TOKEN)?.value ?? '';
+  const refreshToken = cookies().get(AuthCookies.REFRESH_TOKEN)?.value ?? '';  
 
   // Server Action to delete auth-related cookies
   const deleteCookies = async () => {

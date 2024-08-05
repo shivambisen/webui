@@ -6,14 +6,18 @@
 'use client';
 
 import { Header, HeaderName , SkipToContent} from '@carbon/react';
-import styles from "../styles/Header.module.css"
+
+import PageHeaderMenu from "./PageHeaderMenu";
+
 
 export default function PageHeader({galasaServiceName} : {galasaServiceName: string}) {
-  
+
   return (
     <Header aria-label="Galasa Ecosystem">
       <SkipToContent />
       <HeaderName prefix="">{galasaServiceName}</HeaderName>
+
+        <PageHeaderMenu />
     </Header>
   );
 };

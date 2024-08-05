@@ -4,8 +4,8 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import RootLayout from '@/app/layout';
-import PageHeader from '@/components/PageHeader';
-import { act, render, screen } from '@testing-library/react';
+import {render} from '@testing-library/react';
+import { useRouter } from 'next/navigation';
 
 describe('Layout', () => {
   it('renders the web UI layout', () => {
@@ -17,6 +17,16 @@ describe('Layout', () => {
 afterEach(() => {
   delete process.env.GALASA_SERVICE_NAME
 })
+
+const mockRouter = {
+  refresh : jest.fn(() => useRouter().refresh),
+};
+
+jest.mock('next/navigation', () => ({
+
+  useRouter: jest.fn(() => mockRouter),
+
+}))
 
 test('renders Galasa Service title when env NEXT_PUBLIC_GALASA_SERVICE_NAME is null or blank string', () => {
 

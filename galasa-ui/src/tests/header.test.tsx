@@ -4,12 +4,22 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import HomePage from '@/app/page';
 import PageHeader from '@/components/PageHeader';
-import { act, render, screen } from '@testing-library/react';
+import {render, screen } from '@testing-library/react';
+import { useRouter } from 'next/navigation';
+
+const mockRouter = {
+    refresh : jest.fn(() => useRouter().refresh),
+};
+
+jest.mock('next/navigation', () => ({
+
+    useRouter: jest.fn(() => mockRouter),
+
+}))
 
 
-test('renders Galasa Service header title when env NEXT_PUBLIC_GALASA_SERVICE_NAME is null or blank string', () => {
+test('renders Galasa Service header title when env GALASA_SERVICE_NAME is null or blank string', () => {
 
     render(<PageHeader galasaServiceName="Galasa Service"/>);
   
@@ -20,7 +30,7 @@ test('renders Galasa Service header title when env NEXT_PUBLIC_GALASA_SERVICE_NA
 });
 
 
-test('renders custom header when title when env NEXT_PUBLIC_GALASA_SERVICE_NAME is present', () => {
+test('renders custom header when title when env GALASA_SERVICE_NAME is present', () => {
 
     render(<PageHeader galasaServiceName='Managers'/>);
   
