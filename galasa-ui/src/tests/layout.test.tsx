@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import RootLayout from '@/app/layout';
-import {render} from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { useRouter } from 'next/navigation';
 
 describe('Layout', () => {
@@ -19,7 +19,7 @@ afterEach(() => {
 })
 
 const mockRouter = {
-  refresh : jest.fn(() => useRouter().refresh),
+  refresh: jest.fn(() => useRouter().refresh),
 };
 
 jest.mock('next/navigation', () => ({
@@ -28,7 +28,7 @@ jest.mock('next/navigation', () => ({
 
 }))
 
-test('renders Galasa Service title when env NEXT_PUBLIC_GALASA_SERVICE_NAME is null or blank string', () => {
+test('renders Galasa Service title when env GALASA_SERVICE_NAME is null or blank string', () => {
 
   process.env.GALASA_SERVICE_NAME = "";  //mocking environment variable
 
@@ -42,7 +42,7 @@ test('renders Galasa Service title when env NEXT_PUBLIC_GALASA_SERVICE_NAME is n
 
 });
 
-test('renders custom title when env NEXT_PUBLIC_GALASA_SERVICE_NAME is not present (not null or blank)', () => {
+test('renders custom title when env GALASA_SERVICE_NAME is not present (not null or blank)', () => {
 
   process.env.GALASA_SERVICE_NAME = 'Managers'; //mocking environment variable
   render(<RootLayout>Hello, world!</RootLayout>);

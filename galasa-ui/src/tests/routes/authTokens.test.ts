@@ -6,7 +6,7 @@
  */
 import * as AuthTokenRoute from '@/app/auth/tokens/route';
 import { AuthenticationAPIApi } from '@/generated/galasaapi';
-import { NextRequest} from 'next/server';
+import { NextRequest } from 'next/server';
 import { DELETE } from '@/app/auth/tokens/route';
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
@@ -122,17 +122,17 @@ describe('DELETE /auth/tokens', () => {
 
   beforeEach(() => {
 
-      jest.clearAllMocks();
-      
+    jest.clearAllMocks();
+
   });
-  
+
   it('Fetches cookies from headers, that are not null, GIVES 204 RESPONSE', async () => {
 
-      const response = await DELETE()
+    const response = await DELETE()
 
-      expect(deleteMock).toBeCalledWith(AuthCookies.ID_TOKEN);
-      expect(deleteMock).toBeCalledTimes(1)
-      expect(response.status).toBe(204);
+    expect(deleteMock).toBeCalledWith(AuthCookies.ID_TOKEN);
+    expect(deleteMock).toBeCalledTimes(1)
+    expect(response.status).toBe(204);
 
   })
 
