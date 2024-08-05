@@ -6,9 +6,15 @@
  */
 import * as AuthTokenRoute from '@/app/auth/tokens/route';
 import { AuthenticationAPIApi } from '@/generated/galasaapi';
-import { NextRequest } from 'next/server';
+import { NextRequest} from 'next/server';
+import { DELETE } from '@/app/auth/tokens/route';
+import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
+import AuthCookies from '@/utils/authCookies';
 
 const mockAuthenticationApi = AuthenticationAPIApi as jest.Mock;
+
+const deleteMock = jest.fn();
 
 // Mock out the cookies() functions in the "next/headers" module
 jest.mock('next/headers', () => ({
@@ -16,6 +22,7 @@ jest.mock('next/headers', () => ({
   cookies: jest.fn(() => ({
     get: jest.fn().mockReturnValue('abc'),
     set: jest.fn(),
+    delete: deleteMock
   })),
 }));
 
@@ -109,4 +116,25 @@ describe('POST /auth/tokens', () => {
     await expect(AuthTokenRoute.POST(request)).rejects.toThrow(/failed to create personal access token/i);
     mockAuthenticationApi.mockReset();
   });
+});
+
+describe('DELETE /auth/tokens', () => {
+
+  beforeEach(() => {
+
+      jest.clearAllMocks();
+      
+  });
+  
+  it('Fetches cookies from headers, that are not null, GIVES 204 RESPONSE', async () => {
+
+      const response = await DELETE()
+
+      expect(deleteMock).toBeCalledWith(AuthCookies.ID_TOKEN);
+      expect(deleteMock).toBeCalledTimes(1)
+      expect(response.status).toBe(204);
+
+  })
+
+
 });
