@@ -15,16 +15,14 @@ function PageHeaderMenu() {
 
   const router = useRouter()
 
-  const [error, setError] = useState(false);
-
   const handleDeleteCookieApiOperation = async () => {
 
     const response = await fetch('/auth/tokens', { method: 'DELETE' });
 
     if (response.status === 204) {
 
-      //auto refresh page to render dex login page
-      router.refresh()
+      //auto redirect to render dex login page
+      router.push("/")
 
     }
   }
