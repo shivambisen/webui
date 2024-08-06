@@ -12,7 +12,7 @@ import React from 'react';
 const fetchMock = jest.spyOn(global, 'fetch')
 
 const mockRouter = {
-    refresh: jest.fn(() => useRouter().refresh),
+    push: jest.fn(() => useRouter().push),
 };
 
 jest.mock('next/navigation', () => ({
@@ -80,8 +80,8 @@ test('clicking log out button calls handleDeleteCookieApiOperation, RESPONSE OK'
 
         expect(fetchMock).toBeCalledTimes(1)
 
-        expect(mockRouter.refresh).toHaveBeenCalled()
-        expect(mockRouter.refresh).toHaveBeenCalledTimes(1)
+        expect(mockRouter.push).toHaveBeenCalled()
+        expect(mockRouter.push).toHaveBeenCalledTimes(1)
 
     })
 
