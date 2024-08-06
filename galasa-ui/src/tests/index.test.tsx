@@ -6,11 +6,22 @@
 import HomePage from '@/app/page';
 import PageHeader from '@/components/PageHeader';
 import { act, render, screen } from '@testing-library/react';
+import { useRouter } from 'next/navigation';
 
 jest.mock('next/headers', () => ({
   cookies: jest.fn(() => ({
     get: jest.fn().mockReturnValue('')
   }))
+}))
+
+const mockRouter = {
+  refresh : jest.fn(() => useRouter().refresh),
+};
+
+jest.mock('next/navigation', () => ({
+
+  useRouter: jest.fn(() => mockRouter),
+
 }))
 
 test('renders Galasa header', () => {

@@ -10,6 +10,7 @@
     "test": "jest --coverage --collectCoverageFrom='src/**/*.{ts,tsx}'"
   },
   "dependencies": {
+    "@carbon/icons-react": "^11.45.0",
     "@carbon/react": "^1.31.3",
     "@types/node": "20.3.1",
     "@types/react": "18.2.12",

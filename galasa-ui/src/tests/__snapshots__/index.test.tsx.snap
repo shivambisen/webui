@@ -59,7 +59,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M24 9.4L22.6 8 16 14.6 9.4 8 8 9.4 14.6 16 8 22.6 9.4 24 16 17.4 22.6 24 24 22.6 17.4 16 24 9.4z"
+                    d="M17.4141 16L24 9.4141 22.5859 8 16 14.5859 9.4143 8 8 9.4141 14.5859 16 8 22.5859 9.4143 24 16 17.4141 22.5859 24 24 22.5859 17.4141 16z"
                   />
                 </svg>
               </button>
@@ -180,7 +180,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                   xmlns="http://www.w3.org/2000/svg"
                 >
                   <path
-                    d="M24 9.4L22.6 8 16 14.6 9.4 8 8 9.4 14.6 16 8 22.6 9.4 24 16 17.4 22.6 24 24 22.6 17.4 16 24 9.4z"
+                    d="M17.4141 16L24 9.4141 22.5859 8 16 14.5859 9.4143 8 8 9.4141 14.5859 16 8 22.5859 9.4143 24 16 17.4141 22.5859 24 24 22.5859 17.4141 16z"
                   />
                 </svg>
               </button>
@@ -226,7 +226,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                       class="cds--tooltip-trigger__wrapper"
                     >
                       <button
-                        aria-labelledby="tooltip-:r3:"
+                        aria-labelledby="tooltip-:r5:"
                         class="cds--btn--icon-only cds--copy-btn cds--copy cds--btn cds--btn--sm cds--layout--size-sm cds--btn--primary"
                         type="button"
                       >
@@ -253,7 +253,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                     <span
                       aria-hidden="true"
                       class="cds--popover"
-                      id="tooltip-:r3:"
+                      id="tooltip-:r5:"
                       role="tooltip"
                     >
                       <span
@@ -326,7 +326,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                   class="cds--tooltip-trigger__wrapper"
                 >
                   <button
-                    aria-labelledby="tooltip-:r5:"
+                    aria-labelledby="tooltip-:r7:"
                     class="cds--btn--icon-only margin-y-1 cds--snippet cds--snippet--inline cds--copy cds--btn cds--btn--primary"
                     type="button"
                   >
@@ -340,7 +340,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                 <span
                   aria-hidden="true"
                   class="cds--popover"
-                  id="tooltip-:r5:"
+                  id="tooltip-:r7:"
                   role="tooltip"
                 >
                   <span
@@ -433,7 +433,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  d="M24 9.4L22.6 8 16 14.6 9.4 8 8 9.4 14.6 16 8 22.6 9.4 24 16 17.4 22.6 24 24 22.6 17.4 16 24 9.4z"
+                  d="M17.4141 16L24 9.4141 22.5859 8 16 14.5859 9.4143 8 8 9.4141 14.5859 16 8 22.5859 9.4143 24 16 17.4141 22.5859 24 24 22.5859 17.4141 16z"
                 />
               </svg>
             </button>
@@ -554,7 +554,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                 xmlns="http://www.w3.org/2000/svg"
               >
                 <path
-                  d="M24 9.4L22.6 8 16 14.6 9.4 8 8 9.4 14.6 16 8 22.6 9.4 24 16 17.4 22.6 24 24 22.6 17.4 16 24 9.4z"
+                  d="M17.4141 16L24 9.4141 22.5859 8 16 14.5859 9.4143 8 8 9.4141 14.5859 16 8 22.5859 9.4143 24 16 17.4141 22.5859 24 24 22.5859 17.4141 16z"
                 />
               </svg>
             </button>
@@ -600,7 +600,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                     class="cds--tooltip-trigger__wrapper"
                   >
                     <button
-                      aria-labelledby="tooltip-:r3:"
+                      aria-labelledby="tooltip-:r5:"
                       class="cds--btn--icon-only cds--copy-btn cds--copy cds--btn cds--btn--sm cds--layout--size-sm cds--btn--primary"
                       type="button"
                     >
@@ -627,7 +627,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                   <span
                     aria-hidden="true"
                     class="cds--popover"
-                    id="tooltip-:r3:"
+                    id="tooltip-:r5:"
                     role="tooltip"
                   >
                     <span
@@ -700,7 +700,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                 class="cds--tooltip-trigger__wrapper"
               >
                 <button
-                  aria-labelledby="tooltip-:r5:"
+                  aria-labelledby="tooltip-:r7:"
                   class="cds--btn--icon-only margin-y-1 cds--snippet cds--snippet--inline cds--copy cds--btn cds--btn--primary"
                   type="button"
                 >
@@ -714,7 +714,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
               <span
                 aria-hidden="true"
                 class="cds--popover"
-                id="tooltip-:r5:"
+                id="tooltip-:r7:"
                 role="tooltip"
               >
                 <span

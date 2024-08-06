@@ -40,3 +40,15 @@ export async function POST(request: NextRequest) {
     throw new Error('Failed to create personal access token.');
   }
 }
+
+
+export async function DELETE() {
+
+  // an api route is made because, cookies are server side props and cannot be access directly on components
+  // that use 'use client' keyword.
+
+  cookies().delete(AuthCookies.ID_TOKEN);
+
+  return (new NextResponse(null, { status: 204 }))
+
+}
