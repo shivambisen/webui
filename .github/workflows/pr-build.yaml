@@ -62,7 +62,7 @@ jobs:
               uses: docker/build-push-action@v5
               with:
                 context: .
-                file: dockerfiles/dockerfile.gradle
+                file: dockerfiles/dockerfile.webui
                 push: false
                 tags: webui:test
             
