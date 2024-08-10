@@ -48,7 +48,21 @@ jobs:
             - name: Installing webui's dependencies using npm
               run: |
                npm --prefix ./galasa-ui install
+            
+            - name: Running webui's unit tests using npm
+              run: |
+                npm --prefix ./galasa-ui test --watchAll=false
+            
+            - name: Building webui using npm
+              run: |
+                npm --prefix ./galasa-ui run build
 
-            
-            
+            - name: Build Gradle image
+              id: build
+              uses: docker/build-push-action@v5
+              with:
+                context: .
+                file: dockerfiles/dockerfile.gradle
+                push: false
+                tags: webui:test
             
