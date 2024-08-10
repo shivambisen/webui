@@ -6,7 +6,7 @@ on:
 
 env:
     REGISTRY: ghcr.io
-    NAMESPACE: jaydee029
+    NAMESPACE: galasa-dev
 
 jobs:
     build-webui:
