@@ -26,7 +26,7 @@ jobs:
 
             - name: Generate typescript openapi client using gradle
               run: |
-               gradle generateTypeScriptClient -PsourceMaven=https://development.galasa.dev/main/maven-repo/framework
+               gradle generateTypeScriptClient -PsourceMaven=https://development.galasa.dev/gh/maven-repo/framework
             
             - name: Fix openapi client
               run: |
@@ -51,7 +51,7 @@ jobs:
             
             - name: Running webui's unit tests using npm
               run: |
-                npm --prefix ./galasa-ui test --watchAll=false
+                npm --prefix ./galasa-ui test -- --watchAll=false
             
             - name: Building webui using npm
               run: |

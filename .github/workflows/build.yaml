@@ -1,7 +1,7 @@
 name: Main Build
 
 on:
-    pull_request:
+    push:
         branches: [main]
 
 env:
@@ -30,7 +30,7 @@ jobs:
 
             - name: Generate typescript openapi client using gradle
               run: |
-               gradle generateTypeScriptClient -PsourceMaven=https://development.galasa.dev/main/maven-repo/framework
+               gradle generateTypeScriptClient -PsourceMaven=https://development.galasa.dev/gh/maven-repo/framework
             
             - name: Fix openapi client
               run: |
@@ -55,7 +55,7 @@ jobs:
             
             - name: Running webui's unit tests using npm
               run: |
-                npm --prefix ./galasa-ui test --watchAll=false
+                npm --prefix ./galasa-ui test -- --watchAll=false
             
             - name: Building webui using npm
               run: |
@@ -72,9 +72,9 @@ jobs:
               id: metadata
               uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
               with:
-                images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/webui-artefacts
+                images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/webui
         
-            - name: Build Webui image for development Maven registry
+            - name: Build Webui image
               id: build
               uses: docker/build-push-action@v5
               with:
