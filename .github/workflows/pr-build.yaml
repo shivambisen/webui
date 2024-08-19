@@ -46,16 +46,19 @@ jobs:
                node-version: "20.10.0"
 
             - name: Installing webui's dependencies using npm
+              working-directory: ./galasa-ui
               run: |
-               npm --prefix ./galasa-ui install
+               npm install
             
             - name: Running webui's unit tests using npm
+              working-directory: ./galasa-ui
               run: |
-                npm --prefix ./galasa-ui test -- --watchAll=false
+                npm test -- --watchAll=false
             
             - name: Building webui using npm
+              working-directory: ./galasa-ui
               run: |
-                npm --prefix ./galasa-ui run build
+                npm run build
 
             - name: Build Webui image for testing
               id: build
