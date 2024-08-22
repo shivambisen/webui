@@ -33,11 +33,12 @@ jobs:
                gradle generateTypeScriptClient --info -PsourceMaven=https://development.galasa.dev/gh/maven-repo/framework 2>&1 | tee build.log
             
             - name: Upload Gradle Build Log
-              if: always()
+              if: failure()
               uses: actions/upload-artifact@v4
               with:
                 name: gradle-build-log
                 path: build.log
+                retention-days: 7
 
             - name: Fix openapi client
               run: |

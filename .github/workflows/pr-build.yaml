@@ -28,6 +28,14 @@ jobs:
               run: |
                gradle generateTypeScriptClient --info -PsourceMaven=https://development.galasa.dev/gh/maven-repo/framework
             
+            - name: Upload Gradle Build Log
+              if: failure()
+              uses: actions/upload-artifact@v4
+              with:
+                name: gradle-build-log
+                path: build.log
+                retention-days: 7
+                
             - name: Fix openapi client
               run: |
                mkdir -p temp &&
