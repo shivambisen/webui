@@ -20,18 +20,25 @@ jobs:
             - name: Setup JDK 
               uses: actions/setup-java@v4
               with:
-                java-version: '11'
+                java-version: '17'
                 distribution: 'semeru'
 
             - name: Setup Gradle
               uses: gradle/actions/setup-gradle@v3
               with:
-                gradle-version: 6.9.2
+                gradle-version: 8.9
 
             - name: Generate typescript openapi client using gradle
               run: |
-               gradle generateTypeScriptClient -PsourceMaven=https://development.galasa.dev/gh/maven-repo/framework
+               gradle generateTypeScriptClient --info -PsourceMaven=https://development.galasa.dev/gh/maven-repo/framework 2>&1 | tee build.log
             
+            - name: Upload Gradle Build Log
+              if: always()
+              uses: actions/upload-artifact@v4
+              with:
+                name: gradle-build-log
+                path: build.log
+
             - name: Fix openapi client
               run: |
                mkdir -p temp &&
