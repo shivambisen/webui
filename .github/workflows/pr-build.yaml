@@ -26,7 +26,8 @@ jobs:
 
             - name: Generate typescript openapi client using gradle
               run: |
-               gradle generateTypeScriptClient --info -PsourceMaven=https://development.galasa.dev/gh/maven-repo/framework
+               set -o pipefail
+               gradle generateTypeScriptClient --info -PsourceMaven=https://development.galasa.dev/gh/maven-repo/framework 2>&1 | tee build.log
             
             - name: Upload Gradle Build Log
               if: failure()
