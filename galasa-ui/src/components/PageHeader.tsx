@@ -4,20 +4,28 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 'use client';
+import "../styles/global.scss"
 
-import { Header, HeaderName , SkipToContent} from '@carbon/react';
-
+import { Header, HeaderName, SkipToContent, Theme } from '@carbon/react';
 import PageHeaderMenu from "./PageHeaderMenu";
+import LeftHeaderMenu from './LeftHeaderMenu';
 
-
-export default function PageHeader({galasaServiceName} : {galasaServiceName: string}) {
+export default function PageHeader({ galasaServiceName }: { galasaServiceName: string }) {
 
   return (
-    <Header aria-label="Galasa Ecosystem">
-      <SkipToContent />
-      <HeaderName prefix="">{galasaServiceName}</HeaderName>
+    <Theme theme="g90">
+      <Header aria-label="Galasa Ecosystem">
+
+        <SkipToContent />
+
+        <LeftHeaderMenu />
+
+        <HeaderName prefix="">{galasaServiceName}</HeaderName>
 
         <PageHeaderMenu />
-    </Header>
+
+      </Header>
+    </Theme>
   );
+
 };

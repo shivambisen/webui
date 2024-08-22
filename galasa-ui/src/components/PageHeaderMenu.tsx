@@ -7,7 +7,6 @@
 
 import React from 'react'
 import { HeaderGlobalBar, OverflowMenu, OverflowMenuItem } from '@carbon/react';
-import { useState } from 'react';
 import { User } from "@carbon/icons-react"
 import { useRouter } from 'next/navigation';
 
@@ -22,9 +21,13 @@ function PageHeaderMenu() {
     if (response.status === 204) {
 
       //auto redirect to render dex login page
-      router.push("/")
+      router.refresh()
 
     }
+  }
+
+  const handleRedirectToMyProfilePage = () => {
+    router.push("/myprofile")
   }
 
   return (
@@ -39,9 +42,14 @@ function PageHeaderMenu() {
         flipped={true}
       >
         <OverflowMenuItem
-          className="optionOne"
+          itemText="My Profile"
+          data-testid='my-profile-btn'
+          onClick={handleRedirectToMyProfilePage}
+        />
+        <OverflowMenuItem
           itemText="Log out"
           onClick={handleDeleteCookieApiOperation}
+          isDelete
           data-testid='logout-btn'
         />
 

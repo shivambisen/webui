@@ -39,6 +39,11 @@ code {
   padding: 10px;
 }
 
+#tile{
+  width: 100vw;
+  font-size: 20px;
+}
+
 $spaceSizes: (1, 2, 3, 5, 8, 13);
 
 @each $space in $spaceSizes {
