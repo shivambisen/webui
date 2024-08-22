@@ -1,0 +1,71 @@
+name: PR Build
+
+on:
+    pull_request:
+        branches: [main]
+
+jobs:
+    build-webui:
+        name: Building Webui
+        runs-on: ubuntu-latest
+
+        steps:
+            - name: Checkout Code
+              uses: actions/checkout@v4
+
+            - name: Setup JDK 
+              uses: actions/setup-java@v4
+              with:
+                java-version: '11'
+                distribution: 'semeru'
+
+            - name: Setup Gradle
+              uses: gradle/actions/setup-gradle@v3
+              with:
+                gradle-version: 6.9.2
+
+            - name: Generate typescript openapi client using gradle
+              run: |
+               gradle generateTypeScriptClient -PsourceMaven=https://development.galasa.dev/gh/maven-repo/framework
+            
+            - name: Fix openapi client
+              run: |
+               mkdir -p temp &&
+               promiseApiFile="galasa-ui/src/generated/galasaapi/types/PromiseAPI.ts" &&
+               cat ${promiseApiFile} | sed "s/const result =/const apiResult =/g" > temp/PromiseAPI-temp.ts &&
+               cat temp/PromiseAPI-temp.ts | sed "s/return result\.toPromise/return apiResult\.toPromise/g" > temp/PromiseAPI.ts &&
+               cp temp/PromiseAPI.ts ${promiseApiFile} &&
+               indexFile="galasa-ui/src/generated/galasaapi/index.ts" &&
+               cat ${indexFile} | sed "s/export { Configuration/export { type Configuration/1" > temp/index-temp.ts &&
+               cat temp/index-temp.ts | sed "s/export { PromiseMiddleware/export { type PromiseMiddleware/1" > temp/index.ts &&
+               cp temp/index.ts ${indexFile}
+
+            - name: Setup Nodejs
+              uses: actions/setup-node@v3
+              with:
+               node-version: "20.10.0"
+
+            - name: Installing webui's dependencies using npm
+              working-directory: ./galasa-ui
+              run: |
+               npm install
+            
+            - name: Running webui's unit tests using npm
+              working-directory: ./galasa-ui
+              run: |
+                npm test -- --watchAll=false
+            
+            - name: Building webui using npm
+              working-directory: ./galasa-ui
+              run: |
+                npm run build
+
+            - name: Build Webui image for testing
+              id: build
+              uses: docker/build-push-action@v5
+              with:
+                context: .
+                file: dockerfiles/dockerfile.webui
+                push: false
+                tags: webui:test
+            
