@@ -8,8 +8,6 @@ import * as AuthTokenRoute from '@/app/auth/tokens/route';
 import { AuthenticationAPIApi } from '@/generated/galasaapi';
 import { NextRequest } from 'next/server';
 import { DELETE } from '@/app/auth/tokens/route';
-import { cookies } from 'next/headers';
-import { NextResponse } from 'next/server';
 import AuthCookies from '@/utils/authCookies';
 
 const mockAuthenticationApi = AuthenticationAPIApi as jest.Mock;
