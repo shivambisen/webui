@@ -3,10 +3,9 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-'use client'
+
 import PageHeader from '@/components/PageHeader';
 import '../styles/global.scss';
-
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 

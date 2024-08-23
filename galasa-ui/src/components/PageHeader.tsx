@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 'use client';
-import "../styles/global.scss"
 
 import { Header, HeaderName, SkipToContent, Theme } from '@carbon/react';
 import PageHeaderMenu from "./PageHeaderMenu";

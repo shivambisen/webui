@@ -390,12 +390,13 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
             </h1>
             <section>
               <h4>
-                Get the most from your Galasa experience by reading the Galasa documentation  
+                Get the most from your Galasa experience by reading the
                 <a
                   href="https://galasa.dev/"
+                  rel="noopener noreferrer"
                   target="_blank"
                 >
-                  here
+                   Galasa documentation
                 </a>
               </h4>
             </section>
@@ -404,12 +405,12 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
               class="heroImage"
               data-nimg="1"
               decoding="async"
-              height="40"
+              height="680"
               loading="lazy"
-              src="/_next/image?url=%2Fimg.jpg&w=96&q=75"
-              srcset="/_next/image?url=%2Fimg.jpg&w=48&q=75 1x, /_next/image?url=%2Fimg.jpg&w=96&q=75 2x"
+              src="/_next/image?url=%2Fimg.jpg&w=1920&q=75"
+              srcset="/_next/image?url=%2Fimg.jpg&w=750&q=75 1x, /_next/image?url=%2Fimg.jpg&w=1920&q=75 2x"
               style="color: transparent;"
-              width="40"
+              width="680"
             />
           </div>
         </section>
@@ -802,12 +803,13 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
           </h1>
           <section>
             <h4>
-              Get the most from your Galasa experience by reading the Galasa documentation  
+              Get the most from your Galasa experience by reading the
               <a
                 href="https://galasa.dev/"
+                rel="noopener noreferrer"
                 target="_blank"
               >
-                here
+                 Galasa documentation
               </a>
             </h4>
           </section>
@@ -816,12 +818,12 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
             class="heroImage"
             data-nimg="1"
             decoding="async"
-            height="40"
+            height="680"
             loading="lazy"
-            src="/_next/image?url=%2Fimg.jpg&w=96&q=75"
-            srcset="/_next/image?url=%2Fimg.jpg&w=48&q=75 1x, /_next/image?url=%2Fimg.jpg&w=96&q=75 2x"
+            src="/_next/image?url=%2Fimg.jpg&w=1920&q=75"
+            srcset="/_next/image?url=%2Fimg.jpg&w=750&q=75 1x, /_next/image?url=%2Fimg.jpg&w=1920&q=75 2x"
             style="color: transparent;"
-            width="40"
+            width="680"
           />
         </div>
       </section>

@@ -3,50 +3,61 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import * as UsersRoute from "@/app/users/route"
-import { NextResponse } from 'next/server';
-import { getUserApiClientWithAuthHeader } from '@/utils/user';
+
+import { UsersAPIApi } from '@/generated/galasaapi';
+import { GET } from '../../app/users/route';
+import { getApiClientWithAuthHeader, createAuthenticatedApiConfiguration } from '../../utils/api';
+
+jest.mock('../../utils/api');
+jest.mock('@/generated/galasaapi');
 
 
-// Mock the dependencies
-jest.mock('@/utils/user', () => ({
-    getUserApiClientWithAuthHeader: jest.fn(),
-}));
+// Define the type for the mocked function
+const mockedGetApiClientWithAuthHeader = getApiClientWithAuthHeader as jest.MockedFunction<typeof getApiClientWithAuthHeader>;
+const mockedCreateAuthenticatedApiConfiguration = createAuthenticatedApiConfiguration as jest.MockedFunction<typeof createAuthenticatedApiConfiguration>;
+const mockedUsersAPIApi = UsersAPIApi as jest.MockedClass<typeof UsersAPIApi>;
 
-describe('GET /users', () => {
-
-    it('should return the loginId of the user with status 200', async () => {
-        // Arrange
-        const mockLoginId = 'mockUser';
-        const mockResponse = [{ loginId: mockLoginId }];
-        const mockUserApiClient = {
-            getUserByLoginId: jest.fn().mockResolvedValue(mockResponse),
-        };
-
-        // Mock the getUserApiClientWithAuthHeader to return the mockUserApiClient
-        (getUserApiClientWithAuthHeader as jest.Mock).mockReturnValue(mockUserApiClient);
-
-        // Act
-        const result = await UsersRoute.GET();
-
-        // Assert
-        expect(getUserApiClientWithAuthHeader).toHaveBeenCalled();
-        expect(mockUserApiClient.getUserByLoginId).toHaveBeenCalledWith('me');
-        expect(result).toEqual(new NextResponse(mockLoginId, { status: 200 }));
+describe('GET function', () => {
+    const mockBearerToken = 'mocked_bearer_token';
+    const mockUserResponse = 'mocked_login_id';
+    const mockApiConfiguration = {
+      baseServer: { url: 'http://mock-server-url' }, // Mock the baseServer property
+      httpApi: {}, // Mock the httpApi property (could be more detailed)
+      middleware: [], // Mock the middleware array
+      authMethods: {} // Mock the authMethods object
+    };
+  
+    beforeEach(() => {
+      jest.clearAllMocks();
+      mockedGetApiClientWithAuthHeader.mockReturnValue(mockBearerToken);
+      mockedCreateAuthenticatedApiConfiguration.mockReturnValue(mockApiConfiguration as any);
+      mockedUsersAPIApi.prototype.getUserByLoginId = jest.fn().mockResolvedValue(mockUserResponse);
+      
     });
-
-    it('should throw an error if the userApiClient fails', async () => {
-        // Arrange
-        const mockError = new Error('Failed to get login id of user');
-        const mockUserApiClient = {
-            getUserByLoginId: jest.fn().mockRejectedValue(mockError),
-        };
-
-        // Mock the getUserApiClientWithAuthHeader to return the mockUserApiClient
-        (getUserApiClientWithAuthHeader as jest.Mock).mockReturnValue(mockUserApiClient);
-
-        // Act & Assert
-        await expect(UsersRoute.GET()).rejects.toThrow('Failed to get login id of user');
+  
+    it('should return the loginId with a 200 status code when successful', async () => {
+      const result = await GET();
+  
+      expect(mockedGetApiClientWithAuthHeader).toHaveBeenCalledTimes(1);
+      expect(mockedCreateAuthenticatedApiConfiguration).toHaveBeenCalledWith(
+        process.env.GALASA_API_SERVER_URL,
+        mockBearerToken
+      );
+      expect(mockedUsersAPIApi).toHaveBeenCalledWith(mockApiConfiguration);
+      expect(result.status).toBe(200);
     });
-
-})
+  
+    it('should throw an error if getUserByLoginId fails', async () => {
+      mockedUsersAPIApi.prototype.getUserByLoginId = jest.fn().mockRejectedValue(new Error('API Error'));
+  
+      await expect(GET()).rejects.toThrow('Failed to get login id of user');
+    });
+  
+    it('should throw an error if getApiClientWithAuthHeader fails', async () => {
+      mockedGetApiClientWithAuthHeader.mockImplementation(() => {
+        throw new Error('Failed to get login id of user');
+      });
+  
+      await expect(GET()).rejects.toThrow('Failed to get login id of user');
+    });
+  });

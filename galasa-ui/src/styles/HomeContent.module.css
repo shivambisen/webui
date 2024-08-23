@@ -1,8 +1,8 @@
-.heroImage{
-    height: 720px;
-    width: 720px;
-    object-fit: contain;
-}
+/*
+ * Copyright contributors to the Galasa project
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 
 .homeContentWrapper{
     width: 100%;
