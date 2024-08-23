@@ -13,6 +13,7 @@ const fetchMock = jest.spyOn(global, 'fetch')
 
 const mockRouter = {
     push: jest.fn(() => useRouter().push),
+    refresh: jest.fn(() => useRouter().refresh)
 };
 
 jest.mock('next/navigation', () => ({
@@ -53,6 +54,38 @@ test('renders logout btn when menu btn is pressed', async () => {
     expect(logoutBtn).toBeInTheDocument();
 })
 
+test('renders my profile btn when menu btn is pressed', async () => {
+
+    render(<PageHeaderMenu />)
+
+    fireEvent.click(screen.getByTestId('menu-btn'))
+
+    const myProfileBtn = screen.getByTestId('my-profile-btn')
+
+    expect(myProfileBtn).toBeInTheDocument();
+})
+
+
+test('clicking my profile btn redirects me to My Profle Page', async () => {
+    render(<PageHeaderMenu />)
+
+    fireEvent.click(screen.getByTestId('menu-btn'))
+
+    const myProfileBtn = screen.getByTestId('my-profile-btn')
+
+    expect(myProfileBtn).toBeInTheDocument();
+
+    fireEvent.click(myProfileBtn)
+
+    await waitFor(() => {
+
+        expect(mockRouter.push).toHaveBeenCalled()
+        expect(mockRouter.push).toHaveBeenCalledTimes(1)
+
+    })
+
+})
+
 test('clicking log out button calls handleDeleteCookieApiOperation, RESPONSE OK', async () => {
 
     render(<PageHeaderMenu />)
@@ -80,8 +113,8 @@ test('clicking log out button calls handleDeleteCookieApiOperation, RESPONSE OK'
 
         expect(fetchMock).toBeCalledTimes(1)
 
-        expect(mockRouter.push).toHaveBeenCalled()
-        expect(mockRouter.push).toHaveBeenCalledTimes(1)
+        expect(mockRouter.refresh).toHaveBeenCalled()
+        expect(mockRouter.refresh).toHaveBeenCalledTimes(1)
 
     })
 

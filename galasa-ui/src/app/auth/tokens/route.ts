@@ -3,10 +3,12 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import { getAuthApiClientWithAuthHeader, sendAuthRequest } from '@/utils/auth';
+import { sendAuthRequest } from '@/utils/auth';
+import { createAuthenticatedApiConfiguration } from '@/utils/api';
 import AuthCookies from '@/utils/authCookies';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
+import { AuthenticationAPIApi } from '@/generated/galasaapi';
 
 // Stop this route from being pre-rendered
 export const dynamic = 'force-dynamic';
@@ -15,10 +17,13 @@ interface TokenDetails {
   tokenDescription: string,
 }
 
+
 // POST request handler for requests to /auth/tokens
 export async function POST(request: NextRequest) {
   // Call out to the API server's /auth/clients endpoint to create a new Dex client
-  const dexClient = await getAuthApiClientWithAuthHeader().postClients();
+
+  const authApiClientWithAuthHeader = new AuthenticationAPIApi(createAuthenticatedApiConfiguration())
+  const dexClient = await authApiClientWithAuthHeader.postClients();
 
   const clientId = dexClient.clientId;
   if (clientId) {

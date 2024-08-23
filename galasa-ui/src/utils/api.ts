@@ -6,6 +6,11 @@
 
 import { ServerConfiguration, createConfiguration } from '@/generated/galasaapi';
 import { ConfigurationParameters } from '@/generated/galasaapi/configuration';
+import { cookies } from 'next/headers';
+import AuthCookies from './authCookies';
+
+
+export const GALASA_API_SERVER_URL = process.env.GALASA_API_SERVER_URL ?? '';
 
 /**
  * Creates an API configuration that can be passed in when initialising API clients.
@@ -24,19 +29,31 @@ export const createApiConfiguration = (apiServerUrl: string) => {
  * @param bearerToken the bearer token to include in a request's "Authorization" header
  * @returns a configuration that includes an "Authorization" header
  */
-export const createAuthenticatedApiConfiguration = (apiServerUrl: string, bearerToken: string) => {
-  const serverConfig = new ServerConfiguration(apiServerUrl, {});
+export const createAuthenticatedApiConfiguration = () => {
+  const serverConfig = new ServerConfiguration(GALASA_API_SERVER_URL, {});
   const requestConfig: ConfigurationParameters = {
     baseServer: serverConfig,
     authMethods: {
       JwtAuth: {
         tokenProvider: {
           getToken() {
-            return bearerToken;
+            return getBearerToken();
           },
         },
       },
     },
   };
   return createConfiguration(requestConfig);
+};
+
+/**
+ * Initialise an auth API client that includes an "Authorization" header in requests.
+ * @returns an auth API client that includes an "Authorization" header in requests
+ */
+export const getBearerToken = () => {
+  const bearerTokenCookie = cookies().get(AuthCookies.ID_TOKEN);
+  if (!bearerTokenCookie) {
+    throw new Error('Unable to get bearer token, please re-authenticate');
+  }
+  return bearerTokenCookie.value;
 };

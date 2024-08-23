@@ -8,6 +8,12 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
       <div
         id="content"
       >
+        <div
+          class="cds--tile"
+          id="tile"
+        >
+          Home
+        </div>
         <button
           class="cds--btn cds--btn--primary"
           type="button"
@@ -226,7 +232,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                       class="cds--tooltip-trigger__wrapper"
                     >
                       <button
-                        aria-labelledby="tooltip-:r5:"
+                        aria-labelledby="tooltip-:r7:"
                         class="cds--btn--icon-only cds--copy-btn cds--copy cds--btn cds--btn--sm cds--layout--size-sm cds--btn--primary"
                         type="button"
                       >
@@ -253,7 +259,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                     <span
                       aria-hidden="true"
                       class="cds--popover"
-                      id="tooltip-:r5:"
+                      id="tooltip-:r7:"
                       role="tooltip"
                     >
                       <span
@@ -326,7 +332,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                   class="cds--tooltip-trigger__wrapper"
                 >
                   <button
-                    aria-labelledby="tooltip-:r7:"
+                    aria-labelledby="tooltip-:r9:"
                     class="cds--btn--icon-only margin-y-1 cds--snippet cds--snippet--inline cds--copy cds--btn cds--btn--primary"
                     type="button"
                   >
@@ -340,7 +346,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                 <span
                   aria-hidden="true"
                   class="cds--popover"
-                  id="tooltip-:r7:"
+                  id="tooltip-:r9:"
                   role="tooltip"
                 >
                   <span
@@ -375,6 +381,39 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
             Focus sentinel
           </span>
         </div>
+        <section>
+          <div
+            class="homeContentWrapper"
+          >
+            <h1>
+              Welcome to your Galasa Service
+            </h1>
+            <section>
+              <h4>
+                Get the most from your Galasa experience by reading the
+                <a
+                  href="https://galasa.dev/"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  Galasa documentation
+                </a>
+              </h4>
+            </section>
+            <img
+              alt="home-graphic"
+              class="heroImage"
+              data-nimg="1"
+              decoding="async"
+              height="680"
+              loading="lazy"
+              src="/_next/image?url=%2Fimg.jpg&w=1920&q=75"
+              srcset="/_next/image?url=%2Fimg.jpg&w=750&q=75 1x, /_next/image?url=%2Fimg.jpg&w=1920&q=75 2x"
+              style="color: transparent;"
+              width="680"
+            />
+          </div>
+        </section>
       </div>
     </div>
   </body>,
@@ -382,6 +421,12 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
     <div
       id="content"
     >
+      <div
+        class="cds--tile"
+        id="tile"
+      >
+        Home
+      </div>
       <button
         class="cds--btn cds--btn--primary"
         type="button"
@@ -600,7 +645,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                     class="cds--tooltip-trigger__wrapper"
                   >
                     <button
-                      aria-labelledby="tooltip-:r5:"
+                      aria-labelledby="tooltip-:r7:"
                       class="cds--btn--icon-only cds--copy-btn cds--copy cds--btn cds--btn--sm cds--layout--size-sm cds--btn--primary"
                       type="button"
                     >
@@ -627,7 +672,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                   <span
                     aria-hidden="true"
                     class="cds--popover"
-                    id="tooltip-:r5:"
+                    id="tooltip-:r7:"
                     role="tooltip"
                   >
                     <span
@@ -700,7 +745,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                 class="cds--tooltip-trigger__wrapper"
               >
                 <button
-                  aria-labelledby="tooltip-:r7:"
+                  aria-labelledby="tooltip-:r9:"
                   class="cds--btn--icon-only margin-y-1 cds--snippet cds--snippet--inline cds--copy cds--btn cds--btn--primary"
                   type="button"
                 >
@@ -714,7 +759,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
               <span
                 aria-hidden="true"
                 class="cds--popover"
-                id="tooltip-:r7:"
+                id="tooltip-:r9:"
                 role="tooltip"
               >
                 <span
@@ -749,6 +794,39 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
           Focus sentinel
         </span>
       </div>
+      <section>
+        <div
+          class="homeContentWrapper"
+        >
+          <h1>
+            Welcome to your Galasa Service
+          </h1>
+          <section>
+            <h4>
+              Get the most from your Galasa experience by reading the
+              <a
+                href="https://galasa.dev/"
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                Galasa documentation
+              </a>
+            </h4>
+          </section>
+          <img
+            alt="home-graphic"
+            class="heroImage"
+            data-nimg="1"
+            decoding="async"
+            height="680"
+            loading="lazy"
+            src="/_next/image?url=%2Fimg.jpg&w=1920&q=75"
+            srcset="/_next/image?url=%2Fimg.jpg&w=750&q=75 1x, /_next/image?url=%2Fimg.jpg&w=1920&q=75 2x"
+            style="color: transparent;"
+            width="680"
+          />
+        </div>
+      </section>
     </div>
   </div>,
   "debug": [Function],
