@@ -396,7 +396,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                   rel="noopener noreferrer"
                   target="_blank"
                 >
-                   Galasa documentation
+                  Galasa documentation
                 </a>
               </h4>
             </section>
@@ -809,7 +809,7 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                 Galasa documentation
+                Galasa documentation
               </a>
             </h4>
           </section>
