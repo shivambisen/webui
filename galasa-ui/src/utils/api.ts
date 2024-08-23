@@ -29,15 +29,15 @@ export const createApiConfiguration = (apiServerUrl: string) => {
  * @param bearerToken the bearer token to include in a request's "Authorization" header
  * @returns a configuration that includes an "Authorization" header
  */
-export const createAuthenticatedApiConfiguration = (apiServerUrl: string, bearerToken: string) => {
-  const serverConfig = new ServerConfiguration(apiServerUrl, {});
+export const createAuthenticatedApiConfiguration = () => {
+  const serverConfig = new ServerConfiguration(GALASA_API_SERVER_URL, {});
   const requestConfig: ConfigurationParameters = {
     baseServer: serverConfig,
     authMethods: {
       JwtAuth: {
         tokenProvider: {
           getToken() {
-            return bearerToken;
+            return getBearerToken();
           },
         },
       },
@@ -50,7 +50,7 @@ export const createAuthenticatedApiConfiguration = (apiServerUrl: string, bearer
  * Initialise an auth API client that includes an "Authorization" header in requests.
  * @returns an auth API client that includes an "Authorization" header in requests
  */
-export const getApiClientWithAuthHeader = () => {
+export const getBearerToken = () => {
   const bearerTokenCookie = cookies().get(AuthCookies.ID_TOKEN);
   if (!bearerTokenCookie) {
     throw new Error('Unable to get bearer token, please re-authenticate');

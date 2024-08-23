@@ -6,10 +6,9 @@
 'use client'
 
 import { useEffect, useState } from "react";
-import { Loading, InlineNotification } from "@carbon/react"
+import { Loading, ToastNotification } from "@carbon/react"
 import styles from "../../styles/MyProfile.module.css"
 import PageTile from "@/components/PageTile";
-import { ToastNotification } from "@carbon/react";
 
 export default function MyProfilePage() {
 
@@ -55,7 +54,7 @@ export default function MyProfilePage() {
                 <Loading data-testid="loader" small={false} active={isLoading} />
                 :
                 <div className={styles.userNameContainer}>
-                    <h4>Currently logged in as: </h4>
+                    <h4>Currently logged in as:</h4>
                     <h4> &nbsp; {loginId}</h4>
                 </div>
             }
@@ -71,8 +70,6 @@ export default function MyProfilePage() {
                     title="Internal Server Error"
                 />    
             }
-
         </div>
-
     );
 };

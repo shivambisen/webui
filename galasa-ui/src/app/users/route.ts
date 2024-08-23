@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import { UsersAPIApi } from "@/generated/galasaapi";
-import { createAuthenticatedApiConfiguration, GALASA_API_SERVER_URL, getApiClientWithAuthHeader } from "@/utils/api";
+import { createAuthenticatedApiConfiguration } from "@/utils/api";
 import { NextResponse } from "next/server";
 
 // Stop this route from being pre-rendered
@@ -13,8 +13,8 @@ export const dynamic = 'force-dynamic';
 export async function GET() {
 
     try {
-        const bearerToken = getApiClientWithAuthHeader();
-        const userApiClientWithAuthHeader = new UsersAPIApi(createAuthenticatedApiConfiguration(GALASA_API_SERVER_URL, bearerToken))
+        
+        const userApiClientWithAuthHeader = new UsersAPIApi(createAuthenticatedApiConfiguration())
 
         const response = await userApiClientWithAuthHeader.getUserByLoginId("me")
 
