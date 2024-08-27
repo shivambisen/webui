@@ -18,7 +18,7 @@ export default function HomeContent() {
                 <Heading>Welcome to your Galasa Service</Heading>
                 <Section level={2}>
                     <h4>Get the most from your Galasa experience by reading the 
-                        <Link href="https://galasa.dev/" target="_blank" rel="noopener noreferrer">Galasa documentation</Link>
+                        <Link className={styles.link} href="https://galasa.dev/" target="_blank" rel="noopener noreferrer"> Galasa documentation.</Link>
                     </h4>
                 </Section>
                 <Image className={styles.heroImage} src={homeGraphic} width={680} height={680} alt='home-graphic'></Image>

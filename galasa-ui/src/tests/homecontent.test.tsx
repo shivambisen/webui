@@ -22,7 +22,7 @@ test("render home content sub-title", () => {
     render(<HomeContent />)
 
     const subTitle = screen.getByText("Get the most from your Galasa experience by reading the")
-    const link = screen.getByText("Galasa documentation")
+    const link = screen.getByText("Galasa documentation.")
 
     expect(link).toBeInTheDocument()
     expect(subTitle).toBeInTheDocument()
