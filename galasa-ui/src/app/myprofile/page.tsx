@@ -48,7 +48,7 @@ export default function MyProfilePage() {
 
     return (
         <div id="content" className={styles.content}>
-            <PageTile title={"Profile"} />
+            <PageTile title={"My Profile"} />
 
             {isLoading ?
                 <Loading data-testid="loader" small={false} active={isLoading} />

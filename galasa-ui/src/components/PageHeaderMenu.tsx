@@ -49,7 +49,6 @@ function PageHeaderMenu() {
         <OverflowMenuItem
           itemText="Log out"
           onClick={handleDeleteCookieApiOperation}
-          isDelete
           data-testid='logout-btn'
         />
 

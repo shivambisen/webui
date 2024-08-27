@@ -392,11 +392,12 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
               <h4>
                 Get the most from your Galasa experience by reading the
                 <a
+                  class="link"
                   href="https://galasa.dev/"
                   rel="noopener noreferrer"
                   target="_blank"
                 >
-                  Galasa documentation
+                   Galasa documentation.
                 </a>
               </h4>
             </section>
@@ -805,11 +806,12 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
             <h4>
               Get the most from your Galasa experience by reading the
               <a
+                class="link"
                 href="https://galasa.dev/"
                 rel="noopener noreferrer"
                 target="_blank"
               >
-                Galasa documentation
+                 Galasa documentation.
               </a>
             </h4>
           </section>
