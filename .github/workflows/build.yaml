@@ -1,96 +1,103 @@
-name: Main Build
+#
+# Copyright contributors to the Galasa project
+#
+# SPDX-License-Identifier: EPL-2.0
+#
+name: Main build
 
 on:
-    push:
-        branches: [main]
+  push:
+    branches: [main]
 
 env:
-    REGISTRY: ghcr.io
-    NAMESPACE: galasa-dev
+  REGISTRY: ghcr.io
+  NAMESPACE: galasa-dev
 
 jobs:
-    build-webui:
-        name: Building Webui
-        runs-on: ubuntu-latest
+  build-webui:
+    name: Build the Galasa Web UI
+    runs-on: ubuntu-latest
 
-        steps:
-            - name: Checkout Code
-              uses: actions/checkout@v4
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
 
-            - name: Setup JDK 
-              uses: actions/setup-java@v4
-              with:
-                java-version: '17'
-                distribution: 'semeru'
+      - name: Setup JDK 
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'semeru'
 
-            - name: Setup Gradle
-              uses: gradle/actions/setup-gradle@v3
-              with:
-                gradle-version: 8.9
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+        with:
+          gradle-version: 8.9
 
-            - name: Generate typescript openapi client using gradle
-              run: |
-               gradle generateTypeScriptClient --info -PsourceMaven=https://development.galasa.dev/gh/maven-repo/framework 2>&1 | tee build.log
-            
-            - name: Upload Gradle Build Log
-              if: failure()
-              uses: actions/upload-artifact@v4
-              with:
-                name: gradle-build-log
-                path: build.log
-                retention-days: 7
+      - name: Generate typescript openapi client using gradle
+        run: |
+          gradle generateTypeScriptClient --info \
+          --no-daemon --console plain \
+          -PsourceMaven=https://development.galasa.dev/main/maven-repo/framework 2>&1 | tee build.log
+      
+      - name: Upload Gradle Build Log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-build-log
+          path: build.log
+          retention-days: 7
 
-            - name: Fix openapi client
-              run: |
-               mkdir -p temp &&
-               promiseApiFile="galasa-ui/src/generated/galasaapi/types/PromiseAPI.ts" &&
-               cat ${promiseApiFile} | sed "s/const result =/const apiResult =/g" > temp/PromiseAPI-temp.ts &&
-               cat temp/PromiseAPI-temp.ts | sed "s/return result\.toPromise/return apiResult\.toPromise/g" > temp/PromiseAPI.ts &&
-               cp temp/PromiseAPI.ts ${promiseApiFile} &&
-               indexFile="galasa-ui/src/generated/galasaapi/index.ts" &&
-               cat ${indexFile} | sed "s/export { Configuration/export { type Configuration/1" > temp/index-temp.ts &&
-               cat temp/index-temp.ts | sed "s/export { PromiseMiddleware/export { type PromiseMiddleware/1" > temp/index.ts &&
-               cp temp/index.ts ${indexFile}
+      - name: Fix openapi client
+        run: |
+          mkdir -p temp &&
+          promiseApiFile="galasa-ui/src/generated/galasaapi/types/PromiseAPI.ts" &&
+          cat ${promiseApiFile} | sed "s/const result =/const apiResult =/g" > temp/PromiseAPI-temp.ts &&
+          cat temp/PromiseAPI-temp.ts | sed "s/return result\.toPromise/return apiResult\.toPromise/g" > temp/PromiseAPI.ts &&
+          cp temp/PromiseAPI.ts ${promiseApiFile} &&
+          indexFile="galasa-ui/src/generated/galasaapi/index.ts" &&
+          cat ${indexFile} | sed "s/export { Configuration/export { type Configuration/1" > temp/index-temp.ts &&
+          cat temp/index-temp.ts | sed "s/export { PromiseMiddleware/export { type PromiseMiddleware/1" > temp/index.ts &&
+          cp temp/index.ts ${indexFile}
 
-            - name: Setup Nodejs
-              uses: actions/setup-node@v3
-              with:
-               node-version: "20.10.0"
+      - name: Setup Nodejs
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20.10.0"
 
-            - name: Installing webui's dependencies using npm
-              working-directory: ./galasa-ui
-              run: |
-               npm install
-            
-            - name: Running webui's unit tests using npm
-              working-directory: ./galasa-ui
-              run: |
-                npm test -- --watchAll=false
-            
-            - name: Building webui using npm
-              working-directory: ./galasa-ui
-              run: |
-                npm run build
+      - name: Installing webui's dependencies using npm
+        working-directory: ./galasa-ui
+        run: |
+          npm install
+      
+      - name: Running webui's unit tests using npm
+        working-directory: ./galasa-ui
+        run: |
+          npm test -- --watchAll=false
+      
+      - name: Building webui using npm
+        working-directory: ./galasa-ui
+        run: |
+          npm run build
 
-            - name: Login to Github Container Registry
-              uses: docker/login-action@v3
-              with:
-                registry: ${{ env.REGISTRY }}
-                username: ${{ github.actor }}
-                password: ${{ secrets.GITHUB_TOKEN }}
-        
-            - name: Extract metadata for webui image
-              id: metadata
-              uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-              with:
-                images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/webui
-        
-            - name: Build Webui image
-              id: build
-              uses: docker/build-push-action@v5
-              with:
-                context: .
-                file: dockerfiles/dockerfile.webui
-                push: true
-                tags: ${{ steps.metadata.outputs.tags }}
-                labels: ${{ steps.metadata.outputs.labels }}
+      - name: Login to Github Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+  
+      - name: Extract metadata for webui image
+        id: metadata
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/webui
+  
+      - name: Build Webui image
+        id: build
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: dockerfiles/dockerfile.webui
+          push: true
+          tags: ${{ steps.metadata.outputs.tags }}
+          labels: ${{ steps.metadata.outputs.labels }}
