@@ -5,8 +5,9 @@
  */
 
 import { UsersAPIApi } from '@/generated/galasaapi';
-import { GET } from '../../app/users/route';
+import { DELETE, GET } from '../../app/users/route';
 import { createAuthenticatedApiConfiguration } from '../../utils/api';
+import AuthCookies from '@/utils/authCookies';
 
 jest.mock('../../utils/api');
 jest.mock('@/generated/galasaapi');
@@ -15,6 +16,17 @@ jest.mock('@/generated/galasaapi');
 // Define the type for the mocked function
 const mockedCreateAuthenticatedApiConfiguration = createAuthenticatedApiConfiguration as jest.MockedFunction<typeof createAuthenticatedApiConfiguration>;
 const mockedUsersAPIApi = UsersAPIApi as jest.MockedClass<typeof UsersAPIApi>;
+
+const deleteMock = jest.fn();
+
+// Mock out the cookies() functions in the "next/headers" module
+jest.mock('next/headers', () => ({
+  ...jest.requireActual('next/headers'),
+  cookies: jest.fn(() => ({
+    get: jest.fn().mockReturnValue('abc'),
+    delete: deleteMock
+  })),
+}));
 
 describe('GET function', () => {
     const mockBearerToken = 'mocked_bearer_token';
@@ -48,4 +60,26 @@ describe('GET function', () => {
   
       await expect(GET()).rejects.toThrow('Failed to get login id of user');
     });
+  });
+
+  describe('DELETE /auth/tokens', () => {
+
+    beforeEach(() => {
+  
+      jest.clearAllMocks();
+  
+    });
+  
+    it('Fetches cookies from headers, that are not null, GIVES 204 RESPONSE', async () => {
+  
+      const response = await DELETE()
+  
+      expect(deleteMock).toBeCalledWith(AuthCookies.ID_TOKEN);
+      expect(deleteMock).toBeCalledWith(AuthCookies.SHOULD_REDIRECT_TO_SETTINGS)
+      expect(deleteMock).toBeCalledTimes(2)
+      expect(response.status).toBe(204);
+  
+    })
+  
+  
   });

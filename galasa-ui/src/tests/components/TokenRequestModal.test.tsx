@@ -24,9 +24,9 @@ describe('Token request modal', () => {
   it('renders invisible token request modal', async () => {
     // Given...
     await act(async () => {
-      return render(<TokenRequestModal />);
+      return render(<TokenRequestModal isDisabled={false}/>);
     });
-    const buttonElement = screen.getByText(/Request Personal Access Token/i);
+    const buttonElement = screen.getByTestId("token-request-btn");
     const requestModalElement = screen.getByRole('presentation');
 
     // Then...
@@ -38,9 +38,9 @@ describe('Token request modal', () => {
   it('becomes visible when the "Request Access Token" button is clicked', async () => {
     // Given...
     await act(async () => {
-      return render(<TokenRequestModal />);
+      return render(<TokenRequestModal isDisabled={false}/>);
     });
-    const buttonElement = screen.getByText(/Request Personal Access Token/i);
+    const buttonElement = screen.getByTestId("token-request-btn");
     const requestModalElement = screen.getByRole('presentation');
 
     // When...
@@ -53,9 +53,9 @@ describe('Token request modal', () => {
   it('becomes invisible when the "Cancel" button is clicked', async () => {
     // Given...
     await act(async () => {
-      return render(<TokenRequestModal />);
+      return render(<TokenRequestModal isDisabled={false} />);
     });
-    const openModalButtonElement = screen.getByText(/Request Personal Access Token/i);
+    const openModalButtonElement = screen.getByTestId("token-request-btn");
     const modalCancelButtonElement = screen.getByText(/Cancel/i);
     const requestModalElement = screen.getByRole('presentation');
 
@@ -81,9 +81,9 @@ describe('Token request modal', () => {
     ) as jest.Mock;
 
     await act(async () => {
-      return render(<TokenRequestModal />);
+      return render(<TokenRequestModal isDisabled={false}/>);
     });
-    const openModalButtonElement = screen.getByText(/Request Personal Access Token/i);
+    const openModalButtonElement = screen.getByTestId("token-request-btn");
     const modalSubmitButtonElement = screen.getByText(/Submit/i);
     const modalNameInputElement = screen.getByLabelText(/Token Name/i);
 
@@ -109,9 +109,9 @@ describe('Token request modal', () => {
     ) as jest.Mock;
 
     await act(async () => {
-      return render(<TokenRequestModal />);
+      return render(<TokenRequestModal isDisabled={false}/>);
     });
-    const openModalButtonElement = screen.getByText(/Request Personal Access Token/i);
+    const openModalButtonElement = screen.getByTestId("token-request-btn");
     const modalSubmitButtonElement = screen.getByText(/Submit/i);
     const modalNameInputElement = screen.getByLabelText(/Token Name/i);
 
@@ -141,9 +141,9 @@ describe('Token request modal', () => {
     global.fetch = jest.fn(() => Promise.reject(fetchErrorMessage)) as jest.Mock;
 
     await act(async () => {
-      render(<TokenRequestModal />);
+      render(<TokenRequestModal isDisabled={false}/>);
     });
-    const openModalButtonElement = screen.getByText(/Request Personal Access Token/i);
+    const openModalButtonElement = screen.getByTestId("token-request-btn");
     const modalSubmitButtonElement = screen.getByText(/Submit/i);
     const modalNameInputElement = screen.getByLabelText(/Token Name/i);
 
@@ -173,9 +173,9 @@ describe('Token request modal', () => {
     global.fetch = jest.fn(() => Promise.reject(fetchErrorMessage)) as jest.Mock;
 
     await act(async () => {
-      render(<TokenRequestModal />);
+      render(<TokenRequestModal isDisabled={false}/>);
     });
-    const openModalButtonElement = screen.getByText(/Request Personal Access Token/i);
+    const openModalButtonElement = screen.getByTestId("token-request-btn");
     const modalSubmitButtonElement = screen.getByText(/Submit/i);
     const modalNameInputElement = screen.getByLabelText(/Token Name/i);
 
@@ -213,10 +213,10 @@ describe('Token request modal', () => {
     ) as jest.Mock;
 
     await act(async () => {
-      render(<TokenRequestModal />);
+      render(<TokenRequestModal isDisabled={false}/>);
     });
 
-    const openModalButtonElement = screen.getByText(/Request Personal Access Token/i);
+    const openModalButtonElement = screen.getByTestId("token-request-btn");
     const modalSubmitButtonElement = screen.getByText(/Submit/i);
 
     // When...
@@ -240,10 +240,10 @@ describe('Token request modal', () => {
     ) as jest.Mock;
 
     await act(async () => {
-      render(<TokenRequestModal />);
+      render(<TokenRequestModal isDisabled={false}/>);
     });
 
-    const openModalButtonElement = screen.getByText(/Request Personal Access Token/i);
+    const openModalButtonElement = screen.getByTestId("token-request-btn");
     const modalNameInputElement = screen.getByLabelText(/Token Name/i);
 
     // When...
@@ -268,9 +268,9 @@ describe('Token request modal', () => {
     ) as jest.Mock;
 
     await act(async () => {
-      return render(<TokenRequestModal />);
+      return render(<TokenRequestModal isDisabled={false}/>);
     });
-    const openModalButtonElement = screen.getByText(/Request Personal Access Token/i);
+    const openModalButtonElement = screen.getByTestId("token-request-btn");
     const modalNameInputElement = screen.getByLabelText(/Token Name/i);
 
     // When...
@@ -294,10 +294,10 @@ describe('Token request modal', () => {
     ) as jest.Mock;
 
     await act(async () => {
-      render(<TokenRequestModal />);
+      render(<TokenRequestModal isDisabled={false}/>);
     });
 
-    const openModalButtonElement = screen.getByText(/Request Personal Access Token/i);
+    const openModalButtonElement = screen.getByTestId("token-request-btn");
     const modalSubmitButtonElement = screen.getByText(/Submit/i);
 
     // When...

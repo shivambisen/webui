@@ -86,6 +86,26 @@ test('clicking my profile btn redirects me to My Profle Page', async () => {
 
 })
 
+test('clicking my settings btn redirects me to My Settings Page', async () => {
+    render(<PageHeaderMenu />)
+
+    fireEvent.click(screen.getByTestId('menu-btn'))
+
+    const myProfileBtn = screen.getByTestId('my-settings-btn')
+
+    expect(myProfileBtn).toBeInTheDocument();
+
+    fireEvent.click(myProfileBtn)
+
+    await waitFor(() => {
+
+        expect(mockRouter.push).toHaveBeenCalled()
+        expect(mockRouter.push).toHaveBeenCalledTimes(1)
+
+    })
+
+})
+
 test('clicking log out button calls handleDeleteCookieApiOperation, RESPONSE OK', async () => {
 
     render(<PageHeaderMenu />)

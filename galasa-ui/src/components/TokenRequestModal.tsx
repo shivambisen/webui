@@ -9,8 +9,10 @@ import { Button, Modal } from '@carbon/react';
 import { useRef, useState } from 'react';
 import { TextInput } from '@carbon/react';
 import { InlineNotification } from '@carbon/react';
+import { Add } from '@carbon/icons-react';
 
-export default function TokenRequestModal() {
+export default function TokenRequestModal({isDisabled} : {isDisabled : boolean}) {
+
   const [open, setOpen] = useState(false);
   const [error, setError] = useState('');
   const [submitDisabled, setSubmitDisabled] = useState(true);
@@ -49,9 +51,12 @@ export default function TokenRequestModal() {
       console.error('Failed to request a personal access token: %s', err);
     }
   };
+    
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Request personal access token</Button>
+      <Button iconDescription={"Create new access token"} data-testid="token-request-btn" disabled={isDisabled} hasIconOnly onClick={() => setOpen(true)}>
+          <Add/>
+      </Button>
       <Modal
         modalHeading="Personal access token request"
         primaryButtonText="Submit request"

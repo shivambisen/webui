@@ -1,0 +1,30 @@
+
+.container { 
+    width: 95%;
+    margin: 5rem auto;
+}
+
+.heading {
+    font-weight: 500;
+}
+
+.titleContainer {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.tokenContainer {
+    width: 90%;
+    margin: 0 auto;
+}
+
+.tokensList{
+    display: flex;
+    flex-wrap: wrap;
+    margin: 1rem 0;
+}
+
+.deleteBtn{
+    margin: 0 1rem;
+}

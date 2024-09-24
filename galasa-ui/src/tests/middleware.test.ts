@@ -15,6 +15,13 @@ jest.mock('jwt-decode', () => ({
   })),
 }));
 
+jest.mock('next/headers', () => ({
+  ...jest.requireActual('next/headers'),
+  cookies: jest.fn(() => ({
+    get: jest.fn().mockReturnValue('false')
+  })),
+}));
+
 describe('Middleware', () => {
   let redirectSpy: jest.SpyInstance;
 
