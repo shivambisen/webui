@@ -8,6 +8,7 @@ import { NextResponse, NextRequest } from 'next/server';
 import AuthCookies from './utils/authCookies';
 import { GALASA_WEBUI_CLIENT_ID, authApiClient, sendAuthRequest } from './utils/auth';
 import { AuthProperties } from './generated/galasaapi';
+import { cookies } from 'next/headers';
 
 // Runs before any request is completed
 export async function middleware(request: NextRequest) {
@@ -15,9 +16,16 @@ export async function middleware(request: NextRequest) {
 
   try {
     if (request.url.includes('/callback')) {
-      // Handle callback requests
-      const responseUrl = request.url.substring(0, request.url.lastIndexOf('/callback'));
+      let responseUrl = request.url.substring(0, request.url.lastIndexOf('/callback'));
+
+      const shouldReturnToMySettingsPage = cookies().get(AuthCookies.SHOULD_REDIRECT_TO_SETTINGS)
+    
+      if(shouldReturnToMySettingsPage?.value === 'true'){
+        responseUrl = responseUrl + "/mysettings"
+      }
+      
       response = await handleCallback(request, NextResponse.redirect(responseUrl, { status: 302 }));
+      
     } else if (!isAuthenticated(request)) {
 
       // Force the user to re-authenticate, getting the URL to redirect to and any cookies to be set

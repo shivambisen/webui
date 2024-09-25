@@ -16,7 +16,7 @@ function PageHeaderMenu() {
 
   const handleDeleteCookieApiOperation = async () => {
 
-    const response = await fetch('/auth/tokens', { method: 'DELETE' });
+    const response = await fetch('/users', { method: 'DELETE' });
 
     if (response.status === 204) {
 
@@ -28,6 +28,10 @@ function PageHeaderMenu() {
 
   const handleRedirectToMyProfilePage = () => {
     router.push("/myprofile")
+  }
+
+  const handleRedirectToMySettingsPage = () => {
+    router.push("/mysettings")
   }
 
   return (
@@ -45,6 +49,11 @@ function PageHeaderMenu() {
           itemText="My Profile"
           data-testid='my-profile-btn'
           onClick={handleRedirectToMyProfilePage}
+        />
+        <OverflowMenuItem
+          itemText="My Settings"
+          data-testid='my-settings-btn'
+          onClick={handleRedirectToMySettingsPage}
         />
         <OverflowMenuItem
           itemText="Log out"

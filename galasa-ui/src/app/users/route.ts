@@ -5,6 +5,8 @@
  */
 import { UsersAPIApi } from "@/generated/galasaapi";
 import { createAuthenticatedApiConfiguration } from "@/utils/api";
+import AuthCookies from "@/utils/authCookies";
+import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
 // Stop this route from being pre-rendered
@@ -24,3 +26,15 @@ export async function GET() {
     }
 
 }
+
+export async function DELETE() {
+
+    // an api route is made because, cookies are server side props and cannot be access directly on components
+    // that use 'use client' keyword.
+
+    cookies().delete(AuthCookies.ID_TOKEN)
+    cookies().delete(AuthCookies.SHOULD_REDIRECT_TO_SETTINGS)
+  
+    return (new NextResponse(null, { status: 204 }))
+  
+  }
