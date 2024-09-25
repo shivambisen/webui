@@ -42,6 +42,9 @@ jest.mock('@/generated/galasaapi', () => ({
           }
         }]
       })
+    ),
+    deleteToken: jest.fn().mockReturnValue(
+      Promise.resolve("Token deleted")
     )
   })),
   UsersAPIApi: jest.fn(() => ({
@@ -189,6 +192,52 @@ describe('GET /auth/tokens', () => {
   
     expect(response.status).toBe(400); // Expecting 400 status code
     expect(responseText).toEqual("No login ID provided");
+  });
+
+});
+
+describe('DELETE /auth/tokens', () => {
+
+  it('should return 200 when token is deleted', async () => {
+
+    mockAuthenticationApi.mockReturnValue({
+      deleteToken: jest.fn().mockReturnValue(
+        Promise.resolve("Token deleted")
+      )
+    });
+
+    const tokenId = "testTokenId";
+
+    const testBody = JSON.stringify({ tokenId });
+
+    const request = new NextRequest("https://my-server/auth/tokens", { method: "DELETE", body: testBody })
+
+    const response = await AuthTokenRoute.DELETE(request)
+
+    expect(response.status).toEqual(200)
+    
+  });
+
+  it('should return 400 when no tokenId is provided', async () => {
+
+    mockAuthenticationApi.mockReturnValue({
+      deleteToken: jest.fn().mockReturnValue(
+        Promise.resolve("Token ID is required")
+      )
+    });
+
+    const tokenId = "";
+
+    const testBody = JSON.stringify({ tokenId });
+
+    const request = new NextRequest("https://my-server/auth/tokens", { method: "DELETE", body: testBody })
+
+    const response = await AuthTokenRoute.DELETE(request)
+    const responseText = await response.text();
+
+    expect(response.status).toEqual(400)
+    expect(responseText).toEqual("Token ID is required")
+    
   });
 
 });
