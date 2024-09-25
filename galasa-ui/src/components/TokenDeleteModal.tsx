@@ -10,8 +10,9 @@ import { TextInput } from '@carbon/react';
 import { InlineNotification } from '@carbon/react';
 import { Loading,Modal} from "@carbon/react"
 import Token from '@/utils/interfaces/Token';
+import TokenRequestModalProps from '@/utils/interfaces/TokenRequestModalProps';
 
-export default function TokenRequestModal({ tokens, selectedTokens, deleteTokenFromSet, updateDeleteModalState }: { tokens: Set<Token>, selectedTokens: Set<string>, deleteTokenFromSet: Function, updateDeleteModalState:Function }) {
+export default function TokenRequestModal({ tokens, selectedTokens, deleteTokenFromSet, updateDeleteModalState }: TokenRequestModalProps) {
 
     const [open, setOpen] = useState(true);
     const [error, setError] = useState('');

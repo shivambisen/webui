@@ -9,7 +9,7 @@ import AuthCookies from '@/utils/authCookies';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { AuthenticationAPIApi, UsersAPIApi } from '@/generated/galasaapi';
-import * as CONSTANTS from "@/utils/constants"
+import * as Constants from "@/utils/constants"
 
 // Stop this route from being pre-rendered
 export const dynamic = 'force-dynamic';
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
 
   if (loginId) {
 
-    const tokens = await authApiClientWithAuthHeader.getTokens(CONSTANTS.CLIENT_API_VERSION, loginId)
+    const tokens = await authApiClientWithAuthHeader.getTokens(Constants.CLIENT_API_VERSION, loginId)
     
     const serializedTokens = JSON.stringify(tokens.tokens);
     return (new NextResponse(serializedTokens, {status: 200}))

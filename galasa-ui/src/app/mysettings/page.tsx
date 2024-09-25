@@ -26,7 +26,6 @@ export default function MySettings() {
   return (
     <div>
         
-      <PageTile title={"My Settings"} />
       <MySettingsPage />
       <TokenResponseModal refreshToken={refreshToken} clientId={clientId} onLoad={deleteCookies} />
       

@@ -13,6 +13,7 @@ import ErrorPage from "@/app/error/page"
 import TokenRequestModal from "@/components/TokenRequestModal";
 import TokenDeleteModal from "@/components/TokenDeleteModal";
 import Token from "@/utils/interfaces/Token";
+import PageTile from "./PageTile";
 
 export default function MySettingsPage() {
 
@@ -105,15 +106,17 @@ export default function MySettingsPage() {
     }
 
     return (
-        <div className={styles.container}>
+        <div id="content" className={styles.container}>
+
+            <PageTile title={"My Settings"} />
 
             <div className={styles.tokenContainer}>
-                <h3 className={styles.title}>Access Tokens</h3>
+                <h4 className={styles.title}>Access Tokens</h4>
 
-                <div className={styles.titleContainer}>
+                <div className={styles.pageHeaderContainer}>
                     <div>
-                        <h4 className={styles.heading}>An access token is a unique secret key held by a client program so it has permission to use the Galasa service</h4>
-                        <h4 className={styles.heading}>A token has the same access rights as the user who allocated it.</h4>
+                        <h5 className={styles.heading}>An access token is a unique secret key held by a client program so it has permission to use the Galasa service</h5>
+                        <h5 className={styles.heading}>A token has the same access rights as the user who allocated it.</h5>
                     </div>
 
                     <div className={styles.btnContainer}>

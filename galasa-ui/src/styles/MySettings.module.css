@@ -12,7 +12,7 @@
     font-weight: 500;
 }
 
-.titleContainer {
+.pageHeaderContainer {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
