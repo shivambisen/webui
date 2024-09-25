@@ -128,7 +128,7 @@ export default function MySettingsPage() {
                 <div title="Access Tokens" className={styles.tokensList}>
                     {
                         Array.from(tokens).map((token) => (
-                            <TokenCard token={token} selectTokenForDeletion={selectTokenForDeletion} />
+                            <TokenCard key={token.tokenId} token={token} selectTokenForDeletion={selectTokenForDeletion} />
                         ))
                     }
                 </div>
