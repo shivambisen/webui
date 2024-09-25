@@ -214,7 +214,7 @@ describe('DELETE /auth/tokens', () => {
 
     const response = await AuthTokenRoute.DELETE(request)
 
-    expect(response.status).toEqual(200)
+    expect(response.status).toEqual(204)
     
   });
 

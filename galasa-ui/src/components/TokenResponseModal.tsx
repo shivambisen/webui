@@ -7,49 +7,26 @@ import { InlineNotification } from '@carbon/react';
 import { Modal, CodeSnippet } from '@carbon/react';
 import { useEffect, useState } from 'react';
 
-interface TokenResponseData {
+interface TokenResponseModalProps {
   refreshToken: string;
   clientId: string;
+  onLoad: () => Promise<void>;
 }
 
-export default function TokenResponseModal() {
-  const [tokenResponseData, setTokenResponseData] = useState<TokenResponseData>() 
+export default function TokenResponseModal({ refreshToken, clientId, onLoad }: TokenResponseModalProps) {
+  const [token, setToken] = useState('');
+  const [clientIdState, setClientId] = useState('');
   const [isOpen, setOpen] = useState(false);
 
-  const handleFetchTokenAndClientId = async () => {
-
-    const response = await fetch('/cookies', { method: "GET" });
-
-    if (response.ok) {
-      
-      const data = await response.json()
-
-      if (data.refreshToken.length > 0 && data.clientId.length > 0) {    
-
-        setTokenResponseData(data)
-        setOpen(true)
-  
-      }
-
-    }
-
-  }
-
-  const deleteClientIdAndTokenOnLoad = async () => {
-
-    try {
-      await fetch('/cookies', { method: "DELETE" });
-    } catch (err) {
-      console.error('Failed to load token response dialog: %s', err)
-    }
-  }
-
   useEffect(() => {
+    if (refreshToken.length > 0 && clientId.length > 0) {
+      setToken(refreshToken);
+      setClientId(clientId);
+      setOpen(true);
 
-    handleFetchTokenAndClientId()    
-
-  }, []);
-
+      onLoad().catch((err) => console.error('Failed to load token response dialog: %s', err));
+    }
+  }, [clientId, refreshToken, onLoad]);
 
   return (
     <Modal
@@ -62,14 +39,13 @@ export default function TokenResponseModal() {
       preventCloseOnClickOutside
       onRequestClose={() => {
         setOpen(false);
-        deleteClientIdAndTokenOnLoad()
       }}
     >
       <p>
         Copy the following property into the galasactl.properties file in your Galasa home directory* or set it as an environment variable in your
         terminal to allow your client tool to access the Galasa Ecosystem.
       </p>
-      <CodeSnippet type="multi" wrapText>{`GALASA_TOKEN=${tokenResponseData?.refreshToken}:${tokenResponseData?.clientId}`}</CodeSnippet>
+      <CodeSnippet type="multi" wrapText>{`GALASA_TOKEN=${token}:${clientIdState}`}</CodeSnippet>
       <InlineNotification
         title="The personal access token details are not stored and cannot be retrieved when this dialog is closed."
         subtitle="Remember to copy the details shown above before closing this dialog."

@@ -9,20 +9,24 @@ import { useState } from "react";
 import styles from "../styles/TokenCard.module.css"
 import { Password } from '@carbon/icons-react';
 import { SelectableTile } from '@carbon/react';
+import Token from "@/utils/interfaces/Token";
 
-function TokenCard({tokenId, tokenDescription, createdAt, owner, handleSelectTokensForDeletion} : {tokenId:string , tokenDescription : string, createdAt : string, owner :string, handleSelectTokensForDeletion : any}){
+function TokenCard({token, selectTokenForDeletion} : {token : Token, selectTokenForDeletion: Function}){
 
-    const trimmedTime = createdAt.split("T")
+    //The token creation time receieved from the API is: e.g 2024-09-25T10:02:55.732580Z
+    // Splitting at "T" will give us the date part of the creationTime ---> split = [2024-09-25 , 10:02:55.732580Z]
+    // split[0] ---> 2024-09-25
+    const trimmedTime = token.creationTime.split("T")
 
     return(
 
-        <SelectableTile onClick={() => handleSelectTokensForDeletion(tokenId)} value={true} key={tokenId} className={styles.cardContainer}>
+        <SelectableTile onClick={() => selectTokenForDeletion(token.tokenId)} value={true} key={token.tokenId} className={styles.cardContainer}>
 
-            <h5>{tokenDescription}</h5>
+            <h5>{token.description}</h5>
             <div className={styles.infoContainer}>
 
                 <h6>Created at: {trimmedTime[0]}</h6>
-                <h6>Owner: {owner}</h6>
+                <h6>Owner: {token.owner.loginId}</h6>
                 
             </div>
 

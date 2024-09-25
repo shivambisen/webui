@@ -9,11 +9,10 @@ import AuthCookies from '@/utils/authCookies';
 import { cookies } from 'next/headers';
 import { NextRequest, NextResponse } from 'next/server';
 import { AuthenticationAPIApi, UsersAPIApi } from '@/generated/galasaapi';
+import * as CONSTANTS from "@/utils/constants"
 
 // Stop this route from being pre-rendered
 export const dynamic = 'force-dynamic';
-
-const CLIENT_API_VERSION = "0.37.0"
 
 interface TokenDetails {
   tokenDescription: string,
@@ -59,15 +58,14 @@ export async function GET(request: NextRequest) {
 
   const loginId = response.length > 0 && response[0].loginId;
 
-  if(loginId){
+  if (loginId) {
 
-    const tokens = await authApiClientWithAuthHeader.getTokens(CLIENT_API_VERSION, loginId)
+    const tokens = await authApiClientWithAuthHeader.getTokens(CONSTANTS.CLIENT_API_VERSION, loginId)
     
     const serializedTokens = JSON.stringify(tokens.tokens);
     return (new NextResponse(serializedTokens, {status: 200}))
 
-  }
-  else{
+  } else {
     return (new NextResponse("No login ID provided", {status : 400}));
   }
 
@@ -85,6 +83,6 @@ export async function DELETE(request: NextRequest){
 
   await authApiClientWithAuthHeader.deleteToken(tokenId)  
 
-  return (new NextResponse(null, {status: 200}))
+  return (new NextResponse(null, {status: 204}))
 
 }

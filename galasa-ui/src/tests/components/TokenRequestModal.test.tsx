@@ -26,7 +26,7 @@ describe('Token request modal', () => {
     await act(async () => {
       return render(<TokenRequestModal isDisabled={false}/>);
     });
-    const buttonElement = screen.getByTestId("token-request-btn");
+    const buttonElement = screen.getByRole("token-request-btn");
     const requestModalElement = screen.getByRole('presentation');
 
     // Then...
@@ -40,7 +40,7 @@ describe('Token request modal', () => {
     await act(async () => {
       return render(<TokenRequestModal isDisabled={false}/>);
     });
-    const buttonElement = screen.getByTestId("token-request-btn");
+    const buttonElement = screen.getByRole("token-request-btn");
     const requestModalElement = screen.getByRole('presentation');
 
     // When...
@@ -55,7 +55,7 @@ describe('Token request modal', () => {
     await act(async () => {
       return render(<TokenRequestModal isDisabled={false} />);
     });
-    const openModalButtonElement = screen.getByTestId("token-request-btn");
+    const openModalButtonElement = screen.getByRole("token-request-btn");
     const modalCancelButtonElement = screen.getByText(/Cancel/i);
     const requestModalElement = screen.getByRole('presentation');
 
@@ -83,7 +83,7 @@ describe('Token request modal', () => {
     await act(async () => {
       return render(<TokenRequestModal isDisabled={false}/>);
     });
-    const openModalButtonElement = screen.getByTestId("token-request-btn");
+    const openModalButtonElement = screen.getByRole("token-request-btn");
     const modalSubmitButtonElement = screen.getByText(/Submit/i);
     const modalNameInputElement = screen.getByLabelText(/Token Name/i);
 
@@ -111,7 +111,7 @@ describe('Token request modal', () => {
     await act(async () => {
       return render(<TokenRequestModal isDisabled={false}/>);
     });
-    const openModalButtonElement = screen.getByTestId("token-request-btn");
+    const openModalButtonElement = screen.getByRole("token-request-btn");
     const modalSubmitButtonElement = screen.getByText(/Submit/i);
     const modalNameInputElement = screen.getByLabelText(/Token Name/i);
 
@@ -143,7 +143,7 @@ describe('Token request modal', () => {
     await act(async () => {
       render(<TokenRequestModal isDisabled={false}/>);
     });
-    const openModalButtonElement = screen.getByTestId("token-request-btn");
+    const openModalButtonElement = screen.getByRole("token-request-btn");
     const modalSubmitButtonElement = screen.getByText(/Submit/i);
     const modalNameInputElement = screen.getByLabelText(/Token Name/i);
 
@@ -175,7 +175,7 @@ describe('Token request modal', () => {
     await act(async () => {
       render(<TokenRequestModal isDisabled={false}/>);
     });
-    const openModalButtonElement = screen.getByTestId("token-request-btn");
+    const openModalButtonElement = screen.getByRole("token-request-btn");
     const modalSubmitButtonElement = screen.getByText(/Submit/i);
     const modalNameInputElement = screen.getByLabelText(/Token Name/i);
 
@@ -216,7 +216,7 @@ describe('Token request modal', () => {
       render(<TokenRequestModal isDisabled={false}/>);
     });
 
-    const openModalButtonElement = screen.getByTestId("token-request-btn");
+    const openModalButtonElement = screen.getByRole("token-request-btn");
     const modalSubmitButtonElement = screen.getByText(/Submit/i);
 
     // When...
@@ -243,7 +243,7 @@ describe('Token request modal', () => {
       render(<TokenRequestModal isDisabled={false}/>);
     });
 
-    const openModalButtonElement = screen.getByTestId("token-request-btn");
+    const openModalButtonElement = screen.getByRole("token-request-btn");
     const modalNameInputElement = screen.getByLabelText(/Token Name/i);
 
     // When...
@@ -270,7 +270,7 @@ describe('Token request modal', () => {
     await act(async () => {
       return render(<TokenRequestModal isDisabled={false}/>);
     });
-    const openModalButtonElement = screen.getByTestId("token-request-btn");
+    const openModalButtonElement = screen.getByRole("token-request-btn");
     const modalNameInputElement = screen.getByLabelText(/Token Name/i);
 
     // When...
@@ -297,7 +297,7 @@ describe('Token request modal', () => {
       render(<TokenRequestModal isDisabled={false}/>);
     });
 
-    const openModalButtonElement = screen.getByTestId("token-request-btn");
+    const openModalButtonElement = screen.getByRole("token-request-btn");
     const modalSubmitButtonElement = screen.getByText(/Submit/i);
 
     // When...

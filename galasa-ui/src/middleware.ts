@@ -16,16 +16,15 @@ export async function middleware(request: NextRequest) {
 
   try {
     if (request.url.includes('/callback')) {
-      const responseUrl = request.url.substring(0, request.url.lastIndexOf('/callback'));
+      let responseUrl = request.url.substring(0, request.url.lastIndexOf('/callback'));
 
       const shouldReturnToMySettingsPage = cookies().get(AuthCookies.SHOULD_REDIRECT_TO_SETTINGS)
     
       if(shouldReturnToMySettingsPage?.value === 'true'){
-        response = await handleCallback(request, NextResponse.redirect(responseUrl + "/mysettings", { status: 302 }));  
+        responseUrl = responseUrl + "/mysettings"
       }
-      else{     
-        response = await handleCallback(request, NextResponse.redirect(responseUrl, { status: 302 }));
-      }
+      
+      response = await handleCallback(request, NextResponse.redirect(responseUrl, { status: 302 }));
       
     } else if (!isAuthenticated(request)) {
 

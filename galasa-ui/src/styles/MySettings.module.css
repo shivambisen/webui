@@ -1,4 +1,8 @@
-
+/*
+ * Copyright contributors to the Galasa project
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 .container { 
     width: 95%;
     margin: 5rem auto;
@@ -25,6 +29,10 @@
     margin: 1rem 0;
 }
 
-.deleteBtn{
-    margin: 0 1rem;
+.deleteBtn {
+    margin-left: 1rem !important;
+}
+
+.title{
+    margin: 1rem 0;
 }

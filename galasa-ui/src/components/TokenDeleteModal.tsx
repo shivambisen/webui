@@ -9,23 +9,15 @@ import { useRef, useState } from 'react';
 import { TextInput } from '@carbon/react';
 import { InlineNotification } from '@carbon/react';
 import { Loading,Modal} from "@carbon/react"
+import Token from '@/utils/interfaces/Token';
 
-export default function TokenRequestModal({ tokens, selectedTokens, handleUpdateTokens, handleUpdateDeleteModalState }: { tokens: any, selectedTokens: any, handleUpdateTokens: any, handleUpdateDeleteModalState:any }) {
+export default function TokenRequestModal({ tokens, selectedTokens, deleteTokenFromSet, updateDeleteModalState }: { tokens: Set<Token>, selectedTokens: Set<string>, deleteTokenFromSet: Function, updateDeleteModalState:Function }) {
 
     const [open, setOpen] = useState(true);
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false)
 
-    interface Token {
-        tokenId: string;
-        description: string;
-        creationTime: string;
-        owner: {
-            loginId: string;
-        };
-    }
-
-    const handleDeleteTokensById = async () => {
+    const deleteTokensById = async () => {
 
         try {
 
@@ -44,10 +36,10 @@ export default function TokenRequestModal({ tokens, selectedTokens, handleUpdate
                         body: JSON.stringify({ tokenId: token.tokenId }),
                     });
 
-                    if (response.ok) {
+                    if (response.status === 204) {
 
                         //Update the tokens after deletion
-                        handleUpdateTokens(token)
+                        deleteTokenFromSet(token)
                         setOpen(false)
 
                     }
@@ -64,7 +56,7 @@ export default function TokenRequestModal({ tokens, selectedTokens, handleUpdate
             }
 
             setError(errorMessage);
-            console.error('Failed to request a personal access token: %s', err);
+            console.error('Failed to delete a personal access token: %s', err);
         }
         finally {
             setIsLoading(false)
@@ -89,10 +81,10 @@ export default function TokenRequestModal({ tokens, selectedTokens, handleUpdate
                 onRequestClose={() => {
                     setOpen(false);
                     setError('');
-                    handleUpdateDeleteModalState()
+                    updateDeleteModalState()
                 }}
                 onRequestSubmit={async () => {
-                    await handleDeleteTokensById();
+                    await deleteTokensById();
                 }}
             >
                 <h6 className='margin-top-1'>
@@ -113,7 +105,7 @@ export default function TokenRequestModal({ tokens, selectedTokens, handleUpdate
                 {error && (
                     <InlineNotification
                         className="margin-top-1"
-                        title="Error requesting access token"
+                        title="Error deleting access token"
                         subtitle={error}
                         kind="error"
                         onCloseButtonClick={() => setError('')}

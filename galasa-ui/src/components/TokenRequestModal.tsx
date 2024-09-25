@@ -54,7 +54,7 @@ export default function TokenRequestModal({isDisabled} : {isDisabled : boolean})
     
   return (
     <>
-      <Button iconDescription={"Create new access token"} data-testid="token-request-btn" disabled={isDisabled} hasIconOnly onClick={() => setOpen(true)}>
+      <Button iconDescription={"Create new access token"} role="token-request-btn" disabled={isDisabled} hasIconOnly onClick={() => setOpen(true)}>
           <Add/>
       </Button>
       <Modal
