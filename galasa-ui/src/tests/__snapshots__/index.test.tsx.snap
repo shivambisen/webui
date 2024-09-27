@@ -14,18 +14,42 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
         >
           Home
         </div>
-        <div
-          class="center"
-        >
-          <h1>
-            Something went wrong!
-          </h1>
-          <p
-            class="margin-top-1"
+        <section>
+          <div
+            class="homeContentWrapper"
           >
-            Please report the problem to your Galasa Ecosystem administrator.
-          </p>
-        </div>
+            <section>
+              <h2>
+                Welcome to your Galasa Service
+              </h2>
+              <section>
+                <h4>
+                  Get the most from your Galasa experience by reading the
+                  <a
+                    class="link"
+                    href="https://galasa.dev/"
+                    rel="noopener noreferrer"
+                    target="_blank"
+                  >
+                     Galasa documentation.
+                  </a>
+                </h4>
+              </section>
+            </section>
+            <img
+              alt="home-graphic"
+              class="heroImage"
+              data-nimg="1"
+              decoding="async"
+              height="680"
+              loading="lazy"
+              src="/_next/image?url=%2Fimg.jpg&w=1920&q=75"
+              srcset="/_next/image?url=%2Fimg.jpg&w=750&q=75 1x, /_next/image?url=%2Fimg.jpg&w=1920&q=75 2x"
+              style="color: transparent;"
+              width="680"
+            />
+          </div>
+        </section>
       </div>
     </div>
   </body>,
@@ -39,18 +63,42 @@ exports[`renders Galasa Ecosystem homepage 1`] = `
       >
         Home
       </div>
-      <div
-        class="center"
-      >
-        <h1>
-          Something went wrong!
-        </h1>
-        <p
-          class="margin-top-1"
+      <section>
+        <div
+          class="homeContentWrapper"
         >
-          Please report the problem to your Galasa Ecosystem administrator.
-        </p>
-      </div>
+          <section>
+            <h2>
+              Welcome to your Galasa Service
+            </h2>
+            <section>
+              <h4>
+                Get the most from your Galasa experience by reading the
+                <a
+                  class="link"
+                  href="https://galasa.dev/"
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                   Galasa documentation.
+                </a>
+              </h4>
+            </section>
+          </section>
+          <img
+            alt="home-graphic"
+            class="heroImage"
+            data-nimg="1"
+            decoding="async"
+            height="680"
+            loading="lazy"
+            src="/_next/image?url=%2Fimg.jpg&w=1920&q=75"
+            srcset="/_next/image?url=%2Fimg.jpg&w=750&q=75 1x, /_next/image?url=%2Fimg.jpg&w=1920&q=75 2x"
+            style="color: transparent;"
+            width="680"
+          />
+        </div>
+      </section>
     </div>
   </div>,
   "debug": [Function],

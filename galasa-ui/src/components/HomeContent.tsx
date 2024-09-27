@@ -15,6 +15,7 @@ import MarkdownIt from 'markdown-it';
 export default function HomeContent() {
 
     const [markdownContent, setMarkdownContent]: any = useState()
+    const [isError, setIsError] = useState(false)
 
     let md = new MarkdownIt();
 
@@ -36,7 +37,7 @@ export default function HomeContent() {
                 setMarkdownContent(result)
             }
         }catch(err){
-            throw new Error("Could not parse markdown into HTML")
+            setIsError(true)
         }
     }
 
