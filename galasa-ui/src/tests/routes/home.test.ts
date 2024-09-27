@@ -13,10 +13,11 @@ jest.mock("@/generated/galasaapi");
 jest.mock("@/utils/api");
 
 describe("GET function", () => {
-    let mockGetCpsProperty : any;
+
+    let mockGetCpsProperty: jest.Mock<Promise<{ data: { value: string } }[]>, [string, string]>;
 
     beforeEach(() => {
-        
+
         jest.clearAllMocks();
 
         mockGetCpsProperty = jest.fn();
@@ -31,7 +32,7 @@ describe("GET function", () => {
     });
 
     it("should return a 200 response with data when the API call is successful", async () => {
-        
+
         const mockResponse = [
             { data: { value: "Mocked welcome markdown content" } }
         ];
@@ -45,5 +46,4 @@ describe("GET function", () => {
         const bodyText = await result.text(); // Extract text from the response
         expect(bodyText).toBe("Mocked welcome markdown content");
     });
-
 });

@@ -5,7 +5,7 @@
  */
 'use client'
 import Image from "next/image";
-import homeGraphic from "../../public/static/homeGraphic.png"
+import homeGraphic from "../../public/static/galasa.svg"
 import { Heading, Section } from "@carbon/react"
 import styles from "../styles/HomeContent.module.css"
 import Link from "next/link";
@@ -14,29 +14,27 @@ import MarkdownIt from 'markdown-it';
 
 export default function HomeContent() {
 
-    const [markdownContent, setMarkdownContent]: any = useState()
+    const [markdownContent, setMarkdownContent] = useState<string>('')
     const [isError, setIsError] = useState(false)
 
-    let md = new MarkdownIt();
+    let md = new MarkdownIt({
+        html: true
+    });
 
     const fetchHomeTitleFromCps = async () => {
 
-        try{
+        try {
             const response = await fetch("/home", { method: "GET" });
 
             if (response.ok) {
-    
+
                 let markdownFileContent = await response.text();
-    
-                if(markdownFileContent.length >= 64){
-                    markdownFileContent = markdownFileContent.substring(0, 64) + "..."
-                }
-    
+
                 let result = md.render(markdownFileContent)
 
                 setMarkdownContent(result)
             }
-        }catch(err){
+        } catch (err) {
             setIsError(true)
         }
     }
@@ -60,10 +58,12 @@ export default function HomeContent() {
                                     <Link className={styles.link} href="https://galasa.dev/" target="_blank" rel="noopener noreferrer"> Galasa documentation.</Link>
                                 </h4>
                             </Section>
+
+                            <Image className={styles.heroImage} src={homeGraphic} width={680} height={680} alt='home-graphic'></Image>
                         </Section>
                     )
                 }
-                <Image className={styles.heroImage} src={homeGraphic} width={680} height={680} alt='home-graphic'></Image>
+                
             </div>
         </Section>
     )
