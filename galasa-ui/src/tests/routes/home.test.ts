@@ -46,10 +46,4 @@ describe("GET function", () => {
         expect(bodyText).toBe("Mocked welcome markdown content");
     });
 
-    it("should throw an error when the API call fails", async () => {
-    
-        mockGetCpsProperty.mockRejectedValue(new Error("API Error"));
-
-        await expect(GET()).rejects.toThrow("Failed to fecth CPS property");
-    });
 });

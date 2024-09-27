@@ -12,21 +12,15 @@ const NAMESPACE = "service"
 const PROPERTY_NAME = "welcome.markdown"
 
 export async function GET() {
-    
-try {
 
     let data;
     const cpsApiClientWithAuthHeader = new ConfigurationPropertyStoreAPIApi(createAuthenticatedApiConfiguration());
     const response = await cpsApiClientWithAuthHeader.getCpsProperty(NAMESPACE, PROPERTY_NAME);
 
-    if(response.length > 0 && response[0]){
+    if (response.length > 0 && response[0]) {
         data = response[0].data?.value;
     }
 
-    return (new NextResponse(data, {status: 200}))
-    
-} catch (error) {
-    throw new Error("Failed to fecth CPS property")
-}
+    return (new NextResponse(data, { status: 200 }))
 
 }
