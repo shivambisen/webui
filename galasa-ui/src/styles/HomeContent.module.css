@@ -11,6 +11,7 @@
     display: grid;
     place-items: center;
     flex-direction: column;
+    text-align: center;
 }
 
 .link{
