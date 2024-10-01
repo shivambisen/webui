@@ -38,7 +38,7 @@ test("render home content title", async () => {
     render(<HomeContent />)
 
     await act(async () => {
-        // Simulate the useEffect the useEffect hook
+        // Simulate the useEffect hook
         await new Promise((resolve) => setTimeout(resolve, 1000));
     });
 
