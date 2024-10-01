@@ -4,25 +4,72 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 'use client'
-import Image from "next/image";
-import homeGraphic from "../../public/static/homeGraphic.png"
-import { Heading, Section } from "@carbon/react"
+import { Section } from "@carbon/react"
 import styles from "../styles/HomeContent.module.css"
-import Link from "next/link";
+import { useEffect, useState } from "react";
+import MarkdownIt from 'markdown-it'
 
 export default function HomeContent() {
+
+    const [markdownContent, setMarkdownContent] = useState<string>("")
+    const [cpsMarkdownContent, setCpsMarkdownContent] = useState<string>("")
+
+    let md = new MarkdownIt({
+        html: false
+    });
+
+    //fetching CPS properties from API
+    //Overrides the default markdown content present in /public/static/markdown/home-contents.md
+    const fetchHomeTitleFromCps = async () => {
+
+        try {
+            const response = await fetch("/home", { method: "GET" });
+
+            if (response.ok) {
+
+                let markdownFileContent = await response.text();
+
+                let result = md.render(markdownFileContent)
+
+                setCpsMarkdownContent(result)
+            }
+        } catch (err) {
+            console.error('Error fetching or processing the markdown file', err);
+        }
+    }
+
+    //fetching markdown content from local project files
+    //will be used as default if no CPS property is set
+    const fetchMarkdown = async () => {
+        try {
+            // Fetch the markdown file from the public/static folder
+            const response = await fetch('/static/markdown/home-contents.md');
+            const text = await response.text();
+
+            // Convert the markdown to HTML
+            const processedContent = await md.render(text)
+            setMarkdownContent(processedContent.toString());
+        } catch (error) {
+            console.error('Error fetching or processing the markdown file', error);
+        }
+    };
+
+    useEffect(() => {
+        Promise.all([fetchHomeTitleFromCps(), fetchMarkdown()])
+    }, [])
 
     return (
         <Section level={1}>
             <div className={styles.homeContentWrapper}>
-                <Heading>Welcome to your Galasa Service</Heading>
-                <Section level={2}>
-                    <h4>Get the most from your Galasa experience by reading the 
-                        <Link className={styles.link} href="https://galasa.dev/" target="_blank" rel="noopener noreferrer"> Galasa documentation.</Link>
-                    </h4>
-                </Section>
-                <Image className={styles.heroImage} src={homeGraphic} width={680} height={680} alt='home-graphic'></Image>
+                
+                {   
+                    cpsMarkdownContent ? <div dangerouslySetInnerHTML={{ __html: cpsMarkdownContent }} />
+                    :
+                    <div dangerouslySetInnerHTML={{ __html: markdownContent }} />
+                }
+
             </div>
+
         </Section>
     )
 

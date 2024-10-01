@@ -5,12 +5,13 @@
  */
 
 .homeContentWrapper{
-    width: 100%;
+    width: 90%;
     height: 100%;
-    margin-top: 4rem;
+    margin: 4rem auto;
     display: grid;
     place-items: center;
     flex-direction: column;
+    text-align: left;
 }
 
 .link{
