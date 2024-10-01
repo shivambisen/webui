@@ -3,27 +3,60 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import { render, screen } from '@testing-library/react';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import React from 'react';
 import HomeContent from '@/components/HomeContent';
 
+beforeEach(() => {
+    global.fetch = jest.fn(() =>
+        Promise.resolve({
+            ok: true,
+            status: 200,
+            statusText: "OK",
+            headers: new Headers(), // Mock Headers
+            redirected: false,
+            type: "basic",
+            url: "",
+            text: jest.fn().mockResolvedValue('# Mocked Markdown Content This is a test'),
+            json: jest.fn(), // Optional mock if needed for other tests
+        } as unknown as Response)
+    );
+});
 
-test("render home content title", () => {
+afterEach(() => {
+    jest.resetAllMocks();
+});
+
+test('renders markdown content', async () => {
+    render(<HomeContent />);
+    const content = await screen.findByText('Mocked Markdown Content This is a test');
+    expect(content).toBeInTheDocument();
+});
+
+test("render home content title", async () => {
 
     render(<HomeContent />)
 
-    const title = screen.getByText("Welcome to your Galasa Service")
+    await act(async () => {
+        // Simulate the useEffect the useEffect hook
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+    });
+
+    const title = screen.getByText("Mocked Markdown Content This is a test")
 
     expect(title).toBeInTheDocument()
 })
 
-test("render home content sub-title", () => {
+test("render home content sub-title", async () => {
 
     render(<HomeContent />)
 
-    const subTitle = screen.getByText("Get the most from your Galasa experience by reading the")
-    const link = screen.getByText("Galasa documentation.")
+    await act(async () => {
+        // Simulate the useEffect the useEffect hook
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+    });
 
-    expect(link).toBeInTheDocument()
+    const subTitle = screen.getByText("Mocked Markdown Content This is a test")
+
     expect(subTitle).toBeInTheDocument()
 })
