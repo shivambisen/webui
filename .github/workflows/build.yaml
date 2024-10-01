@@ -85,8 +85,8 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          username: galasa-team
+          password: ${{ secrets.GALASA_TEAM_WRITE_PACKAGES_TOKEN }}
   
       - name: Extract metadata for webui image
         id: metadata
@@ -103,3 +103,16 @@ jobs:
           push: true
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
+
+  report-failure:
+    name: Report failure in workflow
+    runs-on: ubuntu-latest
+    needs: build-webui
+    if: failure()
+
+    steps:
+      - name: Report failure in workflow to Slack
+        env: 
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+        run : |
+          docker run --rm -v ${{ github.workspace }}:/var/workspace ghcr.io/galasa-dev/galasabld-ibm:main slackpost workflows --repo "webui" --workflowName "${{ github.workflow }}" --workflowRunNum "${{ github.run_id }}" --ref "${{ env.BRANCH }}" --hook "${{ env.SLACK_WEBHOOK }}"
