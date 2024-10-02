@@ -8,7 +8,7 @@
 import { useRef, useState } from 'react';
 import { TextInput } from '@carbon/react';
 import { InlineNotification } from '@carbon/react';
-import { Loading,Modal} from "@carbon/react";
+import { Loading, Modal } from "@carbon/react";
 import Token from '@/utils/interfaces/Token';
 import TokenRequestModalProps from '@/utils/interfaces/TokenRequestModalProps';
 
@@ -65,8 +65,8 @@ export default function TokenRequestModal({ tokens, selectedTokens, deleteTokenF
 
   };
 
-  if(isLoading){
-    <Loading  />;
+  if (isLoading) {
+    <Loading />;
   }
 
 
@@ -89,13 +89,13 @@ export default function TokenRequestModal({ tokens, selectedTokens, deleteTokenF
         }}
       >
         <h6 className='margin-top-1'>
-                    Number of access tokens to delete: {selectedTokens.size}
+          Number of access tokens to delete: {selectedTokens.size}
         </h6>
 
         <div className='margin-top-2'>
           <InlineNotification
             title="Client programs using these access tokens will no longer have access to this Galasa Service."
-            subtitle="This operation is irreversible, though new access tokens can be created to replace the ones being deleted."
+            subtitle="This operation is irreversible, though new access tokens can be created to replace the ones being deleted. Whichever client program used this token will need to be re-configured to use a replacement."
             kind="warning"
             lowContrast
             hideCloseButton

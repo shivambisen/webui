@@ -84,13 +84,13 @@ describe('Token request modal', () => {
       return render(<TokenRequestModal isDisabled={false}/>);
     });
     const openModalButtonElement = screen.getByRole("token-request-btn");
-    const modalSubmitButtonElement = screen.getByText(/Submit/i);
+    const modalCreateButtonElement = screen.getByText(/^Create$/);
     const modalNameInputElement = screen.getByLabelText(/Token Name/i);
 
     // When...
     fireEvent.click(openModalButtonElement);
     fireEvent.input(modalNameInputElement, { target: { value: 'dummy' } });
-    fireEvent.click(modalSubmitButtonElement);
+    fireEvent.click(modalCreateButtonElement);
 
     // Then...
     await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(1));
@@ -112,7 +112,7 @@ describe('Token request modal', () => {
       return render(<TokenRequestModal isDisabled={false}/>);
     });
     const openModalButtonElement = screen.getByRole("token-request-btn");
-    const modalSubmitButtonElement = screen.getByText(/Submit/i);
+    const modalSubmitButtonElement = screen.getByText(/^Create$/);
     const modalNameInputElement = screen.getByLabelText(/Token Name/i);
 
     // The error notification should not exist yet
@@ -144,7 +144,7 @@ describe('Token request modal', () => {
       render(<TokenRequestModal isDisabled={false}/>);
     });
     const openModalButtonElement = screen.getByRole("token-request-btn");
-    const modalSubmitButtonElement = screen.getByText(/Submit/i);
+    const modalSubmitButtonElement = screen.getByText(/^Create$/);
     const modalNameInputElement = screen.getByLabelText(/Token Name/i);
 
     // The error notification should not exist yet
@@ -176,7 +176,7 @@ describe('Token request modal', () => {
       render(<TokenRequestModal isDisabled={false}/>);
     });
     const openModalButtonElement = screen.getByRole("token-request-btn");
-    const modalSubmitButtonElement = screen.getByText(/Submit/i);
+    const modalSubmitButtonElement = screen.getByText(/^Create$/);
     const modalNameInputElement = screen.getByLabelText(/Token Name/i);
 
     // The error notification should not exist yet
@@ -217,7 +217,7 @@ describe('Token request modal', () => {
     });
 
     const openModalButtonElement = screen.getByRole("token-request-btn");
-    const modalSubmitButtonElement = screen.getByText(/Submit/i);
+    const modalSubmitButtonElement = screen.getByText(/^Create$/);
 
     // When...
     await act(async () => {
@@ -298,7 +298,7 @@ describe('Token request modal', () => {
     });
 
     const openModalButtonElement = screen.getByRole("token-request-btn");
-    const modalSubmitButtonElement = screen.getByText(/Submit/i);
+    const modalSubmitButtonElement = screen.getByText(/^Create$/);
 
     // When...
     await act(async () => {

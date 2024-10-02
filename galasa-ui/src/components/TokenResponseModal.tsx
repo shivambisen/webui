@@ -54,9 +54,9 @@ export default function TokenResponseModal({ refreshToken, clientId, onLoad }: T
         hideCloseButton
       />
       <p className="margin-top-1">
-        *If you do not have a galasactl.properties file in your Galasa home directory, run the following command to create one:
+        *If you do not have a galasactl.properties file in your Galasa home directory, run the following command in a terminal to create one:
       </p>
-      <CodeSnippet className="margin-y-1" type="inline" align="right">{`galasactl local init`}</CodeSnippet>
+      <CodeSnippet className="margin-y-1" type="multi" align="right">{`galasactl local init`}</CodeSnippet>
       <p>
         See the{' '}
         <a href="https://galasa.dev/docs/initialising-home-folder" target="_blank" rel="noopener noreferrer">
