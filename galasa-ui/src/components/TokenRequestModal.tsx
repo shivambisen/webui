@@ -58,8 +58,8 @@ export default function TokenRequestModal({isDisabled} : {isDisabled : boolean})
           <Add/>
       </Button>
       <Modal
-        modalHeading="Personal access token request"
-        primaryButtonText="Submit request"
+        modalHeading="Create Galasa Personal Access Token"
+        primaryButtonText="Create"
         primaryButtonDisabled={submitDisabled}
         secondaryButtonText="Cancel"
         shouldSubmitOnEnter={true}
@@ -78,7 +78,15 @@ export default function TokenRequestModal({isDisabled} : {isDisabled : boolean})
           A personal access token is an alternative to using a password for authentication and can be used to allow client tools to access the Galasa Ecosystem on your behalf.
           Keep your personal access tokens secret and treat them like passwords.
         </p>
+
         <br />
+
+        <p>
+        You are about to allocate a new token, please give the token a name
+        </p>
+
+        <br />
+
         <TextInput
           data-modal-primary-focus
           ref={tokenNameInputRef}
