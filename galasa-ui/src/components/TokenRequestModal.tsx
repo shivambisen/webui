@@ -19,7 +19,7 @@ export default function TokenRequestModal({isDisabled} : {isDisabled : boolean})
   const tokenNameInputRef = useRef<HTMLInputElement>();
 
   const onChangeInputValidation = () => {
-    const tokenName = tokenNameInputRef.current?.value ?? '';
+    const tokenName = tokenNameInputRef.current?.value.trim() ?? '';
     setSubmitDisabled(!tokenName);
   };
 
@@ -28,7 +28,7 @@ export default function TokenRequestModal({isDisabled} : {isDisabled : boolean})
       const response = await fetch('/auth/tokens', {
         method: 'POST',
         body: JSON.stringify({
-          tokenDescription: tokenNameInputRef.current?.value
+          tokenDescription: tokenNameInputRef.current?.value.trim()
         }),
       });
 
