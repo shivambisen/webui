@@ -40,19 +40,29 @@ describe('GET function', () => {
   
   beforeEach(() => {
     jest.clearAllMocks();
-  
+
+    // Mock the API configuration creation
     mockedCreateAuthenticatedApiConfiguration.mockReturnValue(mockApiConfiguration as any);
-    mockedUsersAPIApi.prototype.getUserByLoginId = jest.fn().mockResolvedValue(mockUserResponse);
-      
+
+    // Mock the getUserByLoginId method to return the mockUserResponse
+    mockedUsersAPIApi.prototype.getUserByLoginId = jest.fn().mockResolvedValue([
+      { loginId: mockUserResponse }
+    ]);
   });
   
+  
   it('should return the loginId with a 200 status code when successful', async () => {
+    // Invoke the GET function without any arguments
     const result = await GET();
-  
-  
+
+    // Access the response body correctly
+    const bodyText = await result.text(); // Use .text() since the response is expected to be text
+
+    // Assertions
     expect(mockedCreateAuthenticatedApiConfiguration).toHaveBeenCalled();
-    expect(mockedUsersAPIApi).toHaveBeenCalledWith(mockApiConfiguration);
-    expect(result.status).toBe(200);
+    expect(mockedUsersAPIApi.prototype.getUserByLoginId).toHaveBeenCalledTimes(1); // Verify internal call
+    expect(result.status).toBe(200); // Verify status code
+    expect(bodyText).toBe(mockUserResponse); // Verify response body
   });
   
   it('should throw an error if getUserByLoginId fails', async () => {
