@@ -54,7 +54,7 @@ export async function GET(request: NextRequest) {
   const authApiClientWithAuthHeader = new AuthenticationAPIApi(createAuthenticatedApiConfiguration());
   const userApiClientWithAuthHeader = new UsersAPIApi(createAuthenticatedApiConfiguration());
 
-  const response = await userApiClientWithAuthHeader.getUserByLoginId("me");
+  const response = await userApiClientWithAuthHeader.getUserByLoginId(Constants.CLIENT_API_VERSION,"me");
 
   const loginId = response.length > 0 && response[0].loginId;
 
