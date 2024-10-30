@@ -6,6 +6,7 @@
 import { UsersAPIApi } from "@/generated/galasaapi";
 import { createAuthenticatedApiConfiguration } from "@/utils/api";
 import AuthCookies from "@/utils/authCookies";
+import * as Constants from "@/utils/constants";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
@@ -18,7 +19,7 @@ export async function GET() {
         
     const userApiClientWithAuthHeader = new UsersAPIApi(createAuthenticatedApiConfiguration());
 
-    const response = await userApiClientWithAuthHeader.getUserByLoginId("me");
+    const response = await userApiClientWithAuthHeader.getUserByLoginId(Constants.CLIENT_API_VERSION,"me");
 
     return (new NextResponse(response[0].loginId, { status: 200 }));
   } catch (err) {

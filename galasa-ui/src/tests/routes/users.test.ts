@@ -7,6 +7,7 @@
 import { UsersAPIApi } from '@/generated/galasaapi';
 import { DELETE, GET } from '../../app/users/route';
 import { createAuthenticatedApiConfiguration } from '../../utils/api';
+import * as Constants from "@/utils/constants";
 import AuthCookies from '@/utils/authCookies';
 
 jest.mock('../../utils/api');
@@ -60,6 +61,7 @@ describe('GET function', () => {
 
     // Assertions
     expect(mockedCreateAuthenticatedApiConfiguration).toHaveBeenCalled();
+    expect(mockedUsersAPIApi.prototype.getUserByLoginId).toHaveBeenCalledWith(Constants.CLIENT_API_VERSION,"me");
     expect(mockedUsersAPIApi.prototype.getUserByLoginId).toHaveBeenCalledTimes(1); // Verify internal call
     expect(result.status).toBe(200); // Verify status code
     expect(bodyText).toBe(mockUserResponse); // Verify response body
