@@ -9,7 +9,8 @@ import { useEffect, useState } from "react";
 import { Loading, ToastNotification } from "@carbon/react";
 import styles from "../../styles/MyProfile.module.css";
 import PageTile from "@/components/PageTile";
-import { FrontEndClient } from "@/utils/interfaces/FrontEndClient";
+import { FrontEndClient } from "@/generated/galasaapi";
+
 
 export default function MyProfilePage() {
 
@@ -17,13 +18,13 @@ export default function MyProfilePage() {
   const [isError, setIsError] = useState(false);
 
   const [userData, setUserData] = useState<{
-    loginId: string | null;
-    webLastLogin: string | null;
-    restApiLastLogin: string | null;
+    loginId?: string;
+    webLastLogin?: string;
+    restApiLastLogin?: string
   }>({
-    loginId: null,
-    webLastLogin: null,
-    restApiLastLogin: null,
+    loginId: undefined,
+    webLastLogin: undefined,
+    restApiLastLogin: undefined,
   });
 
   const [clients, setClients] = useState<FrontEndClient[] | []>([]);
@@ -41,7 +42,13 @@ export default function MyProfilePage() {
         setUserData(data.userData);
 
         if (data.userData.clients) {
-          setClients(data.userData.clients);
+          const clientsWithDates: FrontEndClient[] = data.userData.clients.map(
+            (client: any) => ({
+              clientName: client.clientName,
+              lastLogin: client.lastLogin ? new Date(client.lastLogin) : null,
+            })
+          );
+          setClients(clientsWithDates);
         }
 
       }
@@ -80,6 +87,9 @@ export default function MyProfilePage() {
 
           {
             clients.map((client, index) => {
+
+              const lastLoginDate = client.lastLogin;
+
               return (
                 <div key={index} className={styles.loginActivityContainer}>
                   <h4 className={styles.clientName}>
@@ -93,7 +103,12 @@ export default function MyProfilePage() {
                   </h4>
 
                   {/* Extracting the date and time from response */}
-                  <h4>&nbsp; {client.lastLogin.substring(0, 10)} {client.lastLogin.substring(11, 16)}</h4>
+                  <h4>
+                    &nbsp;
+                    {lastLoginDate
+                      ? `${lastLoginDate.toLocaleDateString()} ${lastLoginDate.toLocaleTimeString()}`
+                      : 'No last login date'}
+                  </h4>
                 </div>
               );
             })
@@ -107,7 +122,7 @@ export default function MyProfilePage() {
           aria-label="closes notification"
           kind="error"
           onClose={function noRefCheck() { }}
-          onCloseButtonClick={function noRefCheck() { setIsError(false); }}
+          onCloseButtonClick={() => { setIsError(false); }}
           statusIconDescription="notification"
           caption="Failed to fetch user profile data."
           title="Internal Server Error"
