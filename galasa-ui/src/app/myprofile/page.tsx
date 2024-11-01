@@ -26,7 +26,7 @@ export default function MyProfilePage() {
     restApiLastLogin: null,
   });
 
-  const [clients, setClients] = useState<FrontEndClient[] | []>([])
+  const [clients, setClients] = useState<FrontEndClient[] | []>([]);
 
   const handleFetchUserData = async () => {
 
@@ -38,10 +38,10 @@ export default function MyProfilePage() {
       if (response.ok) {
 
         const data = await response.json();
-        setUserData(data.userData)
+        setUserData(data.userData);
 
-        if(data.userData.clients){
-          setClients(data.userData.clients)
+        if (data.userData.clients) {
+          setClients(data.userData.clients);
         }
 
       }
@@ -79,39 +79,39 @@ export default function MyProfilePage() {
           <h3 className={styles.loginActivityTile}>Recent Login Activity</h3>
 
           {
-            clients.map((client) => {
+            clients.map((client, index) => {
               return (
-                <div className={styles.loginActivityContainer}>
+                <div key={index} className={styles.loginActivityContainer}>
                   <h4 className={styles.clientName}>
-                  {
-                    client.clientName === "web-ui"
-                    ? 
-                    "Last logged in to this web application (UTC):" 
-                    : 
-                    "Last logged in using a Galasa personal access token (UTC):"
-                  }
+                    {
+                      client.clientName === "web-ui"
+                        ?
+                        "Last logged in to this web application (UTC):"
+                        :
+                        "Last logged in using a Galasa personal access token (UTC):"
+                    }
                   </h4>
-                  
+
                   {/* Extracting the date and time from response */}
-                  <h4>&nbsp; {client.lastLogin.substring(0,10)} {client.lastLogin.substring(11,16)}</h4>
+                  <h4>&nbsp; {client.lastLogin.substring(0, 10)} {client.lastLogin.substring(11, 16)}</h4>
                 </div>
-              )
+              );
             })
           }
-          
+
         </div>
       }
 
       {isError &&
-                <ToastNotification
-                  aria-label="closes notification"
-                  kind="error"
-                  onClose={function noRefCheck() { }}
-                  onCloseButtonClick={function noRefCheck() { setIsError(false);}}
-                  statusIconDescription="notification"
-                  caption="Failed to fetch user profile data."
-                  title="Internal Server Error"
-                />    
+        <ToastNotification
+          aria-label="closes notification"
+          kind="error"
+          onClose={function noRefCheck() { }}
+          onCloseButtonClick={function noRefCheck() { setIsError(false); }}
+          statusIconDescription="notification"
+          caption="Failed to fetch user profile data."
+          title="Internal Server Error"
+        />
       }
     </div>
   );

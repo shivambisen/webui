@@ -20,7 +20,7 @@ export async function GET() {
     const userApiClientWithAuthHeader = new UsersAPIApi(createAuthenticatedApiConfiguration());
 
     const response = await userApiClientWithAuthHeader.getUserByLoginId(Constants.CLIENT_API_VERSION,"me");
-    const userData = response[0]
+    const userData = response[0];
 
     return NextResponse.json({ userData: userData }, { status: 200 });
 
