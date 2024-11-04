@@ -118,14 +118,14 @@ export default function MySettingsPage() {
             <h5 className={styles.heading}>An access token is a unique secret key held by a client program so it has permission to use the Galasa service</h5>
             <h5 className={styles.heading}>A token has the same access rights as the user who allocated it.</h5>
           </div>
+        </div>
 
-          <div className={styles.btnContainer}>
-            <TokenRequestModal isDisabled={selectedTokens.size > 0 ? true : false} />
+        <div className={styles.btnContainer}>
+          <TokenRequestModal isDisabled={selectedTokens.size > 0} />
 
-            <Button onClick={() => setIsDeleteModalOpen(true)} className={styles.deleteBtn} disabled={selectedTokens.size === 0} kind="danger">
-                            Delete {selectedTokens.size} selected access tokens
-            </Button>
-          </div>
+          <Button onClick={() => setIsDeleteModalOpen(true)} className={styles.deleteBtn} disabled={selectedTokens.size === 0} kind="danger">
+            Delete {selectedTokens.size} selected access tokens
+          </Button>
         </div>
 
         <div title="Access Tokens" className={styles.tokensList}>
