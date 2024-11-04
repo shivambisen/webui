@@ -121,7 +121,7 @@ export default function MySettingsPage() {
         </div>
 
         <div className={styles.btnContainer}>
-          <TokenRequestModal isDisabled={selectedTokens.size > 0 ? true : false} />
+          <TokenRequestModal isDisabled={selectedTokens.size > 0} />
 
           <Button onClick={() => setIsDeleteModalOpen(true)} className={styles.deleteBtn} disabled={selectedTokens.size === 0} kind="danger">
             Delete {selectedTokens.size} selected access tokens
