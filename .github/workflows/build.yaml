@@ -39,9 +39,9 @@ jobs:
         run: |
           gradle generateTypeScriptClient --info \
           --no-daemon --console plain \
-          -PsourceMaven=https://development.galasa.dev/main/maven-repo/framework 2>&1 | tee build.log
+          -PsourceMaven=https://development.galasa.dev/main/maven-repo/obr 2>&1 | tee build.log
       
-      - name: Upload Gradle Build Log
+      - name: Upload Gradle build log
         if: failure()
         uses: actions/upload-artifact@v4
         with:
