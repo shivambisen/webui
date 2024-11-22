@@ -61,6 +61,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "20.10.0"
+      
+      - name: Turn script into an executable
+        run: chmod +x detect-secrets.sh
+  
+      - name: Run the detect secrets script
+        run: ./detect-secrets.sh
 
       - name: Installing webui's dependencies using npm
         working-directory: ./galasa-ui
@@ -77,12 +83,6 @@ jobs:
         run: |
           npm run build
       
-      - name: Turn script into an executable
-        run: chmod +x detect-secrets.sh
-
-      - name: Run the detect secrets script
-        run: ./detect-secrets.sh
-
       - name: Build Webui image for testing
         id: build
         uses: docker/build-push-action@v5

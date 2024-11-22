@@ -22,7 +22,7 @@ popd 2>&1 >>/dev/null
 export ORIGINAL_DIR=$(pwd)
 # cd "${BASEDIR}"
 
-cd "${BASEDIR}/.."
+cd "${BASEDIR}"
 REPO_ROOT=$(pwd)
 
 #-----------------------------------------------------------------------------------------
@@ -64,8 +64,6 @@ function usage {
     cat <<EOF
 Options are:
 -h | --help : Display this help text
---module The name of the module to start building from
---chain true/false/yes/no/y/n
 EOF
 }
 

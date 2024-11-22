@@ -217,5 +217,7 @@ generate_rest_client
 download_node_dependencies
 run_tests
 do_build
-check_secrets
+
+${BASEDIR}/detect-secrets.sh
+
 success "Project built OK."
