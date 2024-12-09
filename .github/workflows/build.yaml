@@ -16,9 +16,33 @@ env:
   BRANCH: ${{ github.ref_name }}
 
 jobs:
+  check-secrets:
+    name: Check the required secrets are set in this organisation
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if WRITE_PACKAGES_USERNAME is set
+        run: |
+          if [ -z "${{ secrets.WRITE_PACKAGES_USERNAME }}" ]; then
+            echo "WRITE_PACKAGES_USERNAME is not set. Please configure it in the repository secrets."
+            exit 1
+          else
+            echo "WRITE_PACKAGES_USERNAME is set."
+          fi
+
+      - name: Check if WRITE_PACKAGES_TOKEN is set
+        run: |
+          if [ -z "${{ secrets.WRITE_PACKAGES_TOKEN }}" ]; then
+            echo "WRITE_PACKAGES_TOKEN is not set. Please configure it in the repository secrets."
+            exit 1
+          else
+            echo "WRITE_PACKAGES_TOKEN is set."
+          fi
+
   build-webui:
     name: Build the Galasa Web UI
     runs-on: ubuntu-latest
+    needs: check-secrets
 
     steps:
       - name: Checkout Code
@@ -41,7 +65,7 @@ jobs:
           gradle generateTypeScriptClient --info \
           --no-daemon --console plain \
           -PsourceMaven=https://development.galasa.dev/main/maven-repo/obr 2>&1 | tee build.log
-      
+
       - name: Upload Gradle build log
         if: failure()
         uses: actions/upload-artifact@v4
@@ -71,12 +95,12 @@ jobs:
         working-directory: ./galasa-ui
         run: |
           npm install
-      
+
       - name: Running webui's unit tests using npm
         working-directory: ./galasa-ui
         run: |
           npm test -- --watchAll=false
-      
+
       - name: Building webui using npm
         working-directory: ./galasa-ui
         run: |
@@ -86,15 +110,15 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: galasa-team
-          password: ${{ secrets.GALASA_TEAM_WRITE_PACKAGES_TOKEN }}
-  
+          username: ${{ secrets.WRITE_PACKAGES_USERNAME }}
+          password: ${{ secrets.WRITE_PACKAGES_TOKEN }}
+
       - name: Extract metadata for webui image
         id: metadata
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/webui
-  
+
       - name: Build Webui image
         id: build
         uses: docker/build-push-action@v5
@@ -106,26 +130,25 @@ jobs:
           labels: ${{ steps.metadata.outputs.labels }}
 
   trigger-workflow:
+    # Skip this job for forks of this repository
+    if: ${{ github.repository_owner == 'galasa-dev' }}
     name: Trigger Helm workflow to recycle ecosystem1
     needs: build-webui
     runs-on: ubuntu-latest
-    # Skip this job for forks of this repository
-    if: ${{ github.repository_owner == 'galasa-dev' }}
-    permissions: write-all
 
     steps:
-    - name: Trigger Helm workflow using GitHub CLI call
-      run: |
-        gh workflow run build-helm.yaml --repo https://github.com/galasa-dev/automation
-      env:
-        GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+      - name: Trigger Helm workflow using GitHub CLI call
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          gh workflow run build-helm.yaml --repo https://github.com/galasa-dev/automation
 
   report-failure:
+    # Skip this job for forks of this repository
+    if: ${{ failure() && github.repository_owner == 'galasa-dev' }}
     name: Report failure in workflow
     runs-on: ubuntu-latest
     needs: build-webui
-    # Skip this job for forks of this repository
-    if: ${{ failure() && github.repository_owner == 'galasa-dev' }}
 
     steps:
       - name: Report failure in workflow to Slack
