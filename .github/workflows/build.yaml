@@ -17,8 +17,6 @@ env:
 
 jobs:
   check-secrets:
-    # Run this job for forks
-    if: ${{ github.repository_owner != 'galasa-dev' }}
     name: Check for required secrets
     runs-on: ubuntu-latest
 
