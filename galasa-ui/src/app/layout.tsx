@@ -7,6 +7,8 @@
 import PageHeader from '@/components/PageHeader';
 import '../styles/global.scss';
 
+export const dynamic = "force-dynamic";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
 
   const galasaServiceName = process.env.GALASA_SERVICE_NAME?.trim() || "Galasa Service";
