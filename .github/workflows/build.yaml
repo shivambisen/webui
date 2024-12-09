@@ -17,11 +17,13 @@ env:
 
 jobs:
   check-secrets:
-    name: Check the required secrets are set in this organisation
+    # Run this job for forks
+    if: ${{ github.repository_owner != 'galasa-dev' }}
+    name: Check for required secrets
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check if WRITE_PACKAGES_USERNAME is set
+      - name: Check if WRITE_PACKAGES_USERNAME is set in this repository
         run: |
           if [ -z "${{ secrets.WRITE_PACKAGES_USERNAME }}" ]; then
             echo "WRITE_PACKAGES_USERNAME is not set. Please configure it in the repository secrets."
@@ -30,7 +32,7 @@ jobs:
             echo "WRITE_PACKAGES_USERNAME is set."
           fi
 
-      - name: Check if WRITE_PACKAGES_TOKEN is set
+      - name: Check if WRITE_PACKAGES_TOKEN is set in this repository
         run: |
           if [ -z "${{ secrets.WRITE_PACKAGES_TOKEN }}" ]; then
             echo "WRITE_PACKAGES_TOKEN is not set. Please configure it in the repository secrets."
@@ -60,7 +62,7 @@ jobs:
           gradle-version: 8.9
           cache-disabled: true
 
-      - name: Generate typescript openapi client using gradle
+      - name: Generate typescript openapi client using Gradle
         run: |
           gradle generateTypeScriptClient --info \
           --no-daemon --console plain \
@@ -130,28 +132,28 @@ jobs:
           labels: ${{ steps.metadata.outputs.labels }}
 
   trigger-workflow:
-    # Skip this job for forks of this repository
+    # Skip this job for forks
     if: ${{ github.repository_owner == 'galasa-dev' }}
-    name: Trigger Helm workflow to recycle ecosystem1
+    name: Recycle ecosystem1
     needs: build-webui
     runs-on: ubuntu-latest
 
     steps:
-      - name: Trigger Helm workflow using GitHub CLI call
+      - name: Trigger Helm workflow using GitHub CLI
         env:
           GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
         run: |
           gh workflow run build-helm.yaml --repo https://github.com/galasa-dev/automation
 
   report-failure:
-    # Skip this job for forks of this repository
+    # Skip this job for forks
     if: ${{ failure() && github.repository_owner == 'galasa-dev' }}
-    name: Report failure in workflow
+    name: Report workflow failure into Slack channel
     runs-on: ubuntu-latest
     needs: build-webui
 
     steps:
-      - name: Report failure in workflow to Slack
+      - name: Report workflow failure into Slack channel
         env: 
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         run : |
