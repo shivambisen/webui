@@ -10,9 +10,24 @@ on:
     branches: [main]
 
 jobs:
+  detect-secrets:
+    name: Detect secrets in this Pull Request
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Turn script into an executable
+        run: chmod +x detect-secrets.sh
+
+      - name: Run the detect secrets script
+        run: ./detect-secrets.sh
+
   build-webui:
     name: Build the Galasa Web UI
     runs-on: ubuntu-latest
+    needs: detect-secrets
 
     steps:
       - name: Checkout Code
@@ -30,13 +45,13 @@ jobs:
           gradle-version: 8.9
           cache-disabled: true
 
-      - name: Generate typescript openapi client using gradle
+      - name: Generate typescript openapi client using Gradle
         run: |
           set -o pipefail
           gradle generateTypeScriptClient --info \
           --no-daemon --console plain \
           -PsourceMaven=https://development.galasa.dev/main/maven-repo/obr 2>&1 | tee build.log
-      
+
       - name: Upload Gradle build log
         if: failure()
         uses: actions/upload-artifact@v4
@@ -44,7 +59,7 @@ jobs:
           name: gradle-build-log
           path: build.log
           retention-days: 7
-          
+
       - name: Fix openapi client
         run: |
           mkdir -p temp &&
@@ -61,28 +76,22 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: "20.10.0"
-      
-      - name: Turn script into an executable
-        run: chmod +x detect-secrets.sh
-  
-      - name: Run the detect secrets script
-        run: ./detect-secrets.sh
 
       - name: Installing webui's dependencies using npm
         working-directory: ./galasa-ui
         run: |
           npm install
-      
+
       - name: Running webui's unit tests using npm
         working-directory: ./galasa-ui
         run: |
           npm test -- --watchAll=false
-      
+
       - name: Building webui using npm
         working-directory: ./galasa-ui
         run: |
           npm run build
-      
+
       - name: Build Webui image for testing
         id: build
         uses: docker/build-push-action@v5
