@@ -12,12 +12,42 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  NAMESPACE: galasa-dev
+  NAMESPACE: ${{ github.repository_owner }}
+  BRANCH: ${{ github.ref_name }}
 
 jobs:
+  check-secrets:
+    # Run this job for forks
+    if: ${{ github.repository_owner != 'galasa-dev' }}
+    name: Check for required secrets
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check if WRITE_GITHUB_PACKAGES_USERNAME is set in this repository
+        run: |
+          if [ -z "${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}" ]; then
+            echo "WRITE_GITHUB_PACKAGES_USERNAME is not set. Please configure it in the repository secrets. \
+            It must contain the GitHub username you want to use to log into GitHub Container Registry."
+            exit 1
+          else
+            echo "WRITE_GITHUB_PACKAGES_USERNAME is set."
+          fi
+
+      - name: Check if WRITE_GITHUB_PACKAGES_TOKEN is set in this repository
+        run: |
+          if [ -z "${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}" ]; then
+            echo "WRITE_GITHUB_PACKAGES_TOKEN is not set. Please configure it in the repository secrets. \
+            It must contain a GitHub Personal Access Token with write:packages scope \
+            that you want to use to log into GitHub Container Registry.""
+            exit 1
+          else
+            echo "WRITE_GITHUB_PACKAGES_TOKEN is set."
+          fi
+
   build-webui:
     name: Build the Galasa Web UI
     runs-on: ubuntu-latest
+    needs: check-secrets
 
     steps:
       - name: Checkout Code
@@ -35,12 +65,12 @@ jobs:
           gradle-version: 8.9
           cache-disabled: true
 
-      - name: Generate typescript openapi client using gradle
+      - name: Generate typescript openapi client using Gradle
         run: |
           gradle generateTypeScriptClient --info \
           --no-daemon --console plain \
           -PsourceMaven=https://development.galasa.dev/main/maven-repo/obr 2>&1 | tee build.log
-      
+
       - name: Upload Gradle build log
         if: failure()
         uses: actions/upload-artifact@v4
@@ -70,12 +100,12 @@ jobs:
         working-directory: ./galasa-ui
         run: |
           npm install
-      
+
       - name: Running webui's unit tests using npm
         working-directory: ./galasa-ui
         run: |
           npm test -- --watchAll=false
-      
+
       - name: Building webui using npm
         working-directory: ./galasa-ui
         run: |
@@ -85,15 +115,15 @@ jobs:
         uses: docker/login-action@v3
         with:
           registry: ${{ env.REGISTRY }}
-          username: galasa-team
-          password: ${{ secrets.GALASA_TEAM_WRITE_PACKAGES_TOKEN }}
-  
+          username: ${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}
+          password: ${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}
+
       - name: Extract metadata for webui image
         id: metadata
         uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
         with:
           images: ${{ env.REGISTRY }}/${{ env.NAMESPACE }}/webui
-  
+
       - name: Build Webui image
         id: build
         uses: docker/build-push-action@v5
@@ -104,14 +134,29 @@ jobs:
           tags: ${{ steps.metadata.outputs.tags }}
           labels: ${{ steps.metadata.outputs.labels }}
 
-  report-failure:
-    name: Report failure in workflow
-    runs-on: ubuntu-latest
+  trigger-workflow:
+    # Skip this job for forks
+    if: ${{ github.repository_owner == 'galasa-dev' }}
+    name: Recycle ecosystem1
     needs: build-webui
-    if: failure()
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Report failure in workflow to Slack
+      - name: Trigger Helm workflow using GitHub CLI
+        env:
+          GH_TOKEN: ${{ secrets.GALASA_TEAM_GITHUB_TOKEN }}
+        run: |
+          gh workflow run build-helm.yaml --repo https://github.com/galasa-dev/automation
+
+  report-failure:
+    # Skip this job for forks
+    if: ${{ failure() && github.repository_owner == 'galasa-dev' }}
+    name: Report workflow failure into Slack channel
+    runs-on: ubuntu-latest
+    needs: build-webui
+
+    steps:
+      - name: Report workflow failure into Slack channel
         env: 
           SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
         run : |
