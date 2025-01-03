@@ -16,36 +16,18 @@ env:
   BRANCH: ${{ github.ref_name }}
 
 jobs:
-  check-secrets:
-    name: Check for required secrets
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Check if WRITE_GITHUB_PACKAGES_USERNAME is set in this repository
-        run: |
-          if [ -z "${{ secrets.WRITE_GITHUB_PACKAGES_USERNAME }}" ]; then
-            echo "WRITE_GITHUB_PACKAGES_USERNAME is not set. Please configure it in the repository secrets. \
-            It must contain the GitHub username you want to use to log into GitHub Container Registry."
-            exit 1
-          else
-            echo "WRITE_GITHUB_PACKAGES_USERNAME is set."
-          fi
-
-      - name: Check if WRITE_GITHUB_PACKAGES_TOKEN is set in this repository
-        run: |
-          if [ -z "${{ secrets.WRITE_GITHUB_PACKAGES_TOKEN }}" ]; then
-            echo "WRITE_GITHUB_PACKAGES_TOKEN is not set. Please configure it in the repository secrets. \
-            It must contain a GitHub Personal Access Token with write:packages scope \
-            that you want to use to log into GitHub Container Registry."
-            exit 1
-          else
-            echo "WRITE_GITHUB_PACKAGES_TOKEN is set."
-          fi
+  check-required-secrets-configured:
+    name: Check required secrets configured
+    uses: galasa-dev/galasa/.github/workflows/check-required-secrets-configured.yaml@main
+    secrets: inherit
+    with:
+      write_github_packages_username: 'true'
+      write_github_packages_token: 'true'
 
   build-webui:
     name: Build the Galasa Web UI
     runs-on: ubuntu-latest
-    needs: check-secrets
+    needs: check-required-secrets-configured
 
     steps:
       - name: Checkout Code
