@@ -5,8 +5,7 @@
  */
 'use client';
 
-import { useRef, useState } from 'react';
-import { TextInput } from '@carbon/react';
+import { useState } from 'react';
 import { InlineNotification } from '@carbon/react';
 import { Loading, Modal } from "@carbon/react";
 import Token from '@/utils/interfaces/Token';

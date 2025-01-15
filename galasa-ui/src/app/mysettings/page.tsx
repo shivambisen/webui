@@ -3,11 +3,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import PageTile from '@/components/PageTile';
 import AuthCookies from '@/utils/authCookies';
 import { cookies } from 'next/headers';
 import MySettingsPage from '@/components/MySettingsPage';
-import TokenResponseModal from '@/components/TokenResponseModal';
+import TokenResponseModal from '@/components/tokens/TokenResponseModal';
 
 
 export default function MySettings() {
@@ -24,11 +23,9 @@ export default function MySettings() {
   };
 
   return (
-    <div>
-        
+    <main>
       <MySettingsPage />
       <TokenResponseModal refreshToken={refreshToken} clientId={clientId} onLoad={deleteCookies} />
-      
-    </div>
+    </main>
   );
 };

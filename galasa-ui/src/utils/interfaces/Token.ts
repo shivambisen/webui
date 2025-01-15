@@ -5,12 +5,12 @@
  */
 
 interface Token {
-    tokenId: string;
-    description: string;
-    creationTime: string;
-    owner: {
-        loginId: string;
-    };
+  tokenId: string;
+  description: string;
+  creationTime: string;
+  owner: {
+      loginId: string;
+  };
 }
 
 export default Token;

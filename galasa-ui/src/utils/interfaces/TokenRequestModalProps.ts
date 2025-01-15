@@ -7,10 +7,10 @@
 import Token from "./Token";
 
 interface TokenRequestModalProps {
-    tokens: Set<Token>;
-    selectedTokens: Set<string>;
-    deleteTokenFromSet: Function;
-    updateDeleteModalState: Function;
+  tokens: Set<Token>;
+  selectedTokens: Set<string>;
+  deleteTokenFromSet: Function;
+  updateDeleteModalState: Function;
 }
 
 export default TokenRequestModalProps;

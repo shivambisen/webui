@@ -8,10 +8,10 @@
 import { useEffect, useState } from "react";
 import { Loading, Button } from "@carbon/react";
 import styles from "@/styles/MySettings.module.css";
-import TokenCard from "@/components/TokenCard";
+import TokenCard from "@/components/tokens/TokenCard";
 import ErrorPage from "@/app/error/page";
-import TokenRequestModal from "@/components/TokenRequestModal";
-import TokenDeleteModal from "@/components/TokenDeleteModal";
+import TokenRequestModal from "@/components/tokens/TokenRequestModal";
+import TokenDeleteModal from "@/components/tokens/TokenDeleteModal";
 import Token from "@/utils/interfaces/Token";
 import PageTile from "./PageTile";
 
@@ -22,8 +22,6 @@ export default function MySettingsPage() {
   const [selectedTokens, setSelectedTokens] = useState<Set<string>>(new Set());
   const [tokens, setTokens] = useState<Set<Token>>(new Set());
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-
 
   const selectTokenForDeletion = (tokenId: string) => {
 
@@ -53,11 +51,8 @@ export default function MySettingsPage() {
       const response = await fetch('/auth/tokens', { method: 'GET' });
 
       if (response.ok) {
-
         const data = await response.json();
-
         setTokens(data);
-
       }
 
     } catch (err) {
@@ -90,9 +85,7 @@ export default function MySettingsPage() {
   };
 
   useEffect(() => {
-
     fetchAccessTokens();
-
   }, []);
 
   if (isLoading) {
@@ -110,13 +103,13 @@ export default function MySettingsPage() {
 
       <PageTile title={"My Settings"} />
 
-      <div className={styles.tokenContainer}>
+      <section className={styles.tokenContainer}>
         <h4 className={styles.title}>Access Tokens</h4>
 
         <div className={styles.pageHeaderContainer}>
           <div>
-            <h5 className={styles.heading}>An access token is a unique secret key held by a client program so it has permission to use the Galasa service</h5>
-            <h5 className={styles.heading}>A token has the same access rights as the user who allocated it.</h5>
+            <p className={styles.heading}>An access token is a unique secret key held by a client program so it has permission to use the Galasa service</p>
+            <p className={styles.heading}>A token has the same access rights as the user who allocated it.</p>
           </div>
         </div>
 
@@ -139,7 +132,7 @@ export default function MySettingsPage() {
         {
           isDeleteModalOpen && <TokenDeleteModal tokens={tokens} selectedTokens={selectedTokens} deleteTokenFromSet={deleteTokenFromSet} updateDeleteModalState={updateDeleteModalState} />
         }
-      </div>
+      </section>
 
     </div>
   );

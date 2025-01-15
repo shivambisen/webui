@@ -5,8 +5,7 @@
  */
 'use client';
 
-import { useState } from "react";
-import styles from "../styles/TokenCard.module.css";
+import styles from "@/styles/TokenCard.module.css";
 import { Password } from '@carbon/icons-react';
 import { SelectableTile } from '@carbon/react';
 import Token from "@/utils/interfaces/Token";

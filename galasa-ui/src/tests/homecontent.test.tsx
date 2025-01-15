@@ -3,39 +3,24 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import { act, fireEvent, render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import React from 'react';
 import HomeContent from '@/components/HomeContent';
-
-beforeEach(() => {
-  global.fetch = jest.fn(() =>
-    Promise.resolve({
-      ok: true,
-      status: 200,
-      statusText: "OK",
-      headers: new Headers(), // Mock Headers
-      redirected: false,
-      type: "basic",
-      url: "",
-      text: jest.fn().mockResolvedValue('# Mocked Markdown Content This is a test'),
-      json: jest.fn(), // Optional mock if needed for other tests
-    } as unknown as Response)
-  );
-});
 
 afterEach(() => {
   jest.resetAllMocks();
 });
 
 test('renders markdown content', async () => {
-  render(<HomeContent />);
+  const mockMarkdownContent = Promise.resolve("# Mocked Markdown Content This is a test");
+  render(<HomeContent markdownContentPromise={mockMarkdownContent} />);
   const content = await screen.findByText('Mocked Markdown Content This is a test');
   expect(content).toBeInTheDocument();
 });
 
 test("render home content title", async () => {
-
-  render(<HomeContent />);
+  const mockMarkdownContent = Promise.resolve("# Mocked Markdown Content This is a test");
+  render(<HomeContent markdownContentPromise={mockMarkdownContent} />);
 
   await act(async () => {
     // Simulate the useEffect hook
@@ -48,15 +33,18 @@ test("render home content title", async () => {
 });
 
 test("render home content sub-title", async () => {
-
-  render(<HomeContent />);
+  const mockMarkdownContent = Promise.resolve(`
+# This is a title
+## This is a subtitle
+  `);
+  render(<HomeContent markdownContentPromise={mockMarkdownContent} />);
 
   await act(async () => {
     // Simulate the useEffect the useEffect hook
     await new Promise((resolve) => setTimeout(resolve, 1000));
   });
 
-  const subTitle = screen.getByText("Mocked Markdown Content This is a test");
+  const subTitle = screen.getByText("This is a subtitle");
 
   expect(subTitle).toBeInTheDocument();
 });
