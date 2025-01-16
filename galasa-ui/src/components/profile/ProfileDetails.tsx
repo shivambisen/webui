@@ -5,12 +5,17 @@
  */
 'use client';
 
+import ErrorPage from "@/app/error/page";
 import styles from "@/styles/MyProfile.module.css";
 import UserProfile from "@/utils/interfaces/UserProfile";
-import { Loading, ToastNotification } from "@carbon/react";
+import { Loading } from "@carbon/react";
 import { useEffect, useState } from "react";
 
-export default function ProfileDetails({ userProfilePromise }: {userProfilePromise: Promise<UserProfile>}) {
+interface ProfileDetailsProps {
+  userProfilePromise: Promise<UserProfile>;
+}
+
+export default function ProfileDetails({ userProfilePromise }: ProfileDetailsProps) {
   const WEB_UI_CLIENT_NAME = "web-ui";
 
   const [{ userData, roleName }, setUserProfile] = useState<UserProfile>({});
@@ -18,7 +23,6 @@ export default function ProfileDetails({ userProfilePromise }: {userProfilePromi
   const [isError, setIsError] = useState(false);
   
   useEffect(() => {
-
     const loadUserProfile = async () => {
       setIsError(false);
       setIsLoading(true);
@@ -41,7 +45,7 @@ export default function ProfileDetails({ userProfilePromise }: {userProfilePromi
     <div className={styles.profileDetails}>
       { isLoading ?
         <Loading data-testid="loader" small={false} active={isLoading} />
-        :
+        : !isError &&
         <>
           <div className={styles.userDetailsContainer}>
             <h3>User Details</h3>
@@ -76,14 +80,7 @@ export default function ProfileDetails({ userProfilePromise }: {userProfilePromi
         </>
       }
       { isError &&
-        <ToastNotification
-          hideCloseButton
-          aria-label="closes notification"
-          kind="error"
-          statusIconDescription="notification"
-          subtitle="Failed to fetch user profile data."
-          title="Internal Server Error"
-        />
+        <ErrorPage />
       }
     </div>
   );

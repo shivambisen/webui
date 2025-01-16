@@ -4,7 +4,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import * as Constants from "@/utils/constants";
-import styles from "@/styles/MyProfile.module.css";
 import PageTile from "@/components/PageTile";
 import { RBACRole, RoleBasedAccessControlAPIApi, UsersAPIApi } from "@/generated/galasaapi";
 import ProfileDetails from "@/components/profile/ProfileDetails";
@@ -35,7 +34,7 @@ export default function MyProfilePage() {
 
       if (usersResponse && usersResponse.length > 0) {
         // The openapi-generated "UserData" model is generated as a class, which can't be passed down
-        // to client components directly as that would be passed by reference, so deep clone the object
+        // to client components by reference, so deep clone the object
         const currentUser = usersResponse[0];
         userProfile.userData = structuredClone(currentUser);
         if (currentUser.role) {
@@ -45,12 +44,13 @@ export default function MyProfilePage() {
       }
     } catch (err) {
       console.error("Failed to get profile details. Reason:", err);
+      throw new Error("Failed to get profile details");
     }
     return userProfile;
   };
 
   return (
-    <main id="content" className={styles.content}>
+    <main id="content">
       <PageTile title={"My Profile"} />
       <ProfileDetails userProfilePromise={fetchUserProfile()} />
     </main>
