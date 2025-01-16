@@ -31,9 +31,8 @@ export default function HomePage() {
         }
       }
     } catch (error) {
-      const errorMsg = "Failed to fetch custom markdown content from CPS";
-      console.warn(errorMsg, error);
-      throw new Error(errorMsg);
+      console.warn('Failed to fetch custom markdown content from CPS', error);
+      throw error;
     }
     return content;
   };
@@ -49,6 +48,7 @@ export default function HomePage() {
 
     } catch (error) {
       console.error('Error fetching or processing the default markdown contents', error);
+      throw error;
     }
     return content;
   };

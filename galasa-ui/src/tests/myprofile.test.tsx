@@ -6,10 +6,9 @@
 
 import { render, screen, waitFor } from '@testing-library/react';
 import MyProfilePage from '../app/myprofile/page';
-import { RoleBasedAccessControlAPIApi, UsersAPIApi } from '@/generated/galasaapi';
+import { RBACRole, RoleBasedAccessControlAPIApi, UsersAPIApi } from '@/generated/galasaapi';
 
 const mockUsersApi = UsersAPIApi as jest.Mock;
-const mockRbacApi = RoleBasedAccessControlAPIApi as jest.Mock;
 
 jest.mock('@/generated/galasaapi');
 
@@ -31,23 +30,25 @@ describe('MyProfilePage', () => {
     // Given...
     const expectedLoginId = 'testuser';
     const expectedRoleName = 'tester';
+
+    const mockRole: RBACRole = {
+      apiVersion: "v1",
+      kind: "GalasaRole",
+      metadata: {
+        name: expectedRoleName,
+        description: 'a dummy role for tests'
+      },
+      data: {}
+    };
+
     mockUsersApi.mockReturnValue({
       getUserByLoginId: jest.fn().mockResolvedValue([{
         loginId: expectedLoginId,
         role: '1',
+        synthetic: {
+          role: mockRole,
+        }
       }]),
-    });
-
-    mockRbacApi.mockReturnValue({
-      getRBACRole: jest.fn().mockResolvedValue({
-        apiVersion: 'v1',
-        kind: 'GalasaRole',
-        metadata: {
-          id: '1',
-          name: expectedRoleName,
-        },
-        data: {},
-      }),
     });
 
     // When...

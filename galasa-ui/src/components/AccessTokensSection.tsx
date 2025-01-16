@@ -88,45 +88,44 @@ export default function AccessTokensSection({accessTokensPromise}: AccessTokensS
     loadAccessTokens();
   }, [accessTokensPromise]);
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
-  if (isError) {
-    return (
-      <ErrorPage />
-    );
-  }
-
   return (
     <section className={styles.tokenContainer}>
-      <h3 className={styles.title}>Access Tokens</h3>
+      { isLoading ?
+        <Loading />
+        : !isError &&
+        <>
+          <h3 className={styles.title}>Access Tokens</h3>
 
-      <div className={styles.pageHeaderContainer}>
-        <div>
-          <p className={styles.heading}>An access token is a unique secret key held by a client program so it has permission to use the Galasa service</p>
-          <p className={styles.heading}>A token has the same access rights as the user who allocated it.</p>
-        </div>
-      </div>
+          <div className={styles.pageHeaderContainer}>
+            <div>
+              <p className={styles.heading}>An access token is a unique secret key held by a client program so it has permission to use the Galasa service</p>
+              <p className={styles.heading}>A token has the same access rights as the user who allocated it.</p>
+            </div>
+          </div>
 
-      <div className={styles.btnContainer}>
-        <TokenRequestModal isDisabled={selectedTokens.size > 0} />
+          <div className={styles.btnContainer}>
+            <TokenRequestModal isDisabled={selectedTokens.size > 0} />
 
-        <Button onClick={() => setIsDeleteModalOpen(true)} className={styles.deleteBtn} disabled={selectedTokens.size === 0} kind="danger">
-          Delete {selectedTokens.size} selected access tokens
-        </Button>
-      </div>
+            <Button onClick={() => setIsDeleteModalOpen(true)} className={styles.deleteBtn} disabled={selectedTokens.size === 0} kind="danger">
+              Delete {selectedTokens.size} selected access tokens
+            </Button>
+          </div>
 
-      <div title="Access Tokens" className={styles.tokensList}>
-        {
-          Array.from(tokens).map((token) => (
-            <TokenCard key={token.tokenId} token={token} selectTokenForDeletion={selectTokenForDeletion} />
-          ))
-        }
-      </div>
+          <div title="Access Tokens" className={styles.tokensList}>
+            {
+              Array.from(tokens).map((token) => (
+                <TokenCard key={token.tokenId} token={token} selectTokenForDeletion={selectTokenForDeletion} />
+              ))
+            }
+          </div>
 
-      {
-        isDeleteModalOpen && <TokenDeleteModal tokens={tokens} selectedTokens={selectedTokens} deleteTokenFromSet={deleteTokenFromSet} updateDeleteModalState={updateDeleteModalState} />
+          {
+            isDeleteModalOpen && <TokenDeleteModal tokens={tokens} selectedTokens={selectedTokens} deleteTokenFromSet={deleteTokenFromSet} updateDeleteModalState={updateDeleteModalState} />
+          }
+        </>
+      }
+      { isError &&
+        <ErrorPage />
       }
     </section>
   );
