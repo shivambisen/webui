@@ -19,6 +19,7 @@ describe('MyProfilePage', () => {
   });
 
   test('renders loading spinner initially', () => {
+    // When...
     render(<MyProfilePage />);
 
     // Assert that the loading spinner is shown initially
@@ -27,6 +28,7 @@ describe('MyProfilePage', () => {
   });
 
   test('fetches and displays user data', async () => {
+    // Given...
     const expectedLoginId = 'testuser';
     const expectedRoleName = 'tester';
     mockUsersApi.mockReturnValue({
@@ -47,26 +49,32 @@ describe('MyProfilePage', () => {
         data: {},
       }),
     });
+
+    // When...
     render(<MyProfilePage />);
 
     // Wait for the data to be fetched and the loading spinner to disappear
     await waitFor(() => expect(screen.queryByTestId('loader')).not.toBeInTheDocument());
 
+    // Then...
     // Assert that the user's login ID is displayed correctly
     expect(screen.getByText(`Currently logged in as: ${expectedLoginId}`)).toBeInTheDocument();
     expect(screen.getByText(`Role: ${expectedRoleName}`)).toBeInTheDocument();
   });
 
   test('handles fetch failure gracefully', async () => {
+    // Given...
     mockUsersApi.mockReturnValue({
       getUserByLoginId: jest.fn().mockRejectedValue(new Error('Something went wrong!')),
     });
 
+    // When...
     render(<MyProfilePage />);
 
     // Wait for the fetch operation to complete
     await waitFor(() => expect(screen.queryByTestId('loader')).not.toBeInTheDocument());
 
+    // Then...
     // Assert that no user data is displayed
     expect(screen.getByText(/Something went wrong/)).toBeInTheDocument();
   });
