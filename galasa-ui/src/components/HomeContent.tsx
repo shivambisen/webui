@@ -31,12 +31,16 @@ export default function HomeContent({ markdownContentPromise }: HomeContentProps
       try {
         const markdownContent = await markdownContentPromise;
 
-        if (markdownContent.responseStatusCode === 403) {
-          setIsAccessAllowed(false);
-        }
-
-        if(markdownContent.responseStatusCode === 200){
+        switch (markdownContent.responseStatusCode) {
+        case 200:
           setRenderedHtmlContent(md.render(markdownContent.markdownContent));
+          break;
+        case 403:
+          setIsAccessAllowed(false);
+          break;
+        default:
+          console.error("Unexpected response:", markdownContent);
+          break;
         }
 
       } catch (err) {
