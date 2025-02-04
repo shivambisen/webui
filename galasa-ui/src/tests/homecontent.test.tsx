@@ -27,7 +27,7 @@ jest.mock('next/navigation', () => ({
 
 test('renders markdown content', async () => {
   // Given...
-  const mockMarkdownContent = Promise.resolve("# Mocked Markdown Content This is a test");
+  const mockMarkdownContent = Promise.resolve({ markdownContent: "# Mocked Markdown Content This is a test", responseStatusCode: 200 });
 
   // When...
   render(<HomeContent markdownContentPromise={mockMarkdownContent} />);
@@ -39,8 +39,8 @@ test('renders markdown content', async () => {
 
 test("render home content title", async () => {
   // Given...
-  const mockMarkdownContent = Promise.resolve("# Mocked Markdown Content This is a test");
-  
+  const mockMarkdownContent = Promise.resolve({ markdownContent: "# Mocked Markdown Content This is a test", responseStatusCode: 200 });
+
   // When...
   render(<HomeContent markdownContentPromise={mockMarkdownContent} />);
   await act(async () => {
@@ -57,10 +57,13 @@ test("render home content title", async () => {
 
 test("render home content sub-title", async () => {
   // Given...
-  const mockMarkdownContent = Promise.resolve(`
+  const mockMarkdownContent = Promise.resolve({
+    markdownContent: `
 # This is a title
 ## This is a subtitle
-  `);
+  `,
+    responseStatusCode: 200
+  });
 
   // When...
   render(<HomeContent markdownContentPromise={mockMarkdownContent} />);

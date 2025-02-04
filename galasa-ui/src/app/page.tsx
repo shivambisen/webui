@@ -8,9 +8,9 @@ import HomeContent from "@/components/HomeContent";
 import PageTile from "@/components/PageTile";
 import { ConfigurationPropertyStoreAPIApi } from "@/generated/galasaapi";
 import { createAuthenticatedApiConfiguration } from "@/utils/api";
+import { MarkdownResponse } from "@/utils/interfaces";
 import { readFile } from "fs/promises";
 import path from "path";
-import { MarkdownResponse } from "@/utils/constants";
 
 export default function HomePage() {
 
@@ -20,14 +20,15 @@ export default function HomePage() {
     const NAMESPACE = "service";
     const PROPERTY_NAME = "welcome.markdown";
 
-    let content : MarkdownResponse = {
+    let content: MarkdownResponse = {
       markdownContent: "",
       responseStatusCode: 200
     };
+
     try {
       const cpsApiClientWithAuthHeader = new ConfigurationPropertyStoreAPIApi(createAuthenticatedApiConfiguration());
       const response = await cpsApiClientWithAuthHeader.getCpsProperty(NAMESPACE, PROPERTY_NAME);
-  
+
       if (response.length > 0) {
         const property = response[0];
         if (property.data && property.data.value) {
@@ -37,10 +38,10 @@ export default function HomePage() {
           };
         }
       }
-    } catch (error : any) {
+    } catch (error: any) {
       console.warn('Failed to fetch custom markdown content from CPS', error);
-      
-      if(error.code === 403){
+
+      if (error.code === 403) {
         return {
           markdownContent: "Access Forbidden",
           responseStatusCode: 403
@@ -55,11 +56,17 @@ export default function HomePage() {
   // Fetches markdown content from local project files, which will be used as the
   // default content if the service.welcome.markdown property is not set
   const fetchDefaultMarkdownContent = async () => {
-    let content = "";
+    let content: MarkdownResponse = {
+      markdownContent: "",
+      responseStatusCode: 200
+    };
     try {
       // Fetch the markdown file from the public/static folder
       const defaultContentFilePath = path.join(process.cwd(), "public", "static", "markdown", "home-contents.md");
-      content = await readFile(defaultContentFilePath, 'utf-8');
+      content = {
+        markdownContent: await readFile(defaultContentFilePath, 'utf-8'),
+        responseStatusCode: 200
+      };
 
     } catch (error) {
       console.error('Error fetching or processing the default markdown contents', error);

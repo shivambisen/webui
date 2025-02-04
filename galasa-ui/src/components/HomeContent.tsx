@@ -8,12 +8,12 @@ import { Section } from "@carbon/react";
 import styles from "@/styles/HomeContent.module.css";
 import { useEffect, useState } from "react";
 import MarkdownIt from 'markdown-it';
-import { MarkdownResponse } from "@/utils/constants";
 import { useRouter } from 'next/navigation';
 import AccessDeniedModal from "./common/AccessDeniedModal";
+import { MarkdownResponse } from "@/utils/interfaces";
 
 interface HomeContentProps {
-  markdownContentPromise: Promise<string | MarkdownResponse>;
+  markdownContentPromise: Promise<MarkdownResponse>;
 }
 
 export default function HomeContent({ markdownContentPromise }: HomeContentProps) {
@@ -31,16 +31,14 @@ export default function HomeContent({ markdownContentPromise }: HomeContentProps
       try {
         const markdownContent = await markdownContentPromise;
 
-        if (typeof markdownContent === "string") {
-          setRenderedHtmlContent(md.render(markdownContent));
+        if (markdownContent.responseStatusCode === 403) {
+          setIsAccessAllowed(false);
         }
-        else {
 
-          if (markdownContent.responseStatusCode === 403) {
-            setIsAccessAllowed(false);
-          }
-
+        if(markdownContent.responseStatusCode === 200){
+          setRenderedHtmlContent(md.render(markdownContent.markdownContent));
         }
+
       } catch (err) {
         console.error('Error fetching or processing markdown content', err);
       }
