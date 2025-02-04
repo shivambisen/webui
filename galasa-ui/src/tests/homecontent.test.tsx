@@ -6,6 +6,7 @@
 import { act, render, screen } from '@testing-library/react';
 import React from 'react';
 import HomeContent from '@/components/HomeContent';
+import { useRouter } from 'next/navigation';
 
 // Mock out the native time functions to so that we can control time as needed
 jest.useFakeTimers();
@@ -13,6 +14,16 @@ jest.useFakeTimers();
 afterEach(() => {
   jest.resetAllMocks();
 });
+
+const mockRouter = {
+  refresh: jest.fn(() => useRouter().refresh)
+};
+
+jest.mock('next/navigation', () => ({
+
+  useRouter: jest.fn(() => mockRouter),
+
+}));
 
 test('renders markdown content', async () => {
   // Given...
