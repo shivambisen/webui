@@ -9,22 +9,11 @@ import React from 'react';
 import { HeaderGlobalBar, OverflowMenu, OverflowMenuItem } from '@carbon/react';
 import { User } from "@carbon/icons-react";
 import { useRouter } from 'next/navigation';
+import { handleDeleteCookieApiOperation } from '@/utils/functions';
 
 function PageHeaderMenu() {
 
   const router = useRouter();
-
-  const handleDeleteCookieApiOperation = async () => {
-
-    const response = await fetch('/users', { method: 'DELETE' });
-
-    if (response.status === 204) {
-
-      //auto redirect to render dex login page
-      router.refresh();
-
-    }
-  };
 
   const handleRedirectToMyProfilePage = () => {
     router.push("/myprofile");
@@ -57,7 +46,7 @@ function PageHeaderMenu() {
         />
         <OverflowMenuItem
           itemText="Log out"
-          onClick={handleDeleteCookieApiOperation}
+          onClick={() => handleDeleteCookieApiOperation(router)}
           data-testid='logout-btn'
         />
 
