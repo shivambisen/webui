@@ -32,68 +32,37 @@ exports[`Layout renders the web UI layout 1`] = `
               >
                 Skip to main content
               </a>
-              <span
-                class="cds--overflow-menu__wrapper"
+              <a
+                href="/"
+                style="padding-left: 0.5rem;"
               >
-                <span
-                  class="cds--popover-container cds--popover--caret cds--popover--high-contrast cds--popover--top cds--tooltip cds--icon-tooltip"
-                >
-                  <div
-                    class="cds--tooltip-trigger__wrapper"
-                  >
-                    <button
-                      aria-expanded="false"
-                      aria-haspopup="true"
-                      aria-labelledby="tooltip-:r0:"
-                      class="cds--btn--icon-only cds--overflow-menu cds--overflow-menu--lg cds--btn cds--layout--size-lg cds--btn--primary"
-                      data-floating-menu-container="true"
-                      data-testid="left-menu-btn"
-                      type="button"
-                    >
-                      <svg
-                        aria-label="Options"
-                        class="cds--overflow-menu__icon"
-                        fill="currentColor"
-                        focusable="false"
-                        height="16"
-                        preserveAspectRatio="xMidYMid meet"
-                        role="img"
-                        viewBox="0 0 16 16"
-                        width="16"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          d="M2 12H14V13H2zM2 9H14V10H2zM2 6H14V7H2zM2 3H14V4H2z"
-                        />
-                      </svg>
-                    </button>
-                  </div>
-                  <span
-                    aria-hidden="true"
-                    class="cds--popover"
-                    id="tooltip-:r0:"
-                    role="tooltip"
-                  >
-                    <span
-                      class="cds--popover-content cds--tooltip-content"
-                    >
-                      Options
-                    </span>
-                    <span
-                      class="cds--popover-caret"
-                    />
-                  </span>
-                </span>
-              </span>
+                <img
+                  alt="Galasa logo"
+                  data-nimg="1"
+                  decoding="async"
+                  height="28"
+                  loading="lazy"
+                  src="/_next/image?url=%2Fimg.jpg&w=64&q=75"
+                  srcset="/_next/image?url=%2Fimg.jpg&w=32&q=75 1x, /_next/image?url=%2Fimg.jpg&w=64&q=75 2x"
+                  style="color: transparent;"
+                  width="28"
+                />
+              </a>
               <a
                 class="cds--header__name"
+                href="/"
               >
-                Galasa Service
+                Galasa
               </a>
               <div
                 class="cds--header__global"
                 data-testid="header-menu"
               >
+                <a
+                  class="cds--header__name"
+                >
+                  Galasa Service
+                </a>
                 <span
                   class="cds--overflow-menu__wrapper"
                 >
@@ -106,7 +75,7 @@ exports[`Layout renders the web UI layout 1`] = `
                       <button
                         aria-expanded="false"
                         aria-haspopup="true"
-                        aria-labelledby="tooltip-:r2:"
+                        aria-labelledby="tooltip-:r0:"
                         class="cds--btn--icon-only cds--overflow-menu cds--overflow-menu--lg cds--btn cds--layout--size-lg cds--btn--primary"
                         data-floating-menu-container="true"
                         data-testid="menu-btn"
@@ -133,7 +102,7 @@ exports[`Layout renders the web UI layout 1`] = `
                     <span
                       aria-hidden="true"
                       class="cds--popover"
-                      id="tooltip-:r2:"
+                      id="tooltip-:r0:"
                       role="tooltip"
                     >
                       <span
@@ -183,68 +152,37 @@ exports[`Layout renders the web UI layout 1`] = `
             >
               Skip to main content
             </a>
-            <span
-              class="cds--overflow-menu__wrapper"
+            <a
+              href="/"
+              style="padding-left: 0.5rem;"
             >
-              <span
-                class="cds--popover-container cds--popover--caret cds--popover--high-contrast cds--popover--top cds--tooltip cds--icon-tooltip"
-              >
-                <div
-                  class="cds--tooltip-trigger__wrapper"
-                >
-                  <button
-                    aria-expanded="false"
-                    aria-haspopup="true"
-                    aria-labelledby="tooltip-:r0:"
-                    class="cds--btn--icon-only cds--overflow-menu cds--overflow-menu--lg cds--btn cds--layout--size-lg cds--btn--primary"
-                    data-floating-menu-container="true"
-                    data-testid="left-menu-btn"
-                    type="button"
-                  >
-                    <svg
-                      aria-label="Options"
-                      class="cds--overflow-menu__icon"
-                      fill="currentColor"
-                      focusable="false"
-                      height="16"
-                      preserveAspectRatio="xMidYMid meet"
-                      role="img"
-                      viewBox="0 0 16 16"
-                      width="16"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        d="M2 12H14V13H2zM2 9H14V10H2zM2 6H14V7H2zM2 3H14V4H2z"
-                      />
-                    </svg>
-                  </button>
-                </div>
-                <span
-                  aria-hidden="true"
-                  class="cds--popover"
-                  id="tooltip-:r0:"
-                  role="tooltip"
-                >
-                  <span
-                    class="cds--popover-content cds--tooltip-content"
-                  >
-                    Options
-                  </span>
-                  <span
-                    class="cds--popover-caret"
-                  />
-                </span>
-              </span>
-            </span>
+              <img
+                alt="Galasa logo"
+                data-nimg="1"
+                decoding="async"
+                height="28"
+                loading="lazy"
+                src="/_next/image?url=%2Fimg.jpg&w=64&q=75"
+                srcset="/_next/image?url=%2Fimg.jpg&w=32&q=75 1x, /_next/image?url=%2Fimg.jpg&w=64&q=75 2x"
+                style="color: transparent;"
+                width="28"
+              />
+            </a>
             <a
               class="cds--header__name"
+              href="/"
             >
-              Galasa Service
+              Galasa
             </a>
             <div
               class="cds--header__global"
               data-testid="header-menu"
             >
+              <a
+                class="cds--header__name"
+              >
+                Galasa Service
+              </a>
               <span
                 class="cds--overflow-menu__wrapper"
               >
@@ -257,7 +195,7 @@ exports[`Layout renders the web UI layout 1`] = `
                     <button
                       aria-expanded="false"
                       aria-haspopup="true"
-                      aria-labelledby="tooltip-:r2:"
+                      aria-labelledby="tooltip-:r0:"
                       class="cds--btn--icon-only cds--overflow-menu cds--overflow-menu--lg cds--btn cds--layout--size-lg cds--btn--primary"
                       data-floating-menu-container="true"
                       data-testid="menu-btn"
@@ -284,7 +222,7 @@ exports[`Layout renders the web UI layout 1`] = `
                   <span
                     aria-hidden="true"
                     class="cds--popover"
-                    id="tooltip-:r2:"
+                    id="tooltip-:r0:"
                     role="tooltip"
                   >
                     <span

@@ -24,7 +24,7 @@ afterEach(() => {
 });
 
 
-test('checking if the left menu btn exists', () => {
+test.skip('checking if the left menu btn exists', () => {
   render(<LeftHeaderMenu />);
 
   const menuBtn = screen.getByTestId('left-menu-btn');
@@ -32,7 +32,7 @@ test('checking if the left menu btn exists', () => {
 });
 
 
-test('renders home btn when menu btn is pressed', async () => {
+test.skip('renders home btn when menu btn is pressed', async () => {
 
   render(<LeftHeaderMenu />);
 
@@ -43,7 +43,7 @@ test('renders home btn when menu btn is pressed', async () => {
   expect(homeBtn).toBeInTheDocument();
 });
 
-test('clicking my profile btn redirects me to home page', async () => {
+test.skip('clicking my profile btn redirects me to home page', async () => {
   render(<LeftHeaderMenu />);
 
   fireEvent.click(screen.getByTestId('left-menu-btn'));

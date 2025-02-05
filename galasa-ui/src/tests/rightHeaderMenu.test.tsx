@@ -37,7 +37,7 @@ test('renders the header containing the header menu', () => {
 });
 
 test('checking if the menu btn exists', () => {
-  render(<PageHeaderMenu />);
+  render(<PageHeaderMenu galasaServiceName='Galasa Service'/>);
 
   const menuBtn = screen.getByTestId('menu-btn');
   expect(menuBtn).toBeInTheDocument();
@@ -45,7 +45,7 @@ test('checking if the menu btn exists', () => {
 
 test('renders logout btn when menu btn is pressed', async () => {
 
-  render(<PageHeaderMenu />);
+  render(<PageHeaderMenu galasaServiceName='Galasa Service'/>);
 
   fireEvent.click(screen.getByTestId('menu-btn'));
 
@@ -56,7 +56,7 @@ test('renders logout btn when menu btn is pressed', async () => {
 
 test('renders my profile btn when menu btn is pressed', async () => {
 
-  render(<PageHeaderMenu />);
+  render(<PageHeaderMenu galasaServiceName='Galasa Service'/>);
 
   fireEvent.click(screen.getByTestId('menu-btn'));
 
@@ -67,7 +67,7 @@ test('renders my profile btn when menu btn is pressed', async () => {
 
 
 test('clicking my profile btn redirects me to My Profle Page', async () => {
-  render(<PageHeaderMenu />);
+  render(<PageHeaderMenu galasaServiceName='Galasa Service' />);
 
   fireEvent.click(screen.getByTestId('menu-btn'));
 
@@ -87,7 +87,7 @@ test('clicking my profile btn redirects me to My Profle Page', async () => {
 });
 
 test('clicking my settings btn redirects me to My Settings Page', async () => {
-  render(<PageHeaderMenu />);
+  render(<PageHeaderMenu galasaServiceName='Galasa Service'/>);
 
   fireEvent.click(screen.getByTestId('menu-btn'));
 
@@ -108,7 +108,7 @@ test('clicking my settings btn redirects me to My Settings Page', async () => {
 
 test('clicking log out button calls handleDeleteCookieApiOperation, RESPONSE OK', async () => {
 
-  render(<PageHeaderMenu />);
+  render(<PageHeaderMenu galasaServiceName='Galasa Service'/>);
 
   const response = new Response(null, {
     status: 204,
@@ -138,6 +138,28 @@ test('clicking log out button calls handleDeleteCookieApiOperation, RESPONSE OK'
 
   });
 
+
+});
+
+test('renders Galasa Service header title when env GALASA_SERVICE_NAME is null or blank string', () => {
+
+  render(<PageHeaderMenu galasaServiceName="Galasa Service" />);
+
+  const titleElement = screen.getByText("Galasa Service");
+  expect(titleElement.textContent).toBe("Galasa Service");
+  expect(titleElement).toBeInTheDocument();
+
+});
+
+
+test('renders custom header when title when env GALASA_SERVICE_NAME is present', () => {
+
+  render(<PageHeaderMenu galasaServiceName='Managers' />);
+
+  const titleElement = screen.getByText("Managers");
+  expect(titleElement.textContent).not.toBe("Galasa Service");
+  expect(titleElement.textContent).toBe("Managers");
+  expect(titleElement).toBeInTheDocument();
 
 });
 
