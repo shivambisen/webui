@@ -13,8 +13,12 @@
     margin: 5rem auto 2rem auto;
 }
 
+.userDetailsContainer h3 {
+    margin: 1rem 0;
+}
+
 .profileDetails p {
-    font-size: 20px;
+    font-weight: 500;
 }
 
 .loginActivityTile {
@@ -24,4 +28,8 @@
 .loginActivityContainer {
     width: 90%;
     margin: 0 auto;
+}
+
+.loginActivityContainer h3 {
+    margin: 1rem 0;
 }
