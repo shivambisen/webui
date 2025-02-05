@@ -4,12 +4,21 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+.profileDetails {
+    width: 95%;
+}
+
 .userDetailsContainer {
-    margin: 0.5rem 2rem 3rem 2rem;
+    width: 90%;
+    margin: 5rem auto 2rem auto;
+}
+
+.userDetailsContainer h3 {
+    margin: 1rem 0;
 }
 
 .profileDetails p {
-    font-size: 20px;
+    font-weight: 500;
 }
 
 .loginActivityTile {
@@ -17,5 +26,10 @@
 }
 
 .loginActivityContainer {
-    margin-left: 2rem;
+    width: 90%;
+    margin: 0 auto;
+}
+
+.loginActivityContainer h3 {
+    margin: 1rem 0;
 }
