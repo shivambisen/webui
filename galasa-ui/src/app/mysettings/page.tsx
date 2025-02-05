@@ -11,6 +11,7 @@ import PageTile from '@/components/PageTile';
 import { AuthenticationAPIApi, UsersAPIApi, AuthTokens } from '@/generated/galasaapi';
 import { createAuthenticatedApiConfiguration } from '@/utils/api';
 import * as Constants from "@/utils/constants";
+import BreadCrumb from '@/components/common/BreadCrumb';
 
 export default function MySettings() {
   const apiConfig = createAuthenticatedApiConfiguration();
@@ -56,6 +57,7 @@ export default function MySettings() {
 
   return (
     <main id="content">
+      <BreadCrumb />
       <PageTile title={"My Settings"} />
       <AccessTokensSection accessTokensPromise={fetchAccessTokens()} />
       <TokenResponseModal refreshToken={refreshToken} clientId={clientId} onLoad={deleteCookies} />
