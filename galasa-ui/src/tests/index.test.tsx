@@ -27,7 +27,7 @@ jest.mock('next/navigation', () => ({
 test('renders Galasa header', () => {
   render(<PageHeader galasaServiceName='Galasa Service'/>);
 
-  const titleElement = screen.getByText('Galasa Service');
+  const titleElement = screen.getByText('Galasa');
   expect(titleElement).toBeInTheDocument();
 });
 

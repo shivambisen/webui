@@ -6,12 +6,12 @@
 'use client';
 
 import React from 'react';
-import { HeaderGlobalBar, OverflowMenu, OverflowMenuItem } from '@carbon/react';
+import { HeaderGlobalBar, OverflowMenu, OverflowMenuItem, HeaderName } from '@carbon/react';
 import { User } from "@carbon/icons-react";
 import { useRouter } from 'next/navigation';
 import { handleDeleteCookieApiOperation } from '@/utils/functions';
 
-function PageHeaderMenu() {
+function PageHeaderMenu({ galasaServiceName }: { galasaServiceName: string }) {
 
   const router = useRouter();
 
@@ -25,6 +25,8 @@ function PageHeaderMenu() {
 
   return (
     <HeaderGlobalBar data-testid="header-menu">
+
+      <HeaderName prefix="">{galasaServiceName}</HeaderName>
 
       <OverflowMenu
         data-floating-menu-container
