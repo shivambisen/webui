@@ -3,12 +3,10 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
+
 import AuthCookies from "@/utils/authCookies";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-
-// Stop this route from being pre-rendered
-export const dynamic = 'force-dynamic';
 
 export async function DELETE() {
 
@@ -17,7 +15,7 @@ export async function DELETE() {
 
   cookies().delete(AuthCookies.ID_TOKEN);
   cookies().delete(AuthCookies.SHOULD_REDIRECT_TO_SETTINGS);
-  
+
   return (new NextResponse(null, { status: 204 }));
-  
+
 }

@@ -5,7 +5,7 @@
  */
 'use client';
 
-import { Header, HeaderName, SkipToContent, Theme } from '@carbon/react';
+import { Header, HeaderName, SkipToContent, Theme, HeaderNavigation, HeaderMenuItem } from '@carbon/react';
 import PageHeaderMenu from "./PageHeaderMenu";
 import Image from 'next/image';
 import galasaLogo from "@/assets/images/galasaLogo.png";
@@ -29,6 +29,10 @@ export default function PageHeader({ galasaServiceName }: { galasaServiceName: s
         </Link>
 
         <HeaderName href="/" prefix="">Galasa</HeaderName>
+
+        <HeaderNavigation>
+          <HeaderMenuItem href="/users">Users</HeaderMenuItem>
+        </HeaderNavigation>
 
         <PageHeaderMenu galasaServiceName={galasaServiceName} />
 
