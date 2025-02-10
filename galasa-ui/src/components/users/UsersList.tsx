@@ -107,7 +107,7 @@ function UsersList({ usersListPromise }: UsersListSectionProps) {
   }
 
   if(isError){
-    <ErrorPage />
+    return <ErrorPage />;
   }
 
   return (

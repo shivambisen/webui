@@ -8,6 +8,8 @@ import AuthCookies from "@/utils/authCookies";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 
+export const dynamic = 'force-dynamic';
+
 export async function DELETE() {
 
   // an api route is made because, cookies are server side props and cannot be access directly on components
