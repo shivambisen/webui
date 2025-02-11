@@ -6,18 +6,18 @@
 
 import { UserData, UsersAPIApi } from '@/generated/galasaapi';
 import { createAuthenticatedApiConfiguration } from '@/utils/api';
-import React, { useEffect } from 'react';
+import React from 'react';
 import * as Constants from "@/utils/constants";
 import BreadCrumb from '@/components/common/BreadCrumb';
 import PageTile from '@/components/PageTile';
-import UsersList from '@/components/users/UsersList';
+import UsersList from '@/components/users/UsersTable';
 
 export const dynamic = 'force-dynamic';
 
 function UsersPage() {
 
   const apiConfig = createAuthenticatedApiConfiguration();
-  const fetchAllUsersInEcosystem = async () => {
+  const fetchAllUsersFromApiServer = async () => {
 
     let users : UserData[] = [];
 
@@ -36,7 +36,7 @@ function UsersPage() {
     <main id="content">
       <BreadCrumb />
       <PageTile title={"Users"} />
-      <UsersList usersListPromise={fetchAllUsersInEcosystem()}/>
+      <UsersList usersListPromise={fetchAllUsersFromApiServer()}/>
     </main>
   );
 }
