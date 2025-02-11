@@ -135,7 +135,7 @@ function UsersTable({ usersListPromise }: UsersListSectionProps) {
         }
 
       } catch (err) {
-        setIsError(false);
+        setIsError(true);
       } finally {
         setIsLoading(false);
       }
@@ -146,12 +146,12 @@ function UsersTable({ usersListPromise }: UsersListSectionProps) {
 
   }, [usersListPromise]);
 
-  if (isLoading) {
-    return <Loading />;
-  }
-
   if (isError) {
     return <ErrorPage />;
+  }
+
+  if (isLoading) {
+    return <Loading />;
   }
 
   return (

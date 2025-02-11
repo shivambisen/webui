@@ -23,18 +23,6 @@ jest.mock('@carbon/react', () => {
   };
 });
 
-// Mock the ErrorPage component.
-jest.mock('@/app/error/page', () => {
-  function ErrorPageMock() {
-    return <div data-testid="error-page">Error Page</div>;
-  }
-  return ErrorPageMock;
-});
-
-// Mock the CSS module.
-jest.mock('@/styles/UsersList.module.css', () => ({
-  userListContainer: 'userListContainer'
-}));
 
 // ------------------------------
 // Tests
@@ -63,11 +51,11 @@ describe('UsersTable component', () => {
         clients: [
           {
             clientName: 'web-ui',
-            lastLogin: new Date('2020-01-01T00:00:00Z')
+            lastLogin: new Date('2020-01-02T00:00:00Z')
           },
           {
             clientName: 'rest-api',
-            lastLogin: new Date('2020-01-02T00:00:00Z')
+            lastLogin: new Date('2020-01-03T00:00:00Z')
           }
         ]
       }
@@ -86,8 +74,8 @@ describe('UsersTable component', () => {
     expect(screen.getByText('admin')).toBeInTheDocument();
 
     // Verify that the formatted dates are rendered.
-    const formattedLastLogin = new Intl.DateTimeFormat('en-GB').format(new Date('2020-01-01T00:00:00Z'));
-    const formattedLastAccessTokenUse = new Intl.DateTimeFormat('en-GB').format(new Date('2020-01-02T00:00:00Z'));
+    const formattedLastLogin = "02/01/2020";
+    const formattedLastAccessTokenUse = "03/01/2020";
     expect(screen.getByText(formattedLastLogin)).toBeInTheDocument();
     expect(screen.getByText(formattedLastAccessTokenUse)).toBeInTheDocument();
   });
@@ -127,12 +115,9 @@ describe('UsersTable component', () => {
     
     render(<UsersTable usersListPromise={rejectedPromise} />);
 
-    // Due to the catch block (which sets isError to false), the table header is rendered even on error.
+    // Check if the Error page was rendered
     await waitFor(() => {
-      expect(screen.getByText('Login ID')).toBeInTheDocument();
+      expect(screen.getByText('Something went wrong!')).toBeInTheDocument();
     });
-
-    // Verify that the error page is not rendered.
-    expect(screen.queryByTestId('error-page')).not.toBeInTheDocument();
   });
 });
