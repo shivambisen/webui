@@ -5,11 +5,9 @@
  */
 
 import { UsersAPIApi } from '@/generated/galasaapi';
-import { DELETE, GET } from '../../app/users/route';
+import { DELETE } from '../../app/logout/route';
 import { createAuthenticatedApiConfiguration } from '../../utils/api';
-import * as Constants from '@/utils/constants';
 import AuthCookies from '@/utils/authCookies';
-import { NextResponse } from 'next/server';
 
 // Mock modules and dependencies
 jest.mock('../../utils/api');

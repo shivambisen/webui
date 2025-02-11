@@ -6,7 +6,7 @@
 
 export const handleDeleteCookieApiOperation = async (router: any) => {
 
-  const response = await fetch('/users', { method: 'DELETE' });
+  const response = await fetch('/logout', { method: 'DELETE' });
 
   if (response.status === 204) {
 

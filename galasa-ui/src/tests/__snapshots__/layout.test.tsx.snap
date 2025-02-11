@@ -54,6 +54,27 @@ exports[`Layout renders the web UI layout 1`] = `
               >
                 Galasa
               </a>
+              <nav
+                class="cds--header__nav"
+              >
+                <ul
+                  class="cds--header__menu-bar"
+                >
+                  <li>
+                    <a
+                      class="cds--header__menu-item"
+                      href="/users"
+                      tabindex="0"
+                    >
+                      <span
+                        class="cds--text-truncate--end"
+                      >
+                        Users
+                      </span>
+                    </a>
+                  </li>
+                </ul>
+              </nav>
               <div
                 class="cds--header__global"
                 data-testid="header-menu"
@@ -174,6 +195,27 @@ exports[`Layout renders the web UI layout 1`] = `
             >
               Galasa
             </a>
+            <nav
+              class="cds--header__nav"
+            >
+              <ul
+                class="cds--header__menu-bar"
+              >
+                <li>
+                  <a
+                    class="cds--header__menu-item"
+                    href="/users"
+                    tabindex="0"
+                  >
+                    <span
+                      class="cds--text-truncate--end"
+                    >
+                      Users
+                    </span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
             <div
               class="cds--header__global"
               data-testid="header-menu"
