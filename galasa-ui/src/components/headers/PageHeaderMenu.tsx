@@ -6,25 +6,14 @@
 'use client';
 
 import React from 'react';
-import { HeaderGlobalBar, OverflowMenu, OverflowMenuItem } from '@carbon/react';
+import { HeaderGlobalBar, OverflowMenu, OverflowMenuItem, HeaderName } from '@carbon/react';
 import { User } from "@carbon/icons-react";
 import { useRouter } from 'next/navigation';
+import { handleDeleteCookieApiOperation } from '@/utils/functions';
 
-function PageHeaderMenu() {
+function PageHeaderMenu({ galasaServiceName }: { galasaServiceName: string }) {
 
   const router = useRouter();
-
-  const handleDeleteCookieApiOperation = async () => {
-
-    const response = await fetch('/users', { method: 'DELETE' });
-
-    if (response.status === 204) {
-
-      //auto redirect to render dex login page
-      router.refresh();
-
-    }
-  };
 
   const handleRedirectToMyProfilePage = () => {
     router.push("/myprofile");
@@ -36,6 +25,8 @@ function PageHeaderMenu() {
 
   return (
     <HeaderGlobalBar data-testid="header-menu">
+
+      <HeaderName prefix="">{galasaServiceName}</HeaderName>
 
       <OverflowMenu
         data-floating-menu-container
@@ -57,7 +48,7 @@ function PageHeaderMenu() {
         />
         <OverflowMenuItem
           itemText="Log out"
-          onClick={handleDeleteCookieApiOperation}
+          onClick={() => handleDeleteCookieApiOperation(router)}
           data-testid='logout-btn'
         />
 

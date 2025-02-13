@@ -6,6 +6,7 @@
 import { act, render, screen } from '@testing-library/react';
 import React from 'react';
 import HomeContent from '@/components/HomeContent';
+import { useRouter } from 'next/navigation';
 
 // Mock out the native time functions to so that we can control time as needed
 jest.useFakeTimers();
@@ -14,9 +15,19 @@ afterEach(() => {
   jest.resetAllMocks();
 });
 
+const mockRouter = {
+  refresh: jest.fn(() => useRouter().refresh)
+};
+
+jest.mock('next/navigation', () => ({
+
+  useRouter: jest.fn(() => mockRouter),
+
+}));
+
 test('renders markdown content', async () => {
   // Given...
-  const mockMarkdownContent = Promise.resolve("# Mocked Markdown Content This is a test");
+  const mockMarkdownContent = Promise.resolve({ markdownContent: "# Mocked Markdown Content This is a test", responseStatusCode: 200 });
 
   // When...
   render(<HomeContent markdownContentPromise={mockMarkdownContent} />);
@@ -28,8 +39,8 @@ test('renders markdown content', async () => {
 
 test("render home content title", async () => {
   // Given...
-  const mockMarkdownContent = Promise.resolve("# Mocked Markdown Content This is a test");
-  
+  const mockMarkdownContent = Promise.resolve({ markdownContent: "# Mocked Markdown Content This is a test", responseStatusCode: 200 });
+
   // When...
   render(<HomeContent markdownContentPromise={mockMarkdownContent} />);
   await act(async () => {
@@ -46,10 +57,13 @@ test("render home content title", async () => {
 
 test("render home content sub-title", async () => {
   // Given...
-  const mockMarkdownContent = Promise.resolve(`
+  const mockMarkdownContent = Promise.resolve({
+    markdownContent: `
 # This is a title
 ## This is a subtitle
-  `);
+  `,
+    responseStatusCode: 200
+  });
 
   // When...
   render(<HomeContent markdownContentPromise={mockMarkdownContent} />);

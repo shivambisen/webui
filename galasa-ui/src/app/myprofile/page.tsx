@@ -8,6 +8,7 @@ import PageTile from "@/components/PageTile";
 import { UserData, UsersAPIApi } from "@/generated/galasaapi";
 import ProfileDetails from "@/components/profile/ProfileDetails";
 import { createAuthenticatedApiConfiguration } from "@/utils/api";
+import BreadCrumb from "@/components/common/BreadCrumb";
 
 export default function MyProfilePage() {
   const apiConfig = createAuthenticatedApiConfiguration();
@@ -29,6 +30,7 @@ export default function MyProfilePage() {
 
   return (
     <main id="content">
+      <BreadCrumb />
       <PageTile title={"My Profile"} />
       <ProfileDetails userProfilePromise={fetchUserProfile()} />
     </main>
