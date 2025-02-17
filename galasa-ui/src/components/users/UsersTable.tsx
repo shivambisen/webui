@@ -18,12 +18,9 @@ import Link from 'next/link';
 
 export const dynamic = "force-dynamic";
 
-type UsersListPromiseType = Promise<UserData[]>;
-type CurrentUserPromiseType = Promise<UserData>;
-
 interface UsersTableProps {
-  usersListPromise: UsersListPromiseType;
-  currentUserPromise: CurrentUserPromiseType;
+  usersListPromise: Promise<UserData[]>;
+  currentUserPromise: Promise<UserData>;
 }
 
 // DataTableHeader, DataTableCell, DataTableRow are IBM Carbon interfaces

@@ -7,8 +7,9 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import UserRoleSection from '../../components/users/UserRoleSection';
 import { UserData } from '@/generated/galasaapi';
+import { updateUserRoleAction } from '@/app/actions/updateUserRoleAction';
 
-// --- Mocks for Carbon Components and ErrorPage --- //
+// --- Mocks for Carbon Components --- //
 jest.mock('@carbon/react', () => ({
   ButtonSet: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
   Button: (props: any) => <button {...props}>{props.children}</button>,
@@ -33,11 +34,9 @@ jest.mock('@carbon/react', () => ({
   ),
 }));
 
-jest.mock('@/app/error/page', () => {
-  const ErrorPage = () => <div data-testid="error-page">Error</div>;
-  ErrorPage.displayName = 'ErrorPage';
-  return ErrorPage;
-});
+jest.mock('@/app/actions/updateUserRoleAction', () => ({
+  updateUserRoleAction: jest.fn(),
+}));
 
 // --- Dummy Data --- //
 const dummyProfile: UserData = {
@@ -90,7 +89,7 @@ describe('UserRoleSection', () => {
     render(<UserRoleSection userProfilePromise={errorPromise} />);
 
     await waitFor(() => {
-      expect(screen.getByTestId('error-page')).toBeInTheDocument();
+      expect(screen.getByText('Something went wrong!')).toBeInTheDocument();
     });
   });
 
@@ -127,64 +126,91 @@ describe('UserRoleSection', () => {
     expect(saveButton).not.toBeDisabled();
   });
 
-  test('save button calls updateUserRole and shows success notification on successful fetch', async () => {
-    const mockFetch = jest.fn().mockResolvedValue({ ok: true });
-    (global.fetch as jest.Mock) = mockFetch;
+  test('save button calls updateUserRoleAction and shows success notification on successful update', async () => {
 
+    // Type-cast the mocked server action.
+    const mockUpdateUserRoleAction = updateUserRoleAction as jest.Mock;
+    // Simulate a successful response.
+    mockUpdateUserRoleAction.mockResolvedValue({ status: 200, message: 'User role updated successfully' });
+  
     render(<UserRoleSection userProfilePromise={Promise.resolve(dummyProfile)} />);
+    
+    // Wait for the component to display the user profile.
     await waitFor(() => {
       expect(screen.getByText(dummyProfile.loginId!)).toBeInTheDocument();
     });
-
+  
     const dropdown = screen.getByTestId('dropdown') as HTMLSelectElement;
     const saveButton = screen.getByText('Save') as HTMLButtonElement;
-
+  
     // Change the dropdown selection to "admin" (index 1).
+    // In the component's items array, index 1 corresponds to:
+    // { id: "2", name: "admin", description: "Administrator access" }
     fireEvent.change(dropdown, { target: { value: '1' } });
-
+  
     // Click the save button.
     fireEvent.click(saveButton);
-
-    // Wait for the fetch call.
+  
+    // Wait for the server action to be called with the expected payload.
     await waitFor(() => {
-      expect(mockFetch).toHaveBeenCalledWith(
-        '/users/edit/updateUserRole',
-        expect.objectContaining({
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-        })
-      );
+      expect(mockUpdateUserRoleAction).toHaveBeenCalledWith({
+        userNumber: dummyProfile.id,
+        roleDetails: { role: '2' },
+      });
     });
-
+  
     // Wait for the success notification to appear.
     await waitFor(() => {
       expect(screen.getByTestId('notification')).toBeInTheDocument();
       expect(screen.getByTestId('notification')).toHaveTextContent('Success');
     });
-
-    // After a successful save, the buttons should be disabled.
+  
+    // After a successful update, both buttons should be disabled.
     expect(saveButton).toBeDisabled();
     const resetButton = screen.getByText('Reset') as HTMLButtonElement;
     expect(resetButton).toBeDisabled();
+  });
+
+  test('resetRole resets the role state and disables reset and save buttons', async () => {
+    render(<UserRoleSection userProfilePromise={Promise.resolve(dummyProfile)} />);
+    
+    await waitFor(() => expect(screen.getByText(dummyProfile.loginId!)).toBeInTheDocument());
+    
+    const resetButton = screen.getByText('Reset') as HTMLButtonElement;
+    const saveButton = screen.getByText('Save') as HTMLButtonElement;
+    const dropdown = screen.getByTestId('dropdown') as HTMLSelectElement;
+  
+    expect(resetButton).toBeDisabled();
+    expect(saveButton).toBeDisabled();
+  
+    // Simulate changing the role via the dropdown.
+    // In our Dropdown mock, changing the value to '1' selects the item at index 1.
+    fireEvent.change(dropdown, { target: { value: '1' } });
+    
+    // After a change, the buttons should be enabled.
+    expect(resetButton).not.toBeDisabled();
+    expect(saveButton).not.toBeDisabled();
+  
+    // Now simulate clicking the reset button.
+    fireEvent.click(resetButton);
+  
+    // After resetting, both buttons should be disabled.
+    expect(resetButton).toBeDisabled();
+    expect(saveButton).toBeDisabled();
+
+    // Verify if the role name was reverted to original value
+    expect(screen.getByText(dummyProfile.synthetic?.role?.metadata?.name!)).toBeInTheDocument();
   });
 
   test('displays error page if updateUserRole fetch fails', async () => {
     const mockFetch = jest.fn().mockRejectedValue(new Error('Failed'));
     (global.fetch as jest.Mock) = mockFetch;
 
-    render(<UserRoleSection userProfilePromise={Promise.resolve(dummyProfile)} />);
-    await waitFor(() => {
-      expect(screen.getByText(dummyProfile.loginId!)).toBeInTheDocument();
-    });
-
-    const dropdown = screen.getByTestId('dropdown') as HTMLSelectElement;
-    const saveButton = screen.getByText('Save') as HTMLButtonElement;
-    fireEvent.change(dropdown, { target: { value: '1' } });
-    fireEvent.click(saveButton);
-
+    render(<UserRoleSection userProfilePromise={Promise.reject(dummyProfile)} />);
+    
     // When the fetch fails, the component sets isError to true and renders the ErrorPage.
     await waitFor(() => {
-      expect(screen.getByTestId('error-page')).toBeInTheDocument();
+      expect(screen.getByText('Something went wrong!')).toBeInTheDocument();
     });
   });
 });

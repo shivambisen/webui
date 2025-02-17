@@ -15,3 +15,10 @@ export interface MarkdownResponse {
 export interface ProfileDetailsProps {
   userProfilePromise: Promise<UserData>;
 }
+
+export interface UpdateUserRolePayload {
+  userNumber: string;
+  roleDetails: {
+    role: string;
+  };
+}

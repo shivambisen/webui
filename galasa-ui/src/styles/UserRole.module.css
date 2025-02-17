@@ -8,13 +8,17 @@
   width: 95%;
 }
 
+.roleDetailsContainer h2 {
+  margin-bottom: 5rem;
+}
+
 .roleDetailsContainer {
   width: 90%;
   margin: 5rem auto 2rem auto;
 }
 
 .roleDetailsContainer h4 {
-  margin: 1rem 0;
+  margin-bottom: 1rem;
 }
 
 .roleDetailsContainer p {
