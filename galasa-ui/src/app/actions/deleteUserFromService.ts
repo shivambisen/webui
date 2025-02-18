@@ -22,7 +22,6 @@ export const deleteUserFromService = async (userNumber: string) => {
   try {
 
     await usersApiClient.deleteUserByNumber(userNumber, Constants.CLIENT_API_VERSION);
-    return { status: 204, message: "User deleted." };
 
   } catch (error: any) {
     console.error(error);

@@ -152,14 +152,11 @@ If the user logs in to the Galasa service after this point, they will be challen
 
   const deleteUser = async (userNumber: string) => {
     try {
-      const response = await deleteUserFromService(userNumber);
-      if (response.status === 204) {
-        // Remove the user from the users array
-        setUsers((prevUsers) =>
-          prevUsers.filter((user) => user.id !== userNumber)
-        );
-        setIsDeleteModalOpen(false);
-      }
+      await deleteUserFromService(userNumber);
+      setUsers((prevUsers) =>
+        prevUsers.filter((user) => user.id !== userNumber)
+      );
+      setIsDeleteModalOpen(false);
     } catch (err) {
       setIsError(true);
     }
