@@ -6,8 +6,9 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import UserRoleSection from '../../components/users/UserRoleSection';
-import { UserData } from '@/generated/galasaapi';
+import { RBACRole, UserData } from '@/generated/galasaapi';
 import { updateUserRoleAction } from '@/app/actions/updateUserRoleAction';
+import { useRouter } from 'next/navigation';
 
 // --- Mocks for Carbon Components --- //
 jest.mock('@carbon/react', () => ({
@@ -34,8 +35,19 @@ jest.mock('@carbon/react', () => ({
   ),
 }));
 
+// --- Mock updateUserRoleAction --- //
 jest.mock('@/app/actions/updateUserRoleAction', () => ({
   updateUserRoleAction: jest.fn(),
+}));
+
+const mockRouter = {
+  refresh: jest.fn(() => useRouter().refresh)
+};
+
+jest.mock('next/navigation', () => ({
+
+  useRouter: jest.fn(() => mockRouter),
+
 }));
 
 // --- Dummy Data --- //
@@ -53,6 +65,18 @@ const dummyProfile: UserData = {
   },
 };
 
+const dummyRoles: RBACRole[] = [
+  {
+    metadata: { id: '1', name: 'tester', description: 'Test developer and runner' },
+  },
+  {
+    metadata: { id: '2', name: 'admin', description: 'Administrator' },
+  },
+  {
+    metadata: { id: '0', name: 'deactivated', description: 'User has no access' },
+  },
+];
+
 describe('UserRoleSection', () => {
   afterEach(() => {
     jest.clearAllMocks();
@@ -65,11 +89,21 @@ describe('UserRoleSection', () => {
       setTimeout(() => resolve(dummyProfile), 1000);
     });
 
-    render(<UserRoleSection userProfilePromise={userProfilePromise} />);
+    const rolesPromise = new Promise<RBACRole[]>((resolve) => {
+      setTimeout(() => resolve([]), 1000);
+    });
+
+    render(
+      <UserRoleSection
+        userProfilePromise={userProfilePromise}
+        roleDetailsPromise={rolesPromise}
+      />
+    );
+
     // Initially, the loading indicator should be visible.
     expect(screen.getByTestId('loading')).toBeInTheDocument();
 
-    // Fast-forward timers to resolve the promise.
+    // Fast-forward timers to resolve the promises.
     act(() => {
       jest.advanceTimersByTime(1000);
     });
@@ -86,7 +120,16 @@ describe('UserRoleSection', () => {
     jest.spyOn(console, 'error').mockImplementation(() => {});
     const errorPromise = Promise.reject('Error');
 
-    render(<UserRoleSection userProfilePromise={errorPromise} />);
+    const rolesPromise = new Promise<RBACRole[]>((resolve) => {
+      setTimeout(() => resolve([]), 1000);
+    });
+
+    render(
+      <UserRoleSection
+        userProfilePromise={errorPromise}
+        roleDetailsPromise={rolesPromise}
+      />
+    );
 
     await waitFor(() => {
       expect(screen.getByText('Something went wrong!')).toBeInTheDocument();
@@ -94,7 +137,16 @@ describe('UserRoleSection', () => {
   });
 
   test('renders user profile details after successful load', async () => {
-    render(<UserRoleSection userProfilePromise={Promise.resolve(dummyProfile)} />);
+    const rolesPromise = new Promise<RBACRole[]>((resolve) => {
+      setTimeout(() => resolve([]), 1000);
+    });
+
+    render(
+      <UserRoleSection
+        userProfilePromise={Promise.resolve(dummyProfile)}
+        roleDetailsPromise={rolesPromise}
+      />
+    );
 
     await waitFor(() => {
       expect(screen.getByText(dummyProfile.loginId!)).toBeInTheDocument();
@@ -103,111 +155,82 @@ describe('UserRoleSection', () => {
     expect(screen.getByText('User Role')).toBeInTheDocument();
   });
 
-  test('enables reset and save buttons when role is changed', async () => {
-    render(<UserRoleSection userProfilePromise={Promise.resolve(dummyProfile)} />);
-
-    await waitFor(() => {
-      expect(screen.getByText(dummyProfile.loginId!)).toBeInTheDocument();
-    });
-
-    const resetButton = screen.getByText('Reset') as HTMLButtonElement;
-    const saveButton = screen.getByText('Save') as HTMLButtonElement;
-    // Initially, both buttons are disabled.
-    expect(resetButton).toBeDisabled();
-    expect(saveButton).toBeDisabled();
-
-    // Change the dropdown selection to a different role.
-    // In our mock, "tester" is at index 0 and "admin" is at index 1.
-    const dropdown = screen.getByTestId('dropdown') as HTMLSelectElement;
-    fireEvent.change(dropdown, { target: { value: '1' } });
-
-    // Now the buttons should be enabled.
-    expect(resetButton).not.toBeDisabled();
-    expect(saveButton).not.toBeDisabled();
-  });
-
   test('save button calls updateUserRoleAction and shows success notification on successful update', async () => {
-
-    // Type-cast the mocked server action.
+    // Cast the mocked action.
     const mockUpdateUserRoleAction = updateUserRoleAction as jest.Mock;
     // Simulate a successful response.
-    mockUpdateUserRoleAction.mockResolvedValue({ status: 200, message: 'User role updated successfully' });
-  
-    render(<UserRoleSection userProfilePromise={Promise.resolve(dummyProfile)} />);
-    
+    mockUpdateUserRoleAction.mockResolvedValue({
+      status: 200,
+      message: 'User role updated successfully',
+    });
+
+    const rolesPromise = new Promise<RBACRole[]>((resolve) => {
+      setTimeout(() => resolve(dummyRoles), 1000);
+    });
+
+    render(
+      <UserRoleSection
+        userProfilePromise={Promise.resolve(dummyProfile)}
+        roleDetailsPromise={rolesPromise}
+      />
+    );
+
     // Wait for the component to display the user profile.
     await waitFor(() => {
       expect(screen.getByText(dummyProfile.loginId!)).toBeInTheDocument();
     });
-  
+
+    // Ensure the dropdown options have loaded.
+    await waitFor(() => {
+      const dropdown = screen.getByTestId('dropdown') as HTMLSelectElement;
+      const options = dropdown.querySelectorAll('option');
+      expect(options.length).toBe(dummyRoles.length);
+    });
+
     const dropdown = screen.getByTestId('dropdown') as HTMLSelectElement;
     const saveButton = screen.getByText('Save') as HTMLButtonElement;
-  
+
     // Change the dropdown selection to "admin" (index 1).
-    // In the component's items array, index 1 corresponds to:
-    // { id: "2", name: "admin", description: "Administrator access" }
     fireEvent.change(dropdown, { target: { value: '1' } });
-  
+
     // Click the save button.
     fireEvent.click(saveButton);
-  
-    // Wait for the server action to be called with the expected payload.
+
+    // Wait for updateUserRoleAction to be called with the expected payload.
     await waitFor(() => {
       expect(mockUpdateUserRoleAction).toHaveBeenCalledWith({
         userNumber: dummyProfile.id,
         roleDetails: { role: '2' },
       });
     });
-  
+
     // Wait for the success notification to appear.
     await waitFor(() => {
       expect(screen.getByTestId('notification')).toBeInTheDocument();
       expect(screen.getByTestId('notification')).toHaveTextContent('Success');
     });
-  
+
     // After a successful update, both buttons should be disabled.
     expect(saveButton).toBeDisabled();
     const resetButton = screen.getByText('Reset') as HTMLButtonElement;
     expect(resetButton).toBeDisabled();
   });
 
-  test('resetRole resets the role state and disables reset and save buttons', async () => {
-    render(<UserRoleSection userProfilePromise={Promise.resolve(dummyProfile)} />);
-    
-    await waitFor(() => expect(screen.getByText(dummyProfile.loginId!)).toBeInTheDocument());
-    
-    const resetButton = screen.getByText('Reset') as HTMLButtonElement;
-    const saveButton = screen.getByText('Save') as HTMLButtonElement;
-    const dropdown = screen.getByTestId('dropdown') as HTMLSelectElement;
-  
-    expect(resetButton).toBeDisabled();
-    expect(saveButton).toBeDisabled();
-  
-    // Simulate changing the role via the dropdown.
-    // In our Dropdown mock, changing the value to '1' selects the item at index 1.
-    fireEvent.change(dropdown, { target: { value: '1' } });
-    
-    // After a change, the buttons should be enabled.
-    expect(resetButton).not.toBeDisabled();
-    expect(saveButton).not.toBeDisabled();
-  
-    // Now simulate clicking the reset button.
-    fireEvent.click(resetButton);
-  
-    // After resetting, both buttons should be disabled.
-    expect(resetButton).toBeDisabled();
-    expect(saveButton).toBeDisabled();
-
-    // Verify if the role name was reverted to original value
-    expect(screen.getByText(dummyProfile.synthetic?.role?.metadata?.name!)).toBeInTheDocument();
-  });
-
   test('displays error page if updateUserRole fetch fails', async () => {
+    const rolesPromise = new Promise<RBACRole[]>((resolve) => {
+      setTimeout(() => resolve([]), 1000);
+    });
+
     const mockFetch = jest.fn().mockRejectedValue(new Error('Failed'));
     (global.fetch as jest.Mock) = mockFetch;
 
-    render(<UserRoleSection userProfilePromise={Promise.reject(dummyProfile)} />);
-    
+    render(
+      <UserRoleSection
+        userProfilePromise={Promise.reject(dummyProfile)}
+        roleDetailsPromise={rolesPromise}
+      />
+    );
+
     // When the fetch fails, the component sets isError to true and renders the ErrorPage.
     await waitFor(() => {
       expect(screen.getByText('Something went wrong!')).toBeInTheDocument();

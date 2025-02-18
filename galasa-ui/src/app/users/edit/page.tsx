@@ -7,9 +7,9 @@ import EditUserBreadCrumb from '@/components/common/EditUserBreadCrumb';
 import PageTile from '@/components/PageTile';
 import UserRoleSection from '@/components/users/UserRoleSection';
 import React from 'react';
-import { UserData, UsersAPIApi } from '@/generated/galasaapi';
-import * as Constants from "@/utils/constants";
+import { RBACRole, RoleBasedAccessControlAPIApi} from '@/generated/galasaapi';
 import { createAuthenticatedApiConfiguration } from '@/utils/api';
+import { fetchUserFromApiServer } from '@/app/actions/getUserFromApiServer';
 
 // In order to extract query param on server-side
 type UsersPageProps = {
@@ -17,31 +17,32 @@ type UsersPageProps = {
   searchParams: { [key: string]: string | string[] | undefined };
 };
 
-export default function EditUserPage({searchParams} : UsersPageProps) {
+export default function EditUserPage({ searchParams }: UsersPageProps) {
 
-  const apiConfig = createAuthenticatedApiConfiguration();
   const loginIdFromQueryParam = searchParams.loginId as string;
 
-  const fetchUserFromApiServer = async () => {
+  const apiConfig = createAuthenticatedApiConfiguration();
 
-    let user: UserData = {};
-    const usersApiClient = new UsersAPIApi(apiConfig);
+  const fetchRBACRolesFromApiServer = async () => {
 
-    const usersReponse = await usersApiClient.getUserByLoginId(Constants.CLIENT_API_VERSION, loginIdFromQueryParam);
+    let roles: RBACRole[] = [];
 
-    if (usersReponse && usersReponse.length > 0) {
-      user = structuredClone(usersReponse[0]);
+    const rbacApiClient = new RoleBasedAccessControlAPIApi(apiConfig);
+    const rolesReponse = await rbacApiClient.getRBACRoles();
+
+    if(rolesReponse && rolesReponse.length >= 1){
+      roles = structuredClone(rolesReponse);
     }
 
-    return user;
-  };
+    return roles;
 
+  };
 
   return (
     <main id="content">
       <EditUserBreadCrumb />
       <PageTile title={"Edit User"} />
-      <UserRoleSection userProfilePromise={fetchUserFromApiServer()}/>
+      <UserRoleSection userProfilePromise={fetchUserFromApiServer(loginIdFromQueryParam)} roleDetailsPromise={fetchRBACRolesFromApiServer()}/>
     </main>
   );
 }

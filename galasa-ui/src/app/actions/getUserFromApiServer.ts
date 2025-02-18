@@ -9,12 +9,12 @@ import * as Constants from "@/utils/constants";
 import { createAuthenticatedApiConfiguration } from '@/utils/api';
 
 
-export const fetchCurrentUserFromApiServer = async () => {
+export const fetchUserFromApiServer = async (loginId: string) => {
 
   const apiConfig = createAuthenticatedApiConfiguration();
   let user: UserData = {};
   const usersApiClient = new UsersAPIApi(apiConfig);
-  const usersReponse = await usersApiClient.getUserByLoginId(Constants.CLIENT_API_VERSION, "me");
+  const usersReponse = await usersApiClient.getUserByLoginId(Constants.CLIENT_API_VERSION, loginId);
 
   if (usersReponse && usersReponse.length > 0) {
     user = structuredClone(usersReponse[0]);

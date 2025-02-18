@@ -11,7 +11,7 @@ import * as Constants from "@/utils/constants";
 import BreadCrumb from '@/components/common/BreadCrumb';
 import PageTile from '@/components/PageTile';
 import UsersTable from '@/components/users/UsersTable';
-import { fetchCurrentUserFromApiServer } from '../actions/getLoggedInUserAction';
+import { fetchUserFromApiServer } from '../actions/getUserFromApiServer';
 
 export const dynamic = 'force-dynamic';
 
@@ -37,7 +37,7 @@ export default function UsersPage() {
     <main id="content">
       <BreadCrumb />
       <PageTile title={"Users"} />
-      <UsersTable usersListPromise={fetchAllUsersFromApiServer()} currentUserPromise={fetchCurrentUserFromApiServer()}/>
+      <UsersTable usersListPromise={fetchAllUsersFromApiServer()} currentUserPromise={fetchUserFromApiServer("me")}/>
     </main>
   );
 }

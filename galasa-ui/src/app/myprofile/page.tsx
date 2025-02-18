@@ -7,7 +7,7 @@
 import PageTile from "@/components/PageTile";
 import ProfileDetails from "@/components/profile/ProfileDetails";
 import BreadCrumb from "@/components/common/BreadCrumb";
-import { fetchCurrentUserFromApiServer } from "../actions/getLoggedInUserAction";
+import { fetchUserFromApiServer } from "../actions/getUserFromApiServer";
 
 export default function MyProfilePage() {
 
@@ -15,7 +15,7 @@ export default function MyProfilePage() {
     <main id="content">
       <BreadCrumb />
       <PageTile title={"My Profile"} />
-      <ProfileDetails userProfilePromise={fetchCurrentUserFromApiServer()} />
+      <ProfileDetails userProfilePromise={fetchUserFromApiServer("me")} />
     </main>
   );
 };
