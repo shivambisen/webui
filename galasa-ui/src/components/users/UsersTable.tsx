@@ -7,14 +7,16 @@
 import { UserData } from '@/generated/galasaapi';
 import React, { useEffect, useState } from 'react';
 import { Loading, Button, DataTable } from "@carbon/react";
-import { Table, TableHead, TableRow, TableBody, TableCell, TableHeader, TableContainer, TableToolbarSearch, TableToolbarContent } from '@carbon/react';
+import { Table, TableHead, TableRow, TableBody, TableCell, TableHeader, TableContainer, TableToolbarSearch, TableToolbarContent, Modal } from '@carbon/react';
 import ErrorPage from '@/app/error/page';
 import { TableRowProps } from '@carbon/react/lib/components/DataTable/TableRow';
 import { TableHeadProps } from '@carbon/react/lib/components/DataTable/TableHead';
 import { TableBodyProps } from '@carbon/react/lib/components/DataTable/TableBody';
-import { Edit } from '@carbon/icons-react';
+import { Edit, TrashCan } from '@carbon/icons-react';
 import styles from "@/styles/UsersList.module.css";
 import Link from 'next/link';
+import { InlineNotification } from '@carbon/react';
+import { deleteUserFromService } from '@/app/actions/deleteUserFromService';
 
 export const dynamic = "force-dynamic";
 
@@ -56,7 +58,16 @@ export default function UsersTable({ usersListPromise, currentUserPromise }: Use
   const [users, setUsers] = useState<UserData[]>([]);
   const [hasEditUserPermission, setHasEditUserPermission] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserData>({});
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const EDIT_OTHER_USERS_PERMISSION = "USER_EDIT_OTHER";
+  const OWNER_ROLE_NAME = "owner";
+
+  const warningString = `Any access tokens previously allocated by this user will be removed and will no longer have access to the Galasa service.
+
+Tests run by this user will remain untouched and available for queries.
+
+If the user logs in to the Galasa service after this point, they will be challenged for credentials from the configured authorization authority, as they were originally when they started using the Galasa service. If that authority allows access, a new set of details for that user will be collected from that point.`;
+
 
   const headers = [
 
@@ -139,6 +150,19 @@ export default function UsersTable({ usersListPromise, currentUserPromise }: Use
 
   };
 
+  const deleteUser = async (userNumber: string) => {
+    try {
+      await deleteUserFromService(userNumber);
+      setUsers((prevUsers) =>
+        prevUsers.filter((user) => user.id !== userNumber)
+      );
+      setIsDeleteModalOpen(false);
+    } catch (err) {
+      setIsError(true);
+    }
+  };
+
+
   useEffect(() => {
 
     const loadUsers = async () => {
@@ -220,11 +244,34 @@ export default function UsersTable({ usersListPromise, currentUserPromise }: Use
                         // Only display edit button if user has the relevant action / permission
                         hasEditUserPermission &&
                         <TableCell className="cds--table-column-menu">
-                          <Link href={{pathname: currentUser.loginId === row.cells[0].value ? "/mysettings" : "/users/edit", query: {loginId: row.cells[0].value}}}>
+                          <Link href={{ pathname: currentUser.loginId === row.cells[0].value ? "/mysettings" : "/users/edit", query: { loginId: row.cells[0].value } }}>
                             <Button renderIcon={Edit} hasIconOnly kind="ghost" iconDescription="Edit User" />
                           </Link>
+                          {
+                            // Owner cannot be deleted. Moreover, a user cannot delete themselves.
+                            (currentUser.id !== row.id && row.cells[1].value !== OWNER_ROLE_NAME) && <Button onClick={() => setIsDeleteModalOpen(true)} renderIcon={TrashCan} hasIconOnly kind="ghost" iconDescription="Delete User" />
+                          }
                         </TableCell>
                       }
+
+                      {
+                        isDeleteModalOpen &&
+                        <Modal onRequestSubmit={() => deleteUser(row.id)} open={isDeleteModalOpen} onRequestClose={() => setIsDeleteModalOpen(false)} danger modalHeading={`Are you sure you want to delete '${row.cells[0].value}'?`} modalLabel="Delete User" primaryButtonText="Delete" secondaryButtonText="Cancel">
+                          <InlineNotification
+                            title="Deleting a user will remove any memory the Galasa service has of this user."
+                            kind="warning"
+                            subtitle={
+                              // Wrap the warning string in a div to ensure that the text has line breaks between them
+                              <div style={{ whiteSpace: 'pre-wrap' }}>
+                                {warningString}
+                              </div>
+                            }
+                            lowContrast
+                            hideCloseButton
+                          />
+                        </Modal>
+                      }
+
                     </TableRow>
                   );
                 })}
