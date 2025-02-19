@@ -8,12 +8,13 @@ import { cookies } from 'next/headers';
 import AccessTokensSection from '@/components/AccessTokensSection';
 import TokenResponseModal from '@/components/tokens/TokenResponseModal';
 import PageTile from '@/components/PageTile';
-import { AuthenticationAPIApi, UsersAPIApi, AuthTokens } from '@/generated/galasaapi';
+import { UsersAPIApi } from '@/generated/galasaapi';
 import { createAuthenticatedApiConfiguration } from '@/utils/api';
 import * as Constants from "@/utils/constants";
 import BreadCrumb from '@/components/common/BreadCrumb';
+import { fetchAccessTokens } from '../actions/getUserAccessTokens';
 
-export default function MySettings() {
+export default async function MySettings() {
   const apiConfig = createAuthenticatedApiConfiguration();
 
   const clientId = cookies().get(AuthCookies.CLIENT_ID)?.value ?? '';
@@ -34,32 +35,24 @@ export default function MySettings() {
     let loginId: string | undefined;
     if (userResponse.length > 0) {
       loginId = userResponse[0].loginId;
-      if (!loginId) {  
+      if (!loginId) {
         throw new Error("Unable to get current user ID from the Galasa API server");
       }
     }
     return loginId;
   };
 
-  const fetchAccessTokens = async () => {
-    const authApiClient = new AuthenticationAPIApi(apiConfig);
-
-    let accessTokens: AuthTokens | undefined;
-    const loginId = await fetchUserLoginId();;
-    if (loginId) {
-      const tokensResponse = await authApiClient.getTokens(Constants.CLIENT_API_VERSION, loginId);
-      if (tokensResponse && tokensResponse.tokens) {
-        accessTokens = structuredClone(tokensResponse);
-      }
-    }
-    return accessTokens;
-  };
+  // Await the login ID before using it
+  const userLoginId = await fetchUserLoginId();
+  if (!userLoginId) {
+    throw new Error("User login ID not found");
+  }
 
   return (
     <main id="content">
       <BreadCrumb />
       <PageTile title={"My Settings"} />
-      <AccessTokensSection accessTokensPromise={fetchAccessTokens()} />
+      <AccessTokensSection accessTokensPromise={fetchAccessTokens(userLoginId)} isAddBtnVisible={true}/>
       <TokenResponseModal refreshToken={refreshToken} clientId={clientId} onLoad={deleteCookies} />
     </main>
   );

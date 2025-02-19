@@ -59,6 +59,7 @@ export default function UsersTable({ usersListPromise, currentUserPromise }: Use
   const [hasEditUserPermission, setHasEditUserPermission] = useState(false);
   const [currentUser, setCurrentUser] = useState<UserData>({});
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState<DataTableRow>();
   const EDIT_OTHER_USERS_PERMISSION = "USER_EDIT_OTHER";
   const OWNER_ROLE_NAME = "owner";
 
@@ -148,6 +149,11 @@ If the user logs in to the Galasa service after this point, they will be challen
 
     }
 
+  };
+
+  const selectRowForDeletion = (row: DataTableRow) => {
+    setSelectedRow(row);
+    setIsDeleteModalOpen(true);
   };
 
   const deleteUser = async (userNumber: string) => {
@@ -249,14 +255,14 @@ If the user logs in to the Galasa service after this point, they will be challen
                           </Link>
                           {
                             // Owner cannot be deleted. Moreover, a user cannot delete themselves.
-                            (currentUser.id !== row.id && row.cells[1].value !== OWNER_ROLE_NAME) && <Button onClick={() => setIsDeleteModalOpen(true)} renderIcon={TrashCan} hasIconOnly kind="ghost" iconDescription="Delete User" />
+                            (currentUser.id !== row.id && row.cells[1].value !== OWNER_ROLE_NAME) && <Button onClick={() => selectRowForDeletion(row)} renderIcon={TrashCan} hasIconOnly kind="ghost" iconDescription="Delete User" />
                           }
                         </TableCell>
                       }
 
                       {
                         isDeleteModalOpen &&
-                        <Modal onRequestSubmit={() => deleteUser(row.id)} open={isDeleteModalOpen} onRequestClose={() => setIsDeleteModalOpen(false)} danger modalHeading={`Are you sure you want to delete '${row.cells[0].value}'?`} modalLabel="Delete User" primaryButtonText="Delete" secondaryButtonText="Cancel">
+                        <Modal onRequestSubmit={() => deleteUser(selectedRow!.id)} open={isDeleteModalOpen} onRequestClose={() => setIsDeleteModalOpen(false)} danger modalHeading={`Are you sure you want to delete '${selectedRow!.cells[0].value}'?`} modalLabel="Delete User" primaryButtonText="Delete" secondaryButtonText="Cancel">
                           <InlineNotification
                             title="Deleting a user will remove any memory the Galasa service has of this user."
                             kind="warning"

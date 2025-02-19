@@ -16,9 +16,10 @@ import { AuthToken, AuthTokens } from "@/generated/galasaapi";
 
 interface AccessTokensSectionProps {
   accessTokensPromise: Promise<AuthTokens | undefined>
+  isAddBtnVisible: Boolean;
 }
 
-export default function AccessTokensSection({accessTokensPromise}: AccessTokensSectionProps) {
+export default function AccessTokensSection({ accessTokensPromise, isAddBtnVisible }: AccessTokensSectionProps) {
 
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
@@ -104,7 +105,10 @@ export default function AccessTokensSection({accessTokensPromise}: AccessTokensS
           </div>
 
           <div className={styles.btnContainer}>
-            <TokenRequestModal isDisabled={selectedTokens.size > 0} />
+
+            {/* // Only the user who is logged in can create a new token
+            // Admins can only delete users' tokens.  */}
+            {isAddBtnVisible && <TokenRequestModal isDisabled={selectedTokens.size > 0} />}
 
             <Button onClick={() => setIsDeleteModalOpen(true)} className={styles.deleteBtn} disabled={selectedTokens.size === 0} kind="danger">
               Delete {selectedTokens.size} selected access tokens

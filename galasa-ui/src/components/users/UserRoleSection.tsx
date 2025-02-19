@@ -192,7 +192,7 @@ export default function UserRoleSection({ userProfilePromise, roleDetailsPromise
     <div className={styles.roleDetails}>
       <div className={styles.roleDetailsContainer}>
         <h2>{userProfile.loginId}</h2>
-        <h4>User Role</h4>
+        <h3>User Role</h3>
         <p>The actions a user can or cannot perform on this Galasa service is controlled by their user role.</p>
         <div className={styles.dropdownContainer}>
           <Dropdown
