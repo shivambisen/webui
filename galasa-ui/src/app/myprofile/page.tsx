@@ -7,7 +7,8 @@
 import PageTile from "@/components/PageTile";
 import ProfileDetails from "@/components/profile/ProfileDetails";
 import BreadCrumb from "@/components/common/BreadCrumb";
-import { fetchUserFromApiServer } from "../actions/getUserFromApiServer";
+import { fetchUserFromApiServer } from "../actions/userServerActions";
+
 
 export default function MyProfilePage() {
 

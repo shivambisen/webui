@@ -11,7 +11,7 @@ import * as Constants from "@/utils/constants";
 import BreadCrumb from '@/components/common/BreadCrumb';
 import PageTile from '@/components/PageTile';
 import UsersTable from '@/components/users/UsersTable';
-import { fetchUserFromApiServer } from '../actions/getUserFromApiServer';
+import { fetchUserFromApiServer } from '../actions/userServerActions';
 
 export const dynamic = 'force-dynamic';
 

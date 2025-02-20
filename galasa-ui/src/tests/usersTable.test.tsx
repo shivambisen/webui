@@ -6,8 +6,9 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import UsersTable from '@/components/users/UsersTable';
-import { UserData } from '@/generated/galasaapi';
+import { UserData, UsersAPIApi } from '@/generated/galasaapi';
 import '@testing-library/jest-dom';
+import { deleteUserFromService } from '@/app/actions/userServerActions';
 
 // ------------------------------
 // Mocks
@@ -22,6 +23,10 @@ jest.mock('@carbon/react', () => {
     Loading: () => <div data-testid="loading">Loading...</div>
   };
 });
+
+let deleteUserByNumberMock: jest.Mock;
+
+deleteUserByNumberMock = jest.fn();
 
 
 // ------------------------------
@@ -85,7 +90,7 @@ describe('UsersTable component', () => {
     const resolvedPromise: Promise<UserData[]> = Promise.resolve(userData);
     const currentUserResolvedPromise: Promise<UserData> = Promise.resolve(currentUser);
 
-    render(<UsersTable usersListPromise={resolvedPromise} currentUserPromise={currentUserResolvedPromise}/>);
+    render(<UsersTable usersListPromise={resolvedPromise} currentUserPromise={currentUserResolvedPromise} />);
 
     // Wait until the table header appears, indicating data has been loaded.
     await waitFor(() => {
@@ -136,7 +141,7 @@ describe('UsersTable component', () => {
 
     const resolvedPromise: Promise<UserData[]> = Promise.resolve(userData);
     const currentUserResolvedPromise: Promise<UserData> = Promise.resolve(currentUser);
-    render(<UsersTable usersListPromise={resolvedPromise} currentUserPromise={currentUserResolvedPromise}/>);
+    render(<UsersTable usersListPromise={resolvedPromise} currentUserPromise={currentUserResolvedPromise} />);
 
     // Wait for the table header to appear.
     await waitFor(() => {
@@ -159,11 +164,26 @@ describe('UsersTable component', () => {
 
     const currentUserResolvedPromise: Promise<UserData> = Promise.resolve({});
 
-    render(<UsersTable usersListPromise={rejectedPromise} currentUserPromise={currentUserResolvedPromise}/>);
+    render(<UsersTable usersListPromise={rejectedPromise} currentUserPromise={currentUserResolvedPromise} />);
 
     // Check if the Error page was rendered
     await waitFor(() => {
       expect(screen.getByText('Something went wrong!')).toBeInTheDocument();
     });
+  });
+
+  test("should throw an error if userNumber is empty", async () => {
+    await expect(deleteUserFromService("")).rejects.toThrow(
+      "User Number is required"
+    );
+  });
+
+  test("should throw an internal server error for other errors", async () => {
+    deleteUserByNumberMock.mockRejectedValueOnce({
+      response: { status: 500 },
+    });
+    await expect(deleteUserFromService("abcd123")).rejects.toThrow(
+      "Internal Server Error"
+    );
   });
 });
