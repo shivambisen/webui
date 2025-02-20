@@ -57,14 +57,6 @@ jest.mock('@/components/tokens/TokenDeleteModal', () => {
 
 });
 
-// Mock ErrorPage to display error message
-jest.mock('@/app/error/page', () => {
-  const MockErrorPage = () => <div data-testid="error-page">Error Page</div>;
-  MockErrorPage.displayName = "MockErrorPage";
-
-  return MockErrorPage;
-});
-
 // --- Tests ---
 describe('AccessTokensSection', () => {
   
@@ -119,10 +111,8 @@ describe('AccessTokensSection', () => {
   });
 
   test('renders error page when fetching tokens fails', async () => {
-    // Supply a promise that rejects.
+  
     const rejectedPromise = Promise.reject(new Error('Fetch error'));
-
-    // Render the component (isAddBtnVisible does not matter here).
     render(
       <AccessTokensSection
         accessTokensPromise={rejectedPromise}
@@ -132,9 +122,8 @@ describe('AccessTokensSection', () => {
 
     // Wait for the error page to be rendered.
     await waitFor(() =>
-      expect(screen.getByTestId('error-page')).toBeInTheDocument()
+      expect(screen.getByText('Something went wrong!')).toBeInTheDocument()
     );
-    expect(screen.getByTestId('error-page')).toHaveTextContent('Error Page');
   });
 
   test('enables delete button and opens delete modal when token is selected', async () => {
