@@ -47,7 +47,7 @@ export default async function MySettings() {
   const userLoginId = await fetchUserLoginId();
   
   if (!userLoginId) {
-    return <ErrorPage />
+    return <ErrorPage />;
   }
 
   return (
