@@ -9,9 +9,9 @@ import UserRoleSection from '@/components/users/UserRoleSection';
 import React from 'react';
 import { RBACRole, RoleBasedAccessControlAPIApi} from '@/generated/galasaapi';
 import { createAuthenticatedApiConfiguration } from '@/utils/api';
-import { fetchUserFromApiServer } from '@/app/actions/getUserFromApiServer';
 import AccessTokensSection from '@/components/AccessTokensSection';
 import { fetchAccessTokens } from '@/app/actions/getUserAccessTokens';
+import { fetchUserFromApiServer } from '@/app/actions/userServerActions';
 
 // In order to extract query param on server-side
 type UsersPageProps = {
@@ -45,7 +45,6 @@ export default function EditUserPage({ searchParams }: UsersPageProps) {
       <EditUserBreadCrumb />
       <PageTile title={"Edit User"} />
       <UserRoleSection userProfilePromise={fetchUserFromApiServer(loginIdFromQueryParam)} roleDetailsPromise={fetchRBACRolesFromApiServer()}/>
-      <br />
       <AccessTokensSection accessTokensPromise={fetchAccessTokens(loginIdFromQueryParam)} isAddBtnVisible={false}/>
     </main>
   );

@@ -7,7 +7,7 @@ import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import UserRoleSection from '../../components/users/UserRoleSection';
 import { RBACRole, UserData } from '@/generated/galasaapi';
-import { updateUserRoleAction } from '@/app/actions/updateUserRoleAction';
+import { updateUserRoleAction } from '@/app/actions/userServerActions';
 import { useRouter } from 'next/navigation';
 
 // --- Mocks for Carbon Components --- //
@@ -36,7 +36,7 @@ jest.mock('@carbon/react', () => ({
 }));
 
 // --- Mock updateUserRoleAction --- //
-jest.mock('@/app/actions/updateUserRoleAction', () => ({
+jest.mock('@/app/actions/userServerActions', () => ({
   updateUserRoleAction: jest.fn(),
 }));
 

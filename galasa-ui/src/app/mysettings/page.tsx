@@ -13,6 +13,7 @@ import { createAuthenticatedApiConfiguration } from '@/utils/api';
 import * as Constants from "@/utils/constants";
 import BreadCrumb from '@/components/common/BreadCrumb';
 import { fetchAccessTokens } from '../actions/getUserAccessTokens';
+import ErrorPage from '../error/page';
 
 export default async function MySettings() {
   const apiConfig = createAuthenticatedApiConfiguration();
@@ -44,8 +45,9 @@ export default async function MySettings() {
 
   // Await the login ID before using it
   const userLoginId = await fetchUserLoginId();
+  
   if (!userLoginId) {
-    throw new Error("User login ID not found");
+    return <ErrorPage />
   }
 
   return (
