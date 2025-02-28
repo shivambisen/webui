@@ -60,6 +60,7 @@ const dummyProfile: UserData = {
         id: '1',
         name: 'tester',
         description: 'Test developer and runner',
+        assignable: true
       },
     },
   },
@@ -67,13 +68,13 @@ const dummyProfile: UserData = {
 
 const dummyRoles: RBACRole[] = [
   {
-    metadata: { id: '1', name: 'tester', description: 'Test developer and runner' },
+    metadata: { id: '1', name: 'tester', description: 'Test developer and runner', assignable:true },
   },
   {
-    metadata: { id: '2', name: 'admin', description: 'Administrator' },
+    metadata: { id: '2', name: 'admin', description: 'Administrator', assignable:true },
   },
   {
-    metadata: { id: '0', name: 'deactivated', description: 'User has no access' },
+    metadata: { id: '0', name: 'deactivated', description: 'User has no access', assignable:true },
   },
 ];
 
