@@ -41,7 +41,7 @@ test('renders the footer with matching client api version', async () => {
     return render(<Footer serviceHealthyPromise={serviceHealthyPromise} clientVersionPromise={clientApiVersionPromise}/>);
   });
 
-  const version = await screen.findByText('Galasa Version 0.37.0');
+  const version = await screen.findByText('Galasa version 0.37.0');
   expect(version).toBeInTheDocument();
 
   //Check the correct color div was rendered -> should render green dot

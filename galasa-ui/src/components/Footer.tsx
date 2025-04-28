@@ -43,7 +43,7 @@ const Footer = ({ serviceHealthyPromise, clientVersionPromise }: FooterProps) =>
     <Theme theme="g90">
       <footer className={styles.footer} role="footer">
         {
-          isHealthOk && <p>Galasa Version {apiVersion}</p>
+          isHealthOk && <p>Galasa version {apiVersion}</p>
         }
         <p className={styles.serviceHealthTitle}>Service health {isHealthOk ? <div className={styles.healthy} /> : <div className={styles.error} />}</p> 
       </footer>
