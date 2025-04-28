@@ -15,7 +15,7 @@ jest.mock('@/actions/healthActions', () => ({
 test('renders the footer', async () => {
 
   const isGalasaServiceHealthy: boolean = true;
-  const clientApiVersion: string = "0.40.0"
+  const clientApiVersion: string = "0.40.0";
 
   const serviceHealthyPromise: Promise<boolean> = Promise.resolve(isGalasaServiceHealthy);
   const clientApiVersionPromise: Promise<string> = Promise.resolve(clientApiVersion);
@@ -32,7 +32,7 @@ test('renders the footer', async () => {
 test('renders the footer with matching client api version', async () => {
 
   const isGalasaServiceHealthy: boolean = true;
-  const clientApiVersion: string = "0.37.0"
+  const clientApiVersion: string = "0.37.0";
 
   const serviceHealthyPromise: Promise<boolean> = Promise.resolve(isGalasaServiceHealthy);
   const clientApiVersionPromise: Promise<string> = Promise.resolve(clientApiVersion);
@@ -53,7 +53,7 @@ test('renders the footer with matching client api version', async () => {
 test('renders the footer with bad service health', async () => {
 
   const isGalasaServiceHealthy: boolean = false;
-  const clientApiVersion: string = "0.37.0"
+  const clientApiVersion: string = "0.37.0";
 
   const serviceHealthyPromise: Promise<boolean> = Promise.resolve(isGalasaServiceHealthy);
   const clientApiVersionPromise: Promise<string> = Promise.resolve(clientApiVersion);
