@@ -7,7 +7,7 @@ import Footer from '@/components/Footer';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import styles from "@/styles/Footer.module.css";
 
-jest.mock('@/actions/healthActions', () => ({
+jest.mock('@/utils/health', () => ({
   getServiceHealthStatus: jest.fn(),
   getClientApiVersion:     jest.fn(),
 }));

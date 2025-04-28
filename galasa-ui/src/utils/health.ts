@@ -3,8 +3,6 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-
-"use server";
 import { BootstrapAPIApi, OpenAPIAPIApi } from "@/generated/galasaapi";
 import { createAuthenticatedApiConfiguration } from "@/utils/api";
 import { CLIENT_API_VERSION } from "@/utils/constants";

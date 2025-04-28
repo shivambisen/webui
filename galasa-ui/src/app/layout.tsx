@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import { getClientApiVersion, getServiceHealthStatus } from '@/actions/healthActions';
+import { getClientApiVersion, getServiceHealthStatus } from '@/utils/health';
 import Footer from '@/components/Footer';
 import PageHeader from '@/components/headers/PageHeader';
 import '@/styles/global.scss';

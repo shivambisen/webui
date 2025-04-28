@@ -37,15 +37,15 @@ const Footer = ({ serviceHealthyPromise, clientVersionPromise }: FooterProps) =>
     checkServiceHealth();
     getApiVersion();
 
-  }, []);
+  }, [serviceHealthyPromise, clientVersionPromise]); // included these to satisfy React Hook linting – their identity is stable so the effect still only runs once
 
   return (
     <Theme theme="g90">
       <footer className={styles.footer} role="footer">
         {
-          isHealthOk && <p>Galasa Version {apiVersion}</p>
+          isHealthOk ? <p>Galasa Version {apiVersion}</p> : <div/> // Added an empty div to maintain content flow and layout
         }
-        <p>Service Health {isHealthOk ? <div className={styles.healthy} /> : <div className={styles.error} />}</p> 
+        <p>Service health {isHealthOk ? <div className={styles.healthy} /> : <div className={styles.error} />}</p> 
       </footer>
     </Theme>
   );
