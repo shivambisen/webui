@@ -11,7 +11,7 @@ import styles from "@/styles/UserRole.module.css";
 import { ButtonSet, Button, Dropdown, Loading } from '@carbon/react';
 import ErrorPage from '@/app/error/page';
 import { InlineNotification } from '@carbon/react';
-import { updateUserRoleAction } from '@/app/actions/userServerActions';
+import { updateUserRoleAction } from '@/actions/userServerActions';
 import { useRouter } from 'next/navigation';
 
 interface DropdownItem {

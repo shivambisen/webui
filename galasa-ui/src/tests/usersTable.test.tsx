@@ -6,9 +6,9 @@
 import React from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import UsersTable from '@/components/users/UsersTable';
-import { UserData, UsersAPIApi } from '@/generated/galasaapi';
+import { UserData } from '@/generated/galasaapi';
 import '@testing-library/jest-dom';
-import { deleteUserFromService } from '@/app/actions/userServerActions';
+import { deleteUserFromService } from '@/actions/userServerActions';
 
 // ------------------------------
 // Mocks

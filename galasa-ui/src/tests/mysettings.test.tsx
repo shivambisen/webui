@@ -7,7 +7,6 @@
 import MySettings from '@/app/mysettings/page';
 import { UsersAPIApi } from '@/generated/galasaapi';
 import { render, screen } from '@testing-library/react';
-import { cookies } from 'next/headers';
 
 // --- Mocks ---
 
@@ -33,7 +32,7 @@ jest.mock('@/utils/api', () => ({
   createAuthenticatedApiConfiguration: () => ({}),
 }));
 
-jest.mock('@/app/actions/getUserAccessTokens', () => ({
+jest.mock('@/actions/getUserAccessTokens', () => ({
   fetchAccessTokens: jest.fn().mockResolvedValue({ tokens: [] }),
 }));
 

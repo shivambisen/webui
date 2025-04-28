@@ -141,6 +141,26 @@ exports[`Layout renders the web UI layout 1`] = `
             </header>
           </div>
           Hello, world!
+          <div
+            class="cds--g90 cds--layer-one"
+          >
+            <footer
+              class="footer"
+              role="footer"
+            >
+              <p>
+                Galasa Version 
+              </p>
+              <p
+                class="serviceHealthTitle"
+              >
+                Service health 
+                <div
+                  class="healthy"
+                />
+              </p>
+            </footer>
+          </div>
         </body>
       </html>
     </div>
@@ -282,6 +302,26 @@ exports[`Layout renders the web UI layout 1`] = `
           </header>
         </div>
         Hello, world!
+        <div
+          class="cds--g90 cds--layer-one"
+        >
+          <footer
+            class="footer"
+            role="footer"
+          >
+            <p>
+              Galasa Version 
+            </p>
+            <p
+              class="serviceHealthTitle"
+            >
+              Service health 
+              <div
+                class="healthy"
+              />
+            </p>
+          </footer>
+        </div>
       </body>
     </html>
   </div>,
