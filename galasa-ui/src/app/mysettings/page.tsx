@@ -12,7 +12,7 @@ import { UsersAPIApi } from '@/generated/galasaapi';
 import { createAuthenticatedApiConfiguration } from '@/utils/api';
 import * as Constants from "@/utils/constants";
 import BreadCrumb from '@/components/common/BreadCrumb';
-import { fetchAccessTokens } from '../actions/getUserAccessTokens';
+import { fetchAccessTokens } from '../../actions/getUserAccessTokens';
 import ErrorPage from '../error/page';
 
 export default async function MySettings() {

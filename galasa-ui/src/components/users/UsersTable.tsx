@@ -16,7 +16,7 @@ import { Edit, TrashCan } from '@carbon/icons-react';
 import styles from "@/styles/UsersList.module.css";
 import Link from 'next/link';
 import { InlineNotification } from '@carbon/react';
-import { deleteUserFromService } from '@/app/actions/userServerActions';
+import { deleteUserFromService } from '@/actions/userServerActions';
 
 export const dynamic = "force-dynamic";
 

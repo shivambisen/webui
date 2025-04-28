@@ -10,8 +10,8 @@ import React from 'react';
 import { RBACRole, RoleBasedAccessControlAPIApi} from '@/generated/galasaapi';
 import { createAuthenticatedApiConfiguration } from '@/utils/api';
 import AccessTokensSection from '@/components/AccessTokensSection';
-import { fetchAccessTokens } from '@/app/actions/getUserAccessTokens';
-import { fetchUserFromApiServer } from '@/app/actions/userServerActions';
+import { fetchAccessTokens } from '@/actions/getUserAccessTokens';
+import { fetchUserFromApiServer } from '@/actions/userServerActions';
 
 // In order to extract query param on server-side
 type UsersPageProps = {

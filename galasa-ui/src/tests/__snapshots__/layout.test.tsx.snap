@@ -148,15 +148,15 @@ exports[`Layout renders the web UI layout 1`] = `
               class="footer"
               role="footer"
             >
-              <h6>
+              <p>
                 Galasa Version 
-              </h6>
-              <h6>
+              </p>
+              <p>
                 Service Health 
                 <div
                   class="healthy"
                 />
-              </h6>
+              </p>
             </footer>
           </div>
         </body>
@@ -307,15 +307,15 @@ exports[`Layout renders the web UI layout 1`] = `
             class="footer"
             role="footer"
           >
-            <h6>
+            <p>
               Galasa Version 
-            </h6>
-            <h6>
+            </p>
+            <p>
               Service Health 
               <div
                 class="healthy"
               />
-            </h6>
+            </p>
           </footer>
         </div>
       </body>

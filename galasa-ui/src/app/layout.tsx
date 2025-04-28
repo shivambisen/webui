@@ -4,11 +4,10 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+import { getClientApiVersion, getServiceHealthStatus } from '@/actions/healthActions';
 import Footer from '@/components/Footer';
 import PageHeader from '@/components/headers/PageHeader';
 import '@/styles/global.scss';
-import { getServiceHealthStatus } from './actions/healthActions';
-import { CLIENT_API_VERSION } from '@/utils/constants';
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +24,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <PageHeader galasaServiceName={galasaServiceName} />
         {children}
-        <Footer />
+        <Footer serviceHealthyPromise={getServiceHealthStatus()} clientVersionPromise={getClientApiVersion()}/>
       </body>
     </html>
   );

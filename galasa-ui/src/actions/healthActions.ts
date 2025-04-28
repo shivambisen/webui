@@ -13,18 +13,18 @@ export async function getServiceHealthStatus() {
 
   const apiConfig = createAuthenticatedApiConfiguration();
   const bootstrapApiClient = new BootstrapAPIApi(apiConfig);
+  let isGalasaServiceHealthy = false;
 
   try {
 
     await bootstrapApiClient.getEcosystemBootstrap(CLIENT_API_VERSION);
-    return true;
+    isGalasaServiceHealthy = true;
 
   } catch (error : any) {
-
     console.error("Health check failed:", error);
-    return false;
-
   };
+
+  return isGalasaServiceHealthy;
   
 };
 

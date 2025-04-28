@@ -9,24 +9,24 @@
 import React, { useEffect, useState } from 'react';
 import styles from "@/styles/Footer.module.css";
 import { Theme } from '@carbon/react';
-import { getClientApiVersion, getServiceHealthStatus } from '@/app/actions/healthActions';
 
-export const dynamic = "force-dynamic";
+interface FooterProps {
+  serviceHealthyPromise: Promise<boolean>;
+  clientVersionPromise?: Promise<string | undefined>;
+}
 
-const Footer = () => {
+const Footer = ({ serviceHealthyPromise, clientVersionPromise }: FooterProps) => {
 
   const [isHealthOk, setIsHealthOk] = useState(true);
   const [apiVersion, setApiVersion] = useState("");
 
   const checkServiceHealth = async () => {
-    const isPingSuccessful = await getServiceHealthStatus();
-    if (isPingSuccessful !== true) {
-      setIsHealthOk(false);
-    }
+    const isPingSuccessful = await serviceHealthyPromise;
+    setIsHealthOk(isPingSuccessful);
   };
 
   const getApiVersion = async () => {
-    const apiVersion = await getClientApiVersion();
+    const apiVersion = await clientVersionPromise;
     if(apiVersion) {
       setApiVersion(apiVersion);
     }
@@ -34,10 +34,8 @@ const Footer = () => {
 
   useEffect(() => {
 
-    Promise.all([
-      checkServiceHealth(),
-      getApiVersion()
-    ]);
+    checkServiceHealth();
+    getApiVersion();
 
   }, []);
 
@@ -45,9 +43,9 @@ const Footer = () => {
     <Theme theme="g90">
       <footer className={styles.footer} role="footer">
         {
-          isHealthOk && <h6>Galasa Version {apiVersion}</h6>
+          isHealthOk && <p>Galasa Version {apiVersion}</p>
         }
-        <h6>Service Health {isHealthOk ? <div className={styles.healthy} /> : <div className={styles.error} />}</h6> 
+        <p>Service Health {isHealthOk ? <div className={styles.healthy} /> : <div className={styles.error} />}</p> 
       </footer>
     </Theme>
   );
