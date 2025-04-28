@@ -151,8 +151,10 @@ exports[`Layout renders the web UI layout 1`] = `
               <p>
                 Galasa Version 
               </p>
-              <p>
-                Service Health 
+              <p
+                class="serviceHealthTitle"
+              >
+                Service health 
                 <div
                   class="healthy"
                 />
@@ -310,8 +312,10 @@ exports[`Layout renders the web UI layout 1`] = `
             <p>
               Galasa Version 
             </p>
-            <p>
-              Service Health 
+            <p
+              class="serviceHealthTitle"
+            >
+              Service health 
               <div
                 class="healthy"
               />

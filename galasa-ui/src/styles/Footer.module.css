@@ -1,7 +1,7 @@
 .footer {
   padding: 1rem 2rem;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
 }
 
@@ -21,4 +21,11 @@
   height: 8px;
   width: 8px;
   margin-left: 0.5rem;
+}
+
+
+.serviceHealthTitle {
+  margin-left: auto;   /* this makes it hug the right edge */
+  display: flex;
+  align-items: center; /* vertically center the little dot */
 }
