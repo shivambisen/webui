@@ -3,53 +3,47 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-.container {
-  padding: 16px 0;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+
+
+.warn{
+  color: #ffb74d;
+}
+
+.error{
+  color: #f44336;
 }
 
 .logContainer {
-  height: 24rem;
-  /* 96 * 4px */
-  overflow-y: auto;
-  background-color: #f3f4f6;
-  padding: 8px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-}
-
-.lineNumber {
-  color: #3b82f6;
-}
-
-.logLine {
-  font-family: 'Menlo', 'Monaco', monospace;
-  font-size: 0.75rem;
-  white-space: pre-wrap;
-  margin: 0;
-}
-
-.pagination {
+  margin: 1rem 0;
   display: flex;
-  justify-content: space-between;
-  margin-top: 16px;
+  align-items: center;
+  justify-content: center;
 }
 
-.button {
-  padding: 8px 16px;
-  background-color: #3b82f6;
-  color: #ffffff;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
+.logEntry {
+  line-height: 1.5;
+  margin-bottom: 0.25rem;
 }
 
-.button:disabled,
-.button.disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
+.tabContent {
+  background-color: white;
+  border: 1px solid var(--galasa-border);
+  border-top: none;
+  border-bottom-left-radius: var(--border-radius);
+  border-bottom-right-radius: var(--border-radius);
 }
 
-.pageInfo {
-  align-self: center;
+.runLog {
+  border: 1px solid var(--galasa-border);
+  border-radius: var(--border-radius);
+  background-color: #0a0a0a;
+  padding: 1rem;
+  font-family: 'IBM Plex Mono', monospace;
+  height: 500px;
+  overflow-y: auto;
+  color: #f4f4f4;
+}
+
+.runLogContent {
+  width: 100%;
 }

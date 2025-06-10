@@ -3,8 +3,8 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-import { CheckmarkFilled, ErrorOutline,Renew, Warning } from '@carbon/icons-react'
-import React from 'react'
+import { CheckmarkFilled, ErrorOutline,Renew, Warning } from '@carbon/icons-react';
+import React from 'react';
 import styles from "@/styles/StatusCheck.module.css";
 
 function StatusCheck({ status }: { status: string }) {
@@ -24,7 +24,7 @@ function StatusCheck({ status }: { status: string }) {
         )
       }
     </>
-  )
+  );
 }
 
-export default StatusCheck
+export default StatusCheck;

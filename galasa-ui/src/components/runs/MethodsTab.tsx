@@ -7,7 +7,6 @@
 import { TestMethod } from '@/generated/galasaapi';
 import { getIsoTimeDifference } from '@/utils/functions';
 import { DataTableHeader, DataTableRow } from '@/utils/interfaces';
-import { CheckmarkFilled, CheckmarkFilledError, ErrorOutline, InProgress } from '@carbon/icons-react';
 import { DataTable, TableContainer, Table, TableCell, TableHeader } from '@carbon/react';
 import TableBody, { TableBodyProps } from '@carbon/react/lib/components/DataTable/TableBody';
 import TableHead, { TableHeadProps } from '@carbon/react/lib/components/DataTable/TableHead';
@@ -16,7 +15,7 @@ import React, { useEffect, useState } from 'react';
 import { TableToolbarContent } from '@carbon/react';
 import { TableToolbarSearch } from '@carbon/react';
 import StatusCheck from '../common/StatusCheck';
-
+import styles from "@/styles/MethodsTab.module.css";
 
 
 export interface MethodDetails {
@@ -45,7 +44,7 @@ function MethodsTab({ methods }: { methods: TestMethod[] }) {
         duration: getIsoTimeDifference(method.startTime!, method.endTime!),
         status: method.status || "",
         result: method.result || ""
-      }
+      };
 
       methodDetails.push(methodDetail);
     }
@@ -53,7 +52,7 @@ function MethodsTab({ methods }: { methods: TestMethod[] }) {
 
     setMethodDetails(methodDetails);
 
-  }
+  };
 
   const headers = [
 
@@ -85,6 +84,10 @@ function MethodsTab({ methods }: { methods: TestMethod[] }) {
 
   return (
     <>
+      <div className={styles.titleContainer}>
+        <h3>Methods</h3>
+        <p>The list of methods executed during this test run.</p>
+      </div>
       <DataTable isSortable rows={methodDetails} headers={headers}>
         {({
           rows,
@@ -130,7 +133,7 @@ function MethodsTab({ methods }: { methods: TestMethod[] }) {
                       </TableCell>
                       {/* Result */}
                       <TableCell key={row.cells[2].id}>
-                        <StatusCheck status={row.cells[2].value}/>
+                        <StatusCheck status={row.cells[2].value} />
                       </TableCell>
                       {/* Elapsed Time */}
                       <TableCell key={row.cells[3].id}>

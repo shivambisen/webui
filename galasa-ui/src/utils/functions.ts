@@ -31,10 +31,10 @@ export function parseIsoDateTime(isoString: string) {
   const mins  = pad(dt.getUTCMinutes());
   const secs  = pad(dt.getUTCSeconds());
 
-  const date = `${day}/${month}/${year}`
-  const time = `${hours}:${mins}:${secs}`
+  const date = `${day}/${month}/${year}`;
+  const time = `${hours}:${mins}:${secs}`;
 
-  return `${date} ${time}`
+  return `${date} ${time}`;
 }
 
 

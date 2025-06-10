@@ -12,13 +12,14 @@ import styles from "@/styles/TestRun.module.css";
 import { Dashboard, Code, CloudLogging, RepoArtifact } from '@carbon/icons-react';
 import OverviewTab from './OverviewTab';
 import InlineText from './InlineText';
-import { Artifact, ArtifactIndexEntry, Run, TestMethod } from '@/generated/galasaapi';
+import { ArtifactIndexEntry, Run, TestMethod } from '@/generated/galasaapi';
 import ErrorPage from '@/app/error/page';
 import { RunMetadata } from '@/utils/interfaces';
 import { getIsoTimeDifference, parseIsoDateTime } from '@/utils/functions';
-import { LogTab } from './LogTab';
 import MethodsTab from './MethodsTab';
 import StatusCheck from '../common/StatusCheck';
+import { ArtifactsTab } from './ArtifactsTab';
+import LogTab from './LogTab';
 
 interface TestRunDetailsProps {
   runId: string;
@@ -32,8 +33,8 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
 
   const [run, setRun] = useState<RunMetadata>();
   const [methods, setMethods] = useState<TestMethod[]>([]);
-  const [artifacts, setArtifacts] = useState<Artifact[]>([]);
-  const [logs, setLogs] = useState<string>("")
+  const [artifacts, setArtifacts] = useState<ArtifactIndexEntry[]>([]);
+  const [logs, setLogs] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
 
@@ -41,7 +42,6 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
   const extractRunDetails = (runDetails: Run) => {
 
     setMethods(runDetails.testStructure?.methods || []);
-    setArtifacts(runDetails.artifacts || []);
 
     // Build run metadata object
     const runMetadata: RunMetadata = {
@@ -61,11 +61,11 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
       duration: getIsoTimeDifference(runDetails.testStructure?.startTime!, runDetails.testStructure?.endTime!),
       tags: runDetails.testStructure?.tags!
 
-    }
+    };
 
     setRun(runMetadata);
 
-  }
+  };
 
   useEffect(() => {
 
@@ -79,11 +79,9 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
         const runLogs = await runLogPromise;
         const runArtifacts = await runArtifactsPromise;
 
-        console.log(runArtifacts);
-        
-
         if (runDetails) {
-          extractRunDetails(runDetails)
+          extractRunDetails(runDetails);
+          setArtifacts(runArtifacts);
           setLogs(runLogs);
         }
 
@@ -100,11 +98,11 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
   }, []);
 
   if (isError) {
-    return <ErrorPage />
+    return <ErrorPage />;
   }
 
   if (isLoading) {
-    return <Loading small={false} active={isLoading} />
+    return <Loading small={false} active={isLoading} />;
   }
 
   return (
@@ -115,11 +113,10 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
 
       <div className={styles.testRunContainer}>
 
-        <h4>Summary</h4>
         <div className={styles.summarySection}>
 
           <div>
-          <span className={styles.summaryStatus}>
+            <span className={styles.summaryStatus}>
               <h5>Status: </h5>
               <p style={{"textTransform" : "capitalize"}}>{run?.status}</p>
             </span>
@@ -130,7 +127,10 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
           </div>
 
           <div>
-            <InlineText title='Test: ' value={run?.testName || ""} />
+            <span className={styles.summaryStatus}>
+              <h5>Test: </h5>
+              <p>{run?.testName}</p>
+            </span>
           </div>
 
         </div>
@@ -152,7 +152,9 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
             <TabPanel>
               <LogTab logs={logs} />
             </TabPanel>
-            <TabPanel>Artifacts Tab</TabPanel>
+            <TabPanel>
+              <ArtifactsTab artifacts={artifacts} runId={runId} runName={run?.runName!}/>
+            </TabPanel>
           </TabPanels>
         </Tabs>
 

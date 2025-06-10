@@ -5,65 +5,159 @@
  */
 'use client';
 
-import React from 'react';
-import styles from '@/styles/LogTab.module.css';
+import React, { useEffect, useState } from 'react';
+import { Search, OverflowMenu, OverflowMenuItem } from '@carbon/react';
+import styles from "@/styles/LogTab.module.css";
+import { Checkbox } from '@carbon/react';
+import { Filter } from '@carbon/icons-react';
 
-export interface LogViewerProps {
-  /** Raw log string (e.g. newline-separated) */
-  logs: string;
-  /** Current page number (for pagination controls) */
-  page?: number;
-  /** Number of lines per page (for pagination) */
-  perPage?: number;
-  /** Callback when page changes; provide this prop to enable pagination controls */
-  onPageChange?: (page: number) => void;
-}
+export default function LogTab({ logs }: { logs: string }) {
 
-export const LogTab: React.FC<LogViewerProps> = ({
-  logs,
-  page = 1,
-  perPage,
-  onPageChange,
-}) => {
-  const allLines = logs.split('\n').filter((line) => line !== '');
-  const linesPerPage = perPage ?? allLines.length;
-  const totalLines = allLines.length;
-  const totalPages = Math.ceil(totalLines / linesPerPage);
-  const displayLines = onPageChange
-    ? allLines.slice((page - 1) * linesPerPage, page * linesPerPage)
-    : allLines;
+  const [logContent, setLogContent] = useState<string>('');
+  const [filteredContent, setFilteredContent] = useState<string>('');
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [filters, setFilters] = useState({
+    ERROR: false,
+    WARN: false,
+    DEBUG: false,
+    INFO: false,
+  });
+
+  const handleSearchChange = (e: any) => {
+    setSearchTerm(e.target?.value || '');
+  };
+
+  const handleFilterChange = (level: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      [level]: !prev[level as keyof typeof prev],
+    }));
+  };
+
+  const renderLogContent = () => {
+    if (!filteredContent) return null;
+
+    const lines = filteredContent.split('\n');
+
+    return lines.map((line, index) => {
+      // Parse log line to determine level
+      let level = 'INFO';
+      if (line.includes('ERROR')) {
+        level = 'ERROR';
+      } else if (line.includes('WARN')) {
+        level = 'WARN';
+      } else if (line.includes('DEBUG')) {
+        level = 'DEBUG';
+      }
+
+      // Apply appropriate class based on log level
+      const levelClass = level.toLowerCase();
+      const colorClass = styles[levelClass as keyof typeof styles] || ""; //select color class based on line type (e.g if error then make the color red for that line)
+
+      return (
+        <div
+          key={index}
+          className={`${colorClass} ${styles.logEntry}`}
+        >
+          <pre>    {index + 1}.   {line}</pre>
+        </div>
+      );
+    });
+  };
+
+  useEffect(() => {
+    let lines = logContent.split('\n');
+  
+    // Filter by search term
+    if (searchTerm.trim()) {
+      const term = searchTerm.toLowerCase();
+      lines = lines.filter(line => line.toLowerCase().includes(term));
+    }
+  
+    // Check if any filters are active
+    const hasActiveFilters = Object.values(filters).some(filter => filter === true);
+  
+    // Filter by log level only if there are active filters
+    if (hasActiveFilters) {
+      lines = lines.filter(line => {
+        if (line.includes('ERROR')) return filters.ERROR;
+        if (line.includes('WARN')) return filters.WARN;
+        if (line.includes('DEBUG')) return filters.DEBUG;
+        return filters.INFO; // Default to INFO if no other level found
+      });
+    }
+    // If no filters are active, show all lines (don't filter by log level)
+  
+    setFilteredContent(lines.join('\n'));
+  }, [searchTerm, logContent, filters]);
+
+  useEffect(() => {
+    setLogContent(logs);
+  }, []);
+
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setFilteredContent(logContent);
+      return;
+    }
+
+    // Filter log content based on search term
+    const term = searchTerm.toLowerCase();
+    const lines = logContent.split('\n');
+    const filteredLines = lines.filter(line =>
+      line.toLowerCase().includes(term)
+    );
+
+    setFilteredContent(filteredLines.join('\n'));
+  }, [searchTerm, logContent]);
 
   return (
-    <div className={styles.container}>
+    <div className={styles.tabContent}>
+      <h3>Run Log</h3>
+      <p>A step-by-step log of what happened over time when the Run was preparing a TestClass for execution, what happened when the TestClass was executed, and when the test environment was cleaned up.
+      The RunLog is an Artifact, which can be downloaded and viewed.</p>
       <div className={styles.logContainer}>
-        {displayLines.map((line, idx) => (
-          <pre key={idx} className={styles.logLine}>
-            {`${idx + 1}. `} <code>{line}</code>
-          </pre>
-        ))}
-      </div>
-
-      {onPageChange && totalPages > 1 && (
-        <div className={styles.pagination}>
-          <button
-            onClick={() => onPageChange(Math.max(page - 1, 1))}
-            disabled={page === 1}
-            className={styles.button + (page === 1 ? ` ${styles.disabled}` : '')}
-          >
-            Previous
-          </button>
-
-          <span className={styles.pageInfo}>Page {page} of {totalPages}</span>
-
-          <button
-            onClick={() => onPageChange(Math.min(page + 1, totalPages))}
-            disabled={page === totalPages}
-            className={styles.button + (page === totalPages ? ` ${styles.disabled}` : '')}
-          >
-            Next
-          </button>
+        <Search
+          placeholder="Search run log"
+          size="lg"
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
+        <div className={styles.filterBtn}>
+          <OverflowMenu iconOnly size="lg" renderIcon={Filter}>
+            <Checkbox
+              id="checkbox-error"
+              labelText="Error"
+              checked={filters.ERROR}
+              onChange={() => handleFilterChange('ERROR')}
+            />
+            <Checkbox
+              id="checkbox-warn"
+              labelText="Warning"
+              checked={filters.WARN}
+              onChange={() => handleFilterChange('WARN')}
+            />
+            <Checkbox
+              id="checkbox-debug"
+              labelText="Debug"
+              checked={filters.DEBUG}
+              onChange={() => handleFilterChange('DEBUG')}
+            />
+            <Checkbox
+              id="checkbox-info"
+              labelText="Info"
+              checked={filters.INFO}
+              onChange={() => handleFilterChange('INFO')}
+            />
+          </OverflowMenu>
         </div>
-      )}
+      </div>
+      <div className={styles.runLog}>
+        <div className={styles.runLogContent}>
+          {renderLogContent()}
+        </div>
+      </div>
     </div>
+
   );
 };

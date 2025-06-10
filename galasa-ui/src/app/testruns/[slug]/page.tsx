@@ -31,7 +31,7 @@ const TestRun = ({ params: { slug } }: TestRunProps) => {
       runDetails = structuredClone(rasRunsResponse);
     }
     return runDetails;
-  }
+  };
 
   const fetchRunDetailLogs = async () => {
 
@@ -40,23 +40,21 @@ const TestRun = ({ params: { slug } }: TestRunProps) => {
 
     return rasRunLogsResponse;
 
-  }
+  };
 
   const fetchTestArtifacts = async (): Promise<ArtifactIndexEntry[]> => {
-    // switch from Set<T> to T[]
+  
     let runArtifacts: ArtifactIndexEntry[] = [];
   
     const rasApiClient = new ResultArchiveStoreAPIApi(apiConfig);
     const rasArtifactResponse = await rasApiClient.getRasRunArtifactList(slug);
   
     if (rasArtifactResponse) {
-
       runArtifacts = structuredClone(Array.from(rasArtifactResponse)); //Convert the set into array
-      
     }
   
     return runArtifacts;
-  }
+  };
 
   return (
     <TestRunDetails runId={slug} runDetailsPromise={fetchRunDetailsFromApiServer()} runArtifactsPromise={fetchTestArtifacts()} runLogPromise={fetchRunDetailLogs()}/>
