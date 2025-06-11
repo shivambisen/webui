@@ -107,19 +107,16 @@ const TestRunDetails = ({ runId, runDetails, runLog, runArtifacts }: TestRunDeta
 
           <div>
             <span className={styles.summaryStatus}>
-              <h5>Status: </h5>
-              <p style={{ "textTransform": "capitalize" }}>{run?.status}</p>
+              Status: {run?.status}
             </span>
             <span className={styles.summaryStatus}>
-              <h5>Result: </h5>
-              <StatusCheck status={run?.result!}></StatusCheck>
+              Result: <StatusCheck status={run?.result!}></StatusCheck>
             </span>
           </div>
 
-          <div className={styles.summaryStatus}>
-            <h5>Test: </h5>
-            <p>{run?.testName}</p>
-          </div>
+          <span className={styles.summaryStatus}>
+            Test: {run?.testName}
+          </span>
 
         </div>
 

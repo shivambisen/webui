@@ -17,11 +17,14 @@
     width: 25%;
     flex-direction: row;
     justify-content: space-between;
-    margin: 2rem 0;   
+    align-items: flex-start;
+    padding: 0;
 }
 
 .summaryStatus {
     display: flex;
     flex-direction: row;
+    align-items: center;
     gap: 0.5rem;
+    text-transform: capitalize;
 }

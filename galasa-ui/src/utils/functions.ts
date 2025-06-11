@@ -63,16 +63,20 @@ export function parseIsoDateTime(isoString: string) {
  */
 export function getIsoTimeDifference(startTime: string, endTime: string): string {
 
-  //Parse both timestamps to get time in milliseconds
-  const startedAt = Date.parse(startTime);
-  const endedAt   = Date.parse(endTime);
-
+  
   let result: string;
+  const dt1 = new Date(startTime);
+  const dt2 = new Date(endTime);
 
   // If either parse failed, produce an error message
-  if (isNaN(startedAt) || isNaN(endedAt)) {
+  if (isNaN(dt1.getTime()) || isNaN(dt2.getTime())) {
+
     result = "Invalid date";
+
   } else {
+
+    const startedAt = Date.parse(startTime);
+    const endedAt   = Date.parse(endTime);
     // Compute absolute delta in seconds
     let delta = Math.abs(endedAt - startedAt) / 1000;
 
@@ -82,16 +86,27 @@ export function getIsoTimeDifference(startTime: string, endTime: string): string
     const minutes = Math.floor(delta / 60);
     const seconds = Math.round((delta - minutes * 60) * 10) / 10;
 
-    // Skipping zero units (except we always show seconds if everything else is zero)
-    const parts: string[] = [];
-    if (hours   > 0) parts.push(`${hours} hr${hours   !== 1 ? "s" : ""}`);
-    if (minutes > 0) parts.push(`${minutes} min${minutes !== 1 ? "s" : ""}`);
-    if (seconds > 0 || parts.length === 0) {
-      parts.push(`${seconds} sec${seconds !== 1 ? "s" : ""}`);
-    }
-
+    const parts = buildTimeDifference(hours, minutes, seconds);
     result = parts.join(" ");
   }
 
   return result;
 }
+
+const buildTimeDifference = (hours : number, minutes : number, seconds: number) => {
+
+  const parts: string[] = [];
+
+  if (hours   > 0) {
+    parts.push(`${hours} hr${hours   !== 1 ? "s" : ""}`);
+  } 
+  
+  if (minutes > 0) {
+    parts.push(`${minutes} min${minutes !== 1 ? "s" : ""}`);
+  }
+  if (seconds > 0 || parts.length === 0) {
+    parts.push(`${seconds} sec${seconds !== 1 ? "s" : ""}`);
+  }
+
+  return parts;
+};
