@@ -27,12 +27,17 @@ interface FolderNode {
   children: { [key: string]: TreeNodeData };
 }
 
+interface ArtifactDetails {
+  artifactFile: string;
+  fileSize:      string;
+  fileName:      string;
+  base64Data:    string;
+  contentType:   string;
+}
+
 type TreeNodeData = FileNode | FolderNode;
 
-export type DownloadResult =
-  | { contentType: 'application/json'; data: any; size: number; base64: string; }
-  | { contentType: 'text/plain'; data: string; size: number; base64: string; }
-  | { contentType: string; data: string; size: number; base64: string; };
+type DownloadResult = { contentType: string; data: string; size: number; base64: string; };
 
 
 export function ArtifactsTab({ artifacts, runId, runName }: { artifacts: ArtifactIndexEntry[], runId: string, runName: string }) {
@@ -43,28 +48,35 @@ export function ArtifactsTab({ artifacts, runId, runName }: { artifacts: Artifac
     children: {},
   });
 
-  const [artifactFile, setArtifactFile] = useState("");
-  const [fileSize, setFileSize] = useState<string>("");
-  const [fileName, setFileName] = useState<string>("");
-  const [base64Data, setBase64Data] = useState<string>("");
-  const [contentType, setContentType] = useState<string>("");
+  const [artifactDetails, setArtifactDetails] = useState<ArtifactDetails>({
+    artifactFile: "",
+    fileSize:      "",
+    fileName:      "",
+    base64Data:    "",
+    contentType:   "",
+  });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
 
   function formatFileSize(bytes: number) {
+
+    let fileSize = "";
+
     if (bytes < 10000) {
-      setFileSize(`${bytes} bytes`);
+      fileSize = `${bytes} bytes`;
     } else {
       const mb = bytes / (1024 * 1024);
-      setFileSize(`${mb.toFixed(2)} MB`);
+      fileSize = `${mb.toFixed(2)} MB`;
     }
+
+    return fileSize;
   }
 
   const handleDownloadClick = () => {
-    if (!base64Data) return;
+    if (!artifactDetails.base64Data) return;
 
     // (a) Turn Base64 string → binary string
-    const binaryString = atob(base64Data);
+    const binaryString = atob(artifactDetails.base64Data);
     // (b) Convert binary string → Uint8Array
     const len = binaryString.length;
     const bytes = new Uint8Array(len);
@@ -79,7 +91,9 @@ export function ArtifactsTab({ artifacts, runId, runName }: { artifacts: Artifac
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = fileName; // name (e.g. “myfile.json” or “notes.txt”)
+
+    const cleanFileName = artifactDetails.fileName.startsWith('/') ? artifactDetails.fileName.slice(1) : artifactDetails.fileName; //strip any leading slashes
+    a.download = cleanFileName; // name (e.g. “myfile.json” or “notes.txt”)
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
@@ -97,21 +111,14 @@ export function ArtifactsTab({ artifacts, runId, runName }: { artifacts: Artifac
     try {
 
       const result: DownloadResult = await downloadArtifactFromServer(runId, artifactUrl);
-      setFileName(artifactUrl);
 
-      // result.data is either:
-      //  • a JS object (if JSON), or
-      //  • a string (if text/plain or something else)
-
-      if (result.contentType.includes('application/json')) {
-        setArtifactFile(result.data);
-      } else {
-        setArtifactFile(result.data as string); // (plain string)
-      }
-
-      setContentType(result.contentType);
-      formatFileSize(result.size);
-      setBase64Data(result.base64);
+      setArtifactDetails({
+        artifactFile: result.data,
+        fileSize:     formatFileSize(result.size),
+        fileName:     artifactUrl,
+        base64Data:   result.base64,
+        contentType:  result.contentType,
+      });
 
     } catch (err: any) {
       console.error(err);
@@ -123,39 +130,39 @@ export function ArtifactsTab({ artifacts, runId, runName }: { artifacts: Artifac
   };
 
   function renderArtifactContent(artifactFile: string, contentType: string) {
+    let result;
+
     // 1) Nothing selected
     if (!artifactFile) {
-      return <p>Select a file to display its content</p>;
+      result = <p>Select a file to display its content</p>;
     }
-
     // 2) Plain-text (or any text/* MIME)
-    if (contentType.startsWith("text/")) {
-      return <pre>{artifactFile}</pre>;
+    else if (contentType.startsWith("text/")) {
+      result = <pre>{artifactFile}</pre>;
     }
-
     // 3) JSON (or JS object)
-    if (
-      contentType.includes("json") ||
-      typeof artifactFile === "object"
-    ) {
-      // if it’s a string, try to parse it first
+    else if (contentType.includes("json") || typeof artifactFile === "object") {
+      // if it's a string, try to parse it first
       let data = artifactFile;
       if (typeof artifactFile === "string") {
         try {
           data = JSON.parse(artifactFile);
-        } catch {
-          // leave it as the raw string if parse fails
+        } catch (err) {
+          console.error("Error parsing file: ", err);
         }
       }
-      return <pre>{JSON.stringify(data, null, 2)}</pre>;
+      result = <pre>{JSON.stringify(data, null, 2)}</pre>; //preventing any filtering and ensuring identation of two spaces
+    }
+    // 4) Binary (zip, images, etc.)
+    else {
+      result = (
+        <p>
+          This is a binary file ({contentType}), please download it to see its content.
+        </p>
+      );
     }
 
-    // 4) Binary (zip, images, etc.)
-    return (
-      <p>
-        This is a binary file ({contentType}), please download it to see its content.
-      </p>
-    );
+    return result;
   }
 
 
@@ -164,94 +171,115 @@ export function ArtifactsTab({ artifacts, runId, runName }: { artifacts: Artifac
     const root: FolderNode = { name: '', isFile: false, children: {} };
 
     artifacts.forEach((artifact) => {
+
       // 1) Get the raw path string, default to empty if undefined
       const rawPath = artifact.path ?? '';
+
       // 2) Remove a leading "/" or "./" if present
-      const cleaned = rawPath.replace(/^\.?\//, '');
+      let cleanedPath = cleanArtifactPath(rawPath);
+
       // 3) Split into segments and drop any empty strings
-      let segments = cleaned.split('/').filter((seg) => seg !== '');
+      let segments = cleanedPath.split('/').filter((seg) => seg !== '');
 
       // 4) If the first segment is "artifact" or "artifacts", drop it so that
       //    "artifact/framework" becomes ["framework", ...]
-      if (segments[0]?.toLowerCase() === 'artifact' || segments[0]?.toLowerCase() === 'artifacts') {
+      const segmentValue = segments[0]?.toLocaleLowerCase();
+
+      if (segmentValue === 'artifact' || segmentValue === 'artifacts') {
         segments = segments.slice(1);
       }
 
-      // If there are no segments left, skip this artifact
-      if (segments.length === 0) {
-        return;
+      if (segments.length > 0) {
+
+        let currentNode: FolderNode = root;
+        createFolderSegments(segments, currentNode, artifact);
+
       }
-
-      let currentNode: FolderNode = root;
-
-      segments.forEach((segment, idx) => {
-        const isLast = idx === segments.length - 1;
-
-        if (isLast) {
-          // It’s a file: insert a FileNode under currentNode.children
-          currentNode.children[segment] = {
-            name: segment,
-            runId: artifact.runId ?? '',
-            url: artifact.path ?? '',
-            isFile: true,
-            children: {},
-          };
-        } else {
-          // It’s a folder: create or reuse a FolderNode
-          const existing = currentNode.children[segment];
-
-          if (!existing) {
-            // Create new folder if it doesn’t exist
-            currentNode.children[segment] = {
-              name: segment,
-              isFile: false,
-              children: {},
-            };
-            currentNode = currentNode.children[segment] as FolderNode;
-          } else if (existing.isFile) {
-            // Conflict: a file was created here before. Replace it with a folder.
-            currentNode.children[segment] = {
-              name: segment,
-              isFile: false,
-              children: {},
-            };
-            currentNode = currentNode.children[segment] as FolderNode;
-          } else {
-            // Descend into existing folder
-            currentNode = existing as FolderNode;
-          }
-        }
-      });
     });
 
     setTreeData(root);
   }, [artifacts]);
 
+  const cleanArtifactPath = (rawPath: string) => {
+
+    let cleanedPath = rawPath;
+    if (rawPath.startsWith("./")) {
+      cleanedPath = rawPath.substring(2);
+    } else if (rawPath.startsWith("/")) {
+      cleanedPath = rawPath.substring(1);
+    }
+
+    return cleanedPath;
+
+  };
+
+  const createFolderSegments = (segments: string[], currentNode: FolderNode, artifact: ArtifactIndexEntry) => {
+    return segments.forEach((segment, idx) => {
+      const isLast = idx === segments.length - 1;
+
+      if (isLast) {
+        // It’s a file: insert a FileNode under currentNode.children
+        currentNode.children[segment] = {
+          name: segment,
+          runId: artifact.runId ?? '',
+          url: artifact.path ?? '',
+          isFile: true,
+          children: {},
+        };
+      } else {
+        // It’s a folder: create or reuse a FolderNode
+        const existing = currentNode.children[segment];
+
+        if (!existing) {
+          // Create new folder if it doesn’t exist
+          currentNode.children[segment] = {
+            name: segment,
+            isFile: false,
+            children: {},
+          };
+          currentNode = currentNode.children[segment] as FolderNode;
+        } else if (existing.isFile) {
+          // Conflict: a file was created here before. Replace it with a folder.
+          currentNode.children[segment] = {
+            name: segment,
+            isFile: false,
+            children: {},
+          };
+          currentNode = currentNode.children[segment] as FolderNode;
+        } else {
+          // Descend into existing folder
+          currentNode = existing as FolderNode;
+        }
+      }
+    });
+  };
+
   // Recursive renderer: emits a <TreeNode> for each TreeNodeData
   const renderNode = (node: TreeNodeData, path: string) => {
+
+    let treeNode;
+
     if (node.isFile) {
       // Leaf file node
-      return (
-        <TreeNode
-          key={path}
-          id={path}
-          renderIcon={path.endsWith(".gz") ? Zip : Document}
-          label={node.name}
-          value={node.name}
-          onSelect={() => downloadArtifact(runId, node.url)}
-        />
-      );
+      treeNode = <TreeNode
+        key={path}
+        id={path}
+        renderIcon={path.endsWith(".gz") ? Zip : Document}
+        label={node.name}
+        value={node.name}
+        onSelect={() => downloadArtifact(runId, node.url)}
+      />;
     } else {
       // Folder node: render label, then recurse on children
-      return (
-        <TreeNode isExpanded={false} key={path} id={path} label={node.name} value={node.name} renderIcon={Folder}>
-          {Object.values(node.children).map((child) => {
-            const childPath = path ? `${path}/${child.name}` : child.name;
-            return renderNode(child, childPath);
-          })}
-        </TreeNode>
-      );
+      treeNode = <TreeNode isExpanded={false} key={path} id={path} label={node.name} value={node.name} renderIcon={Folder}>
+        {Object.values(node.children).map((child) => {
+          const childPath = path ? `${path}/${child.name}` : child.name;
+          return renderNode(child, childPath);
+        })}
+      </TreeNode>;
     }
+
+    return treeNode;
   };
 
   return (
@@ -278,12 +306,12 @@ export function ArtifactsTab({ artifacts, runId, runName }: { artifacts: Artifac
               <div>
 
                 <div>
-                  {artifactFile !== "" &&
+                  {artifactDetails.artifactFile !== "" &&
                     <Tile className={styles.toolbar}>
                       <div>
-                        <h5>{fileName}</h5>
+                        <h5>{artifactDetails.fileName}</h5>
                         <p className={styles.fileSize}>
-                          {fileSize}
+                          {artifactDetails.fileSize}
                         </p>
                       </div>
                       <div className={styles.toolbarOptions}>
@@ -296,7 +324,7 @@ export function ArtifactsTab({ artifacts, runId, runName }: { artifacts: Artifac
                 </div>
 
                 <pre className={styles.fileRenderer}>
-                  {renderArtifactContent(artifactFile, contentType)}
+                  {renderArtifactContent(artifactDetails.artifactFile, artifactDetails.contentType)}
                 </pre>
               </div>
             )

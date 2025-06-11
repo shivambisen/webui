@@ -15,15 +15,13 @@ interface TestRunProps {
   };
 }
 
-// Type the props directly on the function's parameter
-const TestRun = ({ params: { slug } }: TestRunProps) => {
+// Make the component async
+export default async function TestRunsPage ({ params: { slug } }: TestRunProps) {
 
   const apiConfig = createAuthenticatedApiConfiguration();
 
   const fetchRunDetailsFromApiServer = async () => {
-
     let runDetails: Run = {};
-
     const rasApiClient = new ResultArchiveStoreAPIApi(apiConfig);
     const rasRunsResponse = await rasApiClient.getRasRunById(slug);
     
@@ -34,31 +32,34 @@ const TestRun = ({ params: { slug } }: TestRunProps) => {
   };
 
   const fetchRunDetailLogs = async () => {
-
     const rasApiClient = new ResultArchiveStoreAPIApi(apiConfig);
     const rasRunLogsResponse = await rasApiClient.getRasRunLog(slug);
-
     return rasRunLogsResponse;
-
   };
 
   const fetchTestArtifacts = async (): Promise<ArtifactIndexEntry[]> => {
-  
     let runArtifacts: ArtifactIndexEntry[] = [];
-  
     const rasApiClient = new ResultArchiveStoreAPIApi(apiConfig);
     const rasArtifactResponse = await rasApiClient.getRasRunArtifactList(slug);
-  
+    
     if (rasArtifactResponse) {
-      runArtifacts = structuredClone(Array.from(rasArtifactResponse)); //Convert the set into array
+      runArtifacts = structuredClone(Array.from(rasArtifactResponse));
     }
-  
+    
     return runArtifacts;
   };
 
+  // Await all the data
+  const runDetails = await fetchRunDetailsFromApiServer();
+  const runArtifacts = await fetchTestArtifacts();
+  const runLogs = await fetchRunDetailLogs();
+
   return (
-    <TestRunDetails runId={slug} runDetailsPromise={fetchRunDetailsFromApiServer()} runArtifactsPromise={fetchTestArtifacts()} runLogPromise={fetchRunDetailLogs()}/>
+    <TestRunDetails 
+      runId={slug} 
+      runDetails={runDetails}
+      runArtifacts={runArtifacts} 
+      runLog={runLogs}
+    />
   );
 };
-
-export default TestRun;

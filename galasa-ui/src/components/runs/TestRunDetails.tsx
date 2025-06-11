@@ -23,13 +23,13 @@ import LogTab from './LogTab';
 
 interface TestRunDetailsProps {
   runId: string;
-  runDetailsPromise: Promise<Run>;
-  runLogPromise: Promise<string>;
-  runArtifactsPromise: Promise<ArtifactIndexEntry[]>;
+  runDetails: Run;
+  runLog: string;
+  runArtifacts: ArtifactIndexEntry[];
 }
 
 // Type the props directly on the function's parameter
-const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsPromise }: TestRunDetailsProps) => {
+const TestRunDetails = ({ runId, runDetails, runLog, runArtifacts }: TestRunDetailsProps) => {
 
   const [run, setRun] = useState<RunMetadata>();
   const [methods, setMethods] = useState<TestMethod[]>([]);
@@ -69,33 +69,23 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
 
   useEffect(() => {
 
-    const loadRun = async () => {
+    setIsLoading(true);
 
-      setIsLoading(true);
+    try {
 
-      try {
-
-        const runDetails = await runDetailsPromise;
-        const runLogs = await runLogPromise;
-        const runArtifacts = await runArtifactsPromise;
-
-        if (runDetails) {
-          extractRunDetails(runDetails);
-          setArtifacts(runArtifacts);
-          setLogs(runLogs);
-        }
-
-      } catch (err) {
-        setIsError(true);
-      } finally {
-        setIsLoading(false);
+      if (runDetails) {
+        extractRunDetails(runDetails);
+        setArtifacts(runArtifacts);
+        setLogs(runLog);
       }
 
-    };
+    } catch (err) {
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
+    }
 
-    loadRun();
-
-  }, []);
+  }, [runDetails, runArtifacts, runLog]);
 
   if (isError) {
     return <ErrorPage />;
@@ -118,7 +108,7 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
           <div>
             <span className={styles.summaryStatus}>
               <h5>Status: </h5>
-              <p style={{"textTransform" : "capitalize"}}>{run?.status}</p>
+              <p style={{ "textTransform": "capitalize" }}>{run?.status}</p>
             </span>
             <span className={styles.summaryStatus}>
               <h5>Result: </h5>
@@ -126,11 +116,9 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
             </span>
           </div>
 
-          <div>
-            <span className={styles.summaryStatus}>
-              <h5>Test: </h5>
-              <p>{run?.testName}</p>
-            </span>
+          <div className={styles.summaryStatus}>
+            <h5>Test: </h5>
+            <p>{run?.testName}</p>
           </div>
 
         </div>
@@ -153,7 +141,7 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
               <LogTab logs={logs} />
             </TabPanel>
             <TabPanel>
-              <ArtifactsTab artifacts={artifacts} runId={runId} runName={run?.runName!}/>
+              <ArtifactsTab artifacts={artifacts} runId={runId} runName={run?.runName!} />
             </TabPanel>
           </TabPanels>
         </Tabs>

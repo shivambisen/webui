@@ -173,7 +173,7 @@ describe('MethodsTab Component', () => {
 
       expect(() => {
         render(<MethodsTab methods={methodsWithMissingData} />);
-      }).not.toThrow();
+      }).not.toThrowError();
     });
   });
 

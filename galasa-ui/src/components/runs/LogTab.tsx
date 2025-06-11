@@ -21,6 +21,7 @@ export default function LogTab({ logs }: { logs: string }) {
     WARN: false,
     DEBUG: false,
     INFO: false,
+    TRACE: false
   });
 
   const handleSearchChange = (e: any) => {
@@ -48,6 +49,8 @@ export default function LogTab({ logs }: { logs: string }) {
         level = 'WARN';
       } else if (line.includes('DEBUG')) {
         level = 'DEBUG';
+      } else if (line.includes('TRACE')) {
+        level = 'TRACE';
       }
 
       // Apply appropriate class based on log level
@@ -67,55 +70,56 @@ export default function LogTab({ logs }: { logs: string }) {
 
   useEffect(() => {
     let lines = logContent.split('\n');
-  
+
     // Filter by search term
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase();
       lines = lines.filter(line => line.toLowerCase().includes(term));
     }
-  
+
     // Check if any filters are active
     const hasActiveFilters = Object.values(filters).some(filter => filter === true);
-  
+
     // Filter by log level only if there are active filters
     if (hasActiveFilters) {
       lines = lines.filter(line => {
         if (line.includes('ERROR')) return filters.ERROR;
         if (line.includes('WARN')) return filters.WARN;
         if (line.includes('DEBUG')) return filters.DEBUG;
+        if (line.includes("TRACE")) return filters.TRACE;
         return filters.INFO; // Default to INFO if no other level found
       });
     }
     // If no filters are active, show all lines (don't filter by log level)
-  
+
     setFilteredContent(lines.join('\n'));
   }, [searchTerm, logContent, filters]);
 
   useEffect(() => {
     setLogContent(logs);
-  }, []);
+  }, [logs]);
 
   useEffect(() => {
     if (!searchTerm.trim()) {
       setFilteredContent(logContent);
-      return;
+    } else {
+      // Filter log content based on search term
+      const term = searchTerm.toLowerCase();
+      const lines = logContent.split('\n');
+      const filteredLines = lines.filter(line =>
+        line.toLowerCase().includes(term)
+      );
+
+      setFilteredContent(filteredLines.join('\n'));
     }
 
-    // Filter log content based on search term
-    const term = searchTerm.toLowerCase();
-    const lines = logContent.split('\n');
-    const filteredLines = lines.filter(line =>
-      line.toLowerCase().includes(term)
-    );
-
-    setFilteredContent(filteredLines.join('\n'));
   }, [searchTerm, logContent]);
 
   return (
     <div className={styles.tabContent}>
       <h3>Run Log</h3>
       <p>A step-by-step log of what happened over time when the Run was preparing a TestClass for execution, what happened when the TestClass was executed, and when the test environment was cleaned up.
-      The RunLog is an Artifact, which can be downloaded and viewed.</p>
+        The RunLog is an Artifact, which can be downloaded and viewed.</p>
       <div className={styles.logContainer}>
         <Search
           placeholder="Search run log"
@@ -124,7 +128,7 @@ export default function LogTab({ logs }: { logs: string }) {
           onChange={handleSearchChange}
         />
         <div className={styles.filterBtn}>
-          <OverflowMenu iconOnly size="lg" renderIcon={Filter}>
+          <OverflowMenu iconOnly size="lg" renderIcon={Filter} flipped={true}>
             <Checkbox
               id="checkbox-error"
               labelText="Error"
@@ -148,6 +152,12 @@ export default function LogTab({ logs }: { logs: string }) {
               labelText="Info"
               checked={filters.INFO}
               onChange={() => handleFilterChange('INFO')}
+            />
+            <Checkbox
+              id="checkbox-trace"
+              labelText="Trace"
+              checked={filters.TRACE}
+              onChange={() => handleFilterChange('TRACE')}
             />
           </OverflowMenu>
         </div>

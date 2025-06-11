@@ -23,7 +23,7 @@ export const downloadArtifactFromServer = async (runId: string, artifactUrl: str
 
   const base64 = buffer.toString("base64");
 
-  let data: any;
+  let data: string;
 
   if (contentType.includes('application/json')) {
     // buffer.toString('utf-8') converts the raw bytes into a JSON string

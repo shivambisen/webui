@@ -8,10 +8,10 @@ import styles from "@/styles/OverviewTab.module.css";
 
 const InlineText = ({ title, value }: { title: string, value: string }) => {
   return (
-    <div className={styles.info}>
-      <h5>{title}</h5>
+    <span className={styles.info}>
+      <p>{title}</p>
       <p className={styles.infoValue}>{value}</p>
-    </div>
+    </span>
   );
 };
 

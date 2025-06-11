@@ -19,22 +19,31 @@ export const handleDeleteCookieApiOperation = async (router: any) => {
 export function parseIsoDateTime(isoString: string) {
   // Construct a Date object
   const dt = new Date(isoString);
+  let formattedDateTime = "";
 
-  // Pad helper
-  const pad = (n: number) => n.toString().padStart(2, '0');
+  if (isNaN(dt.getTime())) {
+    formattedDateTime = "Invalid date";
+  } else {
 
-  // Extract components
-  const year  = dt.getUTCFullYear();
-  const month = pad(dt.getUTCMonth() + 1);
-  const day   = pad(dt.getUTCDate());
-  const hours = pad(dt.getUTCHours());
-  const mins  = pad(dt.getUTCMinutes());
-  const secs  = pad(dt.getUTCSeconds());
+    // Pad helper
+    const pad = (n: number) => n.toString().padStart(2, '0');
 
-  const date = `${day}/${month}/${year}`;
-  const time = `${hours}:${mins}:${secs}`;
+    // Extract components
+    const year = dt.getUTCFullYear();
+    const month = pad(dt.getUTCMonth() + 1);
+    const day = pad(dt.getUTCDate());
+    const hours = pad(dt.getUTCHours());
+    const mins = pad(dt.getUTCMinutes());
+    const secs = pad(dt.getUTCSeconds());
 
-  return `${date} ${time}`;
+    const date = `${day}/${month}/${year}`;
+    const time = `${hours}:${mins}:${secs}`;
+
+    formattedDateTime = `${date} ${time}`;
+  }
+
+  return formattedDateTime;
+
 }
 
 
@@ -53,24 +62,36 @@ export function parseIsoDateTime(isoString: string) {
  * @returns formatted duration string
  */
 export function getIsoTimeDifference(startTime: string, endTime: string): string {
-  // Parse dates and get difference in seconds
-  const t1 = Date.parse(startTime);
-  const t2 = Date.parse(endTime);
-  let delta = Math.abs(t2 - t1) / 1000;  // seconds
 
-  // Compute components
-  const hours   = Math.floor(delta / 3600);
-  delta -= hours * 3600;
-  const minutes = Math.floor(delta / 60);
-  const seconds = Math.round((delta - minutes * 60) * 10) / 10;
+  //Parse both timestamps to get time in milliseconds
+  const startedAt = Date.parse(startTime);
+  const endedAt   = Date.parse(endTime);
 
-  // Build parts with proper pluralization, skipping zero units
-  const parts: string[] = [];
-  if (hours   > 0) parts.push(`${hours} hr${hours   !== 1 ? "s" : ""}`);
-  if (minutes > 0) parts.push(`${minutes} min${minutes !== 1 ? "s" : ""}`);
-  if (seconds > 0 || parts.length === 0) {
-    parts.push(`${seconds} sec${seconds !== 1 ? "s" : ""}`);
+  let result: string;
+
+  // If either parse failed, produce an error message
+  if (isNaN(startedAt) || isNaN(endedAt)) {
+    result = "Invalid date";
+  } else {
+    // Compute absolute delta in seconds
+    let delta = Math.abs(endedAt - startedAt) / 1000;
+
+    // Break into components
+    const hours   = Math.floor(delta / 3600);
+    delta         -= hours * 3600;
+    const minutes = Math.floor(delta / 60);
+    const seconds = Math.round((delta - minutes * 60) * 10) / 10;
+
+    // Skipping zero units (except we always show seconds if everything else is zero)
+    const parts: string[] = [];
+    if (hours   > 0) parts.push(`${hours} hr${hours   !== 1 ? "s" : ""}`);
+    if (minutes > 0) parts.push(`${minutes} min${minutes !== 1 ? "s" : ""}`);
+    if (seconds > 0 || parts.length === 0) {
+      parts.push(`${seconds} sec${seconds !== 1 ? "s" : ""}`);
+    }
+
+    result = parts.join(" ");
   }
 
-  return parts.join(" ");
+  return result;
 }
