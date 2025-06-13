@@ -90,7 +90,7 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
       } finally {
         setIsLoading(false);
       }
-    }
+    };
 
     loadUser();
 

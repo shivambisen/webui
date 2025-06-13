@@ -59,7 +59,7 @@ export default async function TestRunPage ({ params: { slug } }: TestRunProps) {
     if (error?.code === 404) {
       return <NotFound title='Run not found' description={`Unable to find a run with id: ${slug}`}/>;
     } else{
-      return <ErrorPage />
+      return <ErrorPage />;
     }
     throw error; // Re-throw other errors
   }
