@@ -17,7 +17,7 @@ jest.mock('@/components/common/StatusCheck', () => {
 });
 
 // Mock the utility function
-jest.mock('@/utils/functions', () => ({
+jest.mock('@/utils/timeOperations', () => ({
   getIsoTimeDifference: jest.fn((startTime: string, endTime: string) => {
     // Mock implementation - return a simple duration string
     return '00:05:30';
@@ -232,7 +232,7 @@ describe('MethodsTab Component', () => {
 
   describe('Duration Calculation', () => {
     it('calls getIsoTimeDifference with correct parameters', () => {
-      const { getIsoTimeDifference } = require('@/utils/functions');
+      const { getIsoTimeDifference } = require('@/utils/timeOperations');
       
       render(<MethodsTab methods={mockMethods} />);
       

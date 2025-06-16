@@ -5,7 +5,7 @@
  */
 "use client";
 import { TestMethod } from '@/generated/galasaapi';
-import { getIsoTimeDifference } from '@/utils/functions';
+import { getIsoTimeDifference } from '@/utils/timeOperations';
 import { DataTableHeader, DataTableRow } from '@/utils/interfaces';
 import { DataTable, TableContainer, Table, TableCell, TableHeader } from '@carbon/react';
 import TableBody, { TableBodyProps } from '@carbon/react/lib/components/DataTable/TableBody';

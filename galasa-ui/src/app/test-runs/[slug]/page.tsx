@@ -21,10 +21,11 @@ interface TestRunProps {
 export default async function TestRunPage ({ params: { slug } }: TestRunProps) {
 
   const apiConfig = createAuthenticatedApiConfiguration();
+  const rasApiClient = new ResultArchiveStoreAPIApi(apiConfig);
 
   const fetchRunDetailsFromApiServer = async () => {
     try {
-      const rasApiClient = new ResultArchiveStoreAPIApi(apiConfig);
+      
       const rasRunsResponse = await rasApiClient.getRasRunById(slug);
       return structuredClone(rasRunsResponse);
     } catch (error: any) {
@@ -34,7 +35,6 @@ export default async function TestRunPage ({ params: { slug } }: TestRunProps) {
   };
 
   const fetchRunDetailLogs = async () => {
-    const rasApiClient = new ResultArchiveStoreAPIApi(apiConfig);
     const rasRunLogsResponse = await rasApiClient.getRasRunLog(slug);
     return rasRunLogsResponse;
   };
@@ -42,7 +42,6 @@ export default async function TestRunPage ({ params: { slug } }: TestRunProps) {
   const fetchTestArtifacts = async (): Promise<ArtifactIndexEntry[]> => {
     let runArtifacts: ArtifactIndexEntry[] = [];
 
-    const rasApiClient = new ResultArchiveStoreAPIApi(apiConfig);
     const rasArtifactResponse = await rasApiClient.getRasRunArtifactList(slug);
 
     if (rasArtifactResponse) {
@@ -61,7 +60,6 @@ export default async function TestRunPage ({ params: { slug } }: TestRunProps) {
     } else{
       return <ErrorPage />;
     }
-    throw error; // Re-throw other errors
   }
 
   return (

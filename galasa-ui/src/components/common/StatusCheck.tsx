@@ -6,7 +6,7 @@
 import { CheckmarkFilled, ErrorOutline,Renew, Warning } from '@carbon/icons-react';
 import React from 'react';
 import styles from "@/styles/StatusCheck.module.css";
-import { COLORS } from '@/utils/constants';
+import { COLORS } from '@/utils/constants/common';
 
 function StatusCheck({ status }: { status: string }) {
   return (

@@ -4,18 +4,6 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-export const handleDeleteCookieApiOperation = async (router: any) => {
-
-  const response = await fetch('/logout', { method: 'DELETE' });
-
-  if (response.status === 204) {
-
-    //auto redirect to render dex login page
-    router.refresh();
-
-  }
-};
-
 export function parseIsoDateTime(isoString: string) {
   // Construct a Date object
   const dt = new Date(isoString);
@@ -109,16 +97,4 @@ const buildTimeDifference = (hours : number, minutes : number, seconds: number) 
   }
 
   return parts;
-};
-
-export const handleDownload = (content: string | ArrayBuffer, fileName: string) => {
-  const blob = new Blob([content]);
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = fileName;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  URL.revokeObjectURL(url);
 };

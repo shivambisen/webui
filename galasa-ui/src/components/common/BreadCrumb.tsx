@@ -10,7 +10,13 @@ import React from 'react';
 import { Breadcrumb, BreadcrumbItem, Theme } from "@carbon/react";
 import "@/styles/global.scss";
 import styles from "@/styles/BreadCrumb.module.css";
-import { BreadCrumbProps } from '@/utils/interfaces';
+
+export interface BreadCrumbProps {
+
+  title: string;
+  route: string;
+
+}
 
 function BreadCrumb({breadCrumbItems} : {breadCrumbItems : BreadCrumbProps[]}) {
 

@@ -10,12 +10,12 @@ import TokenResponseModal from '@/components/tokens/TokenResponseModal';
 import PageTile from '@/components/PageTile';
 import { UsersAPIApi } from '@/generated/galasaapi';
 import { createAuthenticatedApiConfiguration } from '@/utils/api';
-import * as Constants from "@/utils/constants";
+import * as Constants from "@/utils/constants/common";
 import BreadCrumb from '@/components/common/BreadCrumb';
 import { fetchAccessTokens } from '../../actions/getUserAccessTokens';
 import ErrorPage from '../error/page';
 import ExperimentalFeaturesSection from '@/components/ExperimentalFeaturesSection';
-import { BREADCRUMB_ITEMS } from '@/utils/constants';
+import { HOME } from '@/utils/constants/breadcrumb';
 
 export default async function MySettings() {
   const apiConfig = createAuthenticatedApiConfiguration();
@@ -54,7 +54,7 @@ export default async function MySettings() {
 
   return (
     <main id="content">
-      <BreadCrumb breadCrumbItems={BREADCRUMB_ITEMS.HOME}/>
+      <BreadCrumb breadCrumbItems={[HOME]}/>
       <PageTile title={"My Settings"} />
       <AccessTokensSection accessTokensPromise={fetchAccessTokens(userLoginId)} isAddBtnVisible={true}/>
       <TokenResponseModal refreshToken={refreshToken} clientId={clientId} onLoad={deleteCookies} />

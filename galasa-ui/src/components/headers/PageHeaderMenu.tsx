@@ -9,7 +9,7 @@ import React from 'react';
 import { HeaderGlobalBar, OverflowMenu, OverflowMenuItem, HeaderName } from '@carbon/react';
 import { User } from "@carbon/icons-react";
 import { useRouter } from 'next/navigation';
-import { handleDeleteCookieApiOperation } from '@/utils/functions';
+import { handleDeleteCookieApiOperation } from '@/utils/logout';
 
 function PageHeaderMenu({ galasaServiceName }: { galasaServiceName: string }) {
 

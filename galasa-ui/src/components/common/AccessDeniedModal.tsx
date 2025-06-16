@@ -8,7 +8,7 @@
 
 import React from 'react';
 import { Modal, InlineNotification } from "@carbon/react";
-import { handleDeleteCookieApiOperation } from '@/utils/functions';
+import { handleDeleteCookieApiOperation } from '@/utils/logout';
 import { useRouter } from 'next/navigation';
 
 function AccessDeniedModal() {

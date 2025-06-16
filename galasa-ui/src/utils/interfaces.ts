@@ -69,13 +69,6 @@ export interface DataTableRow {
   isSelected?: boolean;
 }
 
-export interface BreadCrumbProps {
-
-  title: string;
-  route: string;
-
-}
-
 export interface RunLog {
   content : string;
   route: string;

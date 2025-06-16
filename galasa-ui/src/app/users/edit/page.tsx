@@ -12,7 +12,7 @@ import AccessTokensSection from '@/components/AccessTokensSection';
 import { fetchAccessTokens } from '@/actions/getUserAccessTokens';
 import { fetchUserFromApiServer } from '@/actions/userServerActions';
 import BreadCrumb from '@/components/common/BreadCrumb';
-import { BREADCRUMB_ITEMS } from '@/utils/constants';
+import { EDIT_USER, HOME } from '@/utils/constants/breadcrumb';
 
 // In order to extract query param on server-side
 type UsersPageProps = {
@@ -43,7 +43,7 @@ export default function EditUserPage({ searchParams }: UsersPageProps) {
 
   return (
     <main id="content">
-      <BreadCrumb breadCrumbItems={BREADCRUMB_ITEMS.EDIT_USER}/>
+      <BreadCrumb breadCrumbItems={[HOME, EDIT_USER]}/>
       <PageTile title={"Edit User"} />
       <UserRoleSection userProfilePromise={fetchUserFromApiServer(loginIdFromQueryParam)} roleDetailsPromise={fetchRBACRolesFromApiServer()}/>
       <AccessTokensSection accessTokensPromise={fetchAccessTokens(loginIdFromQueryParam)} isAddBtnVisible={false}/>

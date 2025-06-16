@@ -1,11 +1,16 @@
+/*
+ * Copyright contributors to the Galasa project
+ *
+ * SPDX-License-Identifier: EPL-2.0
+ */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import LogTab from '@/components/runs/LogTab';
-import { handleDownload } from '@/utils/functions';
+import { handleDownload } from '@/utils/artifacts';
 
 // Mock the utility function
-jest.mock('@/utils/functions', () => ({
+jest.mock('@/utils/artifacts', () => ({
   handleDownload: jest.fn(),
 }));
 
@@ -60,8 +65,7 @@ jest.mock('@carbon/icons-react', () => ({
   CloudDownload: () => <div>CloudDownload</div>,
 }));
 
-describe('LogTab', () => {
-  const sampleLogs = `2024-01-01 10:00:00 INFO Starting application
+const sampleLogs = `2024-01-01 10:00:00 INFO Starting application
 2024-01-01 10:00:01 DEBUG Initializing database connection
 2024-01-01 10:00:02 ERROR Failed to connect to database
 2024-01-01 10:00:03 WARN Connection retry attempt 1
@@ -70,9 +74,11 @@ describe('LogTab', () => {
 Multi-line continuation
 2024-01-01 10:00:06 ERROR Another error occurred`;
 
+describe('LogTab', () => {
+
   beforeEach(() => {
     jest.clearAllMocks();
-    
+
     // Mock scrollIntoView
     Element.prototype.scrollIntoView = jest.fn();
   });
@@ -80,33 +86,33 @@ Multi-line continuation
   describe('Rendering', () => {
     it('renders the component with title and description', () => {
       render(<LogTab logs={sampleLogs} />);
-      
+
       expect(screen.getByText('Run Log')).toBeInTheDocument();
       expect(screen.getByText(/A step-by-step log of what happened/)).toBeInTheDocument();
     });
 
     it('renders search input', () => {
       render(<LogTab logs={sampleLogs} />);
-      
+
       expect(screen.getByTestId('search-input')).toBeInTheDocument();
       expect(screen.getByPlaceholderText('Find in run log')).toBeInTheDocument();
     });
 
     it('renders filter menu', () => {
       render(<LogTab logs={sampleLogs} />);
-      
+
       expect(screen.getByTestId('overflow-menu')).toBeInTheDocument();
     });
 
     it('renders download button', () => {
       render(<LogTab logs={sampleLogs} />);
-      
+
       expect(screen.getByTestId('icon-button-download-run-log')).toBeInTheDocument();
     });
 
     it('renders log content with line numbers', () => {
       render(<LogTab logs={sampleLogs} />);
-      
+
       expect(screen.getByText('1.')).toBeInTheDocument();
       expect(screen.getByText('2.')).toBeInTheDocument();
       expect(screen.getByText(/Starting application/)).toBeInTheDocument();
@@ -116,7 +122,7 @@ Multi-line continuation
   describe('Log Processing', () => {
     it('processes log lines and assigns correct levels', () => {
       render(<LogTab logs={sampleLogs} />);
-      
+
       // Check that different log levels are rendered
       expect(screen.getByText(/Starting application/)).toBeInTheDocument();
       expect(screen.getByText(/Failed to connect to database/)).toBeInTheDocument();
@@ -125,7 +131,7 @@ Multi-line continuation
 
     it('handles multi-line log entries', () => {
       render(<LogTab logs={sampleLogs} />);
-      
+
       expect(screen.getByText(/Detailed execution trace/)).toBeInTheDocument();
       expect(screen.getByText(/Multi-line continuation/)).toBeInTheDocument();
     });
@@ -134,9 +140,9 @@ Multi-line continuation
       const logsWithContinuation = `2024-01-01 10:00:01 ERROR First error line
 This is a continuation line
 2024-01-01 10:00:02 INFO New info line`;
-      
+
       render(<LogTab logs={logsWithContinuation} />);
-      
+
       expect(screen.getByText(/First error line/)).toBeInTheDocument();
       expect(screen.getByText(/This is a continuation line/)).toBeInTheDocument();
     });
@@ -146,7 +152,7 @@ This is a continuation line
   describe('Filtering', () => {
     it('renders all filter checkboxes', () => {
       render(<LogTab logs={sampleLogs} />);
-      
+
       expect(screen.getByTestId('checkbox-error')).toBeInTheDocument();
       expect(screen.getByTestId('checkbox-warning')).toBeInTheDocument();
       expect(screen.getByTestId('checkbox-info')).toBeInTheDocument();
@@ -156,7 +162,7 @@ This is a continuation line
 
     it('all filters are checked by default', () => {
       render(<LogTab logs={sampleLogs} />);
-      
+
       expect(screen.getByTestId('checkbox-error')).toBeChecked();
       expect(screen.getByTestId('checkbox-warning')).toBeChecked();
       expect(screen.getByTestId('checkbox-info')).toBeChecked();
@@ -166,17 +172,17 @@ This is a continuation line
 
     it('toggles filter when checkbox is clicked', async () => {
       render(<LogTab logs={sampleLogs} />);
-      
+
       const errorCheckbox = screen.getByTestId('checkbox-error');
       expect(errorCheckbox).toBeChecked();
-      
+
       fireEvent.click(errorCheckbox);
       expect(errorCheckbox).not.toBeChecked();
     });
 
     it('hides all content when all filters are unchecked', async () => {
       render(<LogTab logs={sampleLogs} />);
-      
+
       // Uncheck all filters
       const checkboxes = [
         screen.getByTestId('checkbox-error'),
@@ -185,11 +191,11 @@ This is a continuation line
         screen.getByTestId('checkbox-debug'),
         screen.getByTestId('checkbox-trace'),
       ];
-      
+
       for (const checkbox of checkboxes) {
         fireEvent.click(checkbox);
       }
-      
+
       // Content should be hidden (no line numbers visible)
       expect(screen.queryByText('1.')).not.toBeInTheDocument();
     });
@@ -198,10 +204,10 @@ This is a continuation line
   describe('Download Functionality', () => {
     it('calls handleDownload when download button is clicked', async () => {
       render(<LogTab logs={sampleLogs} />);
-      
+
       const downloadButton = screen.getByTestId('icon-button-download-run-log');
       fireEvent.click(downloadButton);
-      
+
       expect(handleDownload).toHaveBeenCalledWith(sampleLogs, 'run.log');
     });
   });
@@ -209,7 +215,7 @@ This is a continuation line
   describe('Edge Cases', () => {
     it('handles empty logs', () => {
       render(<LogTab logs="" />);
-      
+
       expect(screen.getByText('Run Log')).toBeInTheDocument();
       expect(screen.queryByText('1.')).not.toBeInTheDocument();
     });
@@ -218,23 +224,23 @@ This is a continuation line
       const logsWithoutLevels = `Simple log line without level
 Another line
 Yet another line`;
-      
+
       render(<LogTab logs={logsWithoutLevels} />);
-      
+
       expect(screen.getByText(/Simple log line without level/)).toBeInTheDocument();
       expect(screen.getByText('1.')).toBeInTheDocument();
     });
 
     it('disables navigation buttons when no matches', async () => {
       render(<LogTab logs={sampleLogs} />);
-      
+
       const searchInput = screen.getByTestId('search-input');
       fireEvent.change(searchInput, { target: { value: 'NONEXISTENT' } });
-      
+
       await waitFor(() => {
         const nextButton = screen.getByTestId('icon-button-next-match');
         const prevButton = screen.getByTestId('icon-button-previous-match');
-        
+
         expect(nextButton).toBeDisabled();
         expect(prevButton).toBeDisabled();
       });
@@ -245,15 +251,88 @@ Yet another line`;
     it('escapes special regex characters in search', async () => {
       const logsWithSpecialChars = `Line with (parentheses) and [brackets]
 Line with $dollar and ^caret`;
-      
+
       render(<LogTab logs={logsWithSpecialChars} />);
-      
+
       const searchInput = screen.getByTestId('search-input');
       fireEvent.change(searchInput, { target: { value: '(parentheses)' } });
-      
+
       await waitFor(() => {
         expect(screen.getByText('1 of 1')).toBeInTheDocument();
       });
     });
   });
+
+  describe('Search and Edge Cases', () => {
+    it('handles empty logs', () => {
+      render(<LogTab logs="" />);
+
+      expect(screen.getByText('Run Log')).toBeInTheDocument();
+      expect(screen.queryByText('1.')).not.toBeInTheDocument();
+    });
+
+    it('handles logs without explicit levels by inheriting INFO', async () => {
+      const logsWithoutLevels = `Simple log line without level\nAnother line`;
+
+      render(<LogTab logs={logsWithoutLevels} />);
+
+      // Check that the line is visible by default.
+      await waitFor(() => {
+        expect(screen.getByText(/Simple log line without level/)).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId('checkbox-info'));
+
+      await waitFor(() => {
+        expect(screen.queryByText(/Simple log line/)).not.toBeInTheDocument();
+      });
+    });
+
+    it('disables navigation buttons when no matches', async () => {
+      render(<LogTab logs={sampleLogs} />);
+
+      const searchInput = screen.getByTestId('search-input');
+      fireEvent.change(searchInput, { target: { value: 'NONEXISTENT' } });
+
+      await waitFor(() => {
+        expect(screen.getByText('No matches')).toBeInTheDocument();
+        expect(screen.getByTestId('icon-button-next-match')).toBeDisabled();
+        expect(screen.getByTestId('icon-button-previous-match')).toBeDisabled();
+      });
+    });
+
+    it('escapes special regex characters in search', async () => {
+      const logsWithSpecialChars = `Line with $dollar and ^caret`;
+
+      render(<LogTab logs={logsWithSpecialChars} />);
+
+      const searchInput = screen.getByTestId('search-input');
+
+      fireEvent.change(searchInput, { target: { value: '$dollar' } });
+
+      await waitFor(() => {
+        // It should find exactly one match.
+        expect(screen.getByText('1 of 1')).toBeInTheDocument();
+      });
+    });
+
+    it('correctly assigns INFO level even if ERROR is in message content', async () => {
+      const mixedLogs = `2024-01-01 10:00:01 INFO There is an ERROR inside this message`;
+      render(<LogTab logs={mixedLogs} />);
+
+      fireEvent.click(screen.getByTestId('checkbox-error'));
+      await waitFor(() => {
+        expect(screen.getByText(/There is an ERROR inside this message/)).toBeInTheDocument();
+      });
+
+      fireEvent.click(screen.getByTestId('checkbox-error'));
+      fireEvent.click(screen.getByTestId('checkbox-info'));
+
+      await waitFor(() => {
+        expect(screen.queryByText(/There is an ERROR inside this message/)).not.toBeInTheDocument();
+      });
+    });
+
+  });
+
 });

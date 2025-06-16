@@ -7,14 +7,14 @@
 import PageTile from "@/components/PageTile";
 import BreadCrumb from "@/components/common/BreadCrumb";
 import styles from "@/styles/TestRunsPage.module.css";
-import { BREADCRUMB_ITEMS } from "@/utils/constants";
+import { HOME } from "@/utils/constants/breadcrumb";
 
 
 export default function TestRunsPage() {
 
   return (
     <main id="content">
-      <BreadCrumb breadCrumbItems={BREADCRUMB_ITEMS.HOME} />
+      <BreadCrumb breadCrumbItems={[HOME]} />
       <PageTile title={"Test Runs"} />
       <div className={styles.testRunsContentWrapper}>
         <p className={styles.underConstruction}>

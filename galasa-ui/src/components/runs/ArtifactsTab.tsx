@@ -12,7 +12,7 @@ import styles from '@/styles/Artifacts.module.css';
 import { CarbonIconType, CloudDownload, Document, Folder, Image, Json, Zip } from '@carbon/icons-react';
 import { downloadArtifactFromServer } from '@/actions/runsAction';
 import { Tile } from '@carbon/react';
-import { handleDownload } from '@/utils/functions';
+import { handleDownload } from '@/utils/artifacts';
 
 interface FileNode {
   name: string;
@@ -58,6 +58,9 @@ export function ArtifactsTab({ artifacts, runId, runName }: { artifacts: Artifac
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+
+  const ZIP_EXTENSIONS = ["zip", "gz", "jar", "rar", "7z"];
+  const IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "gif", "svg"];
 
   function formatFileSize(bytes: number) {
 
@@ -248,11 +251,11 @@ export function ArtifactsTab({ artifacts, runId, runName }: { artifacts: Artifac
     const extension = pathSplit[pathSplit.length - 1]; // get the last split e.g some.file.ts -> we need the extension (ts)
     let icon: CarbonIconType = Document;
 
-    if(extension == "gz" || extension == "zip" || extension == "jar" || extension == "rar" || extension == "7z") {
+    if(ZIP_EXTENSIONS.includes(extension)) {
       icon = Zip;
     } else if (extension == "json") {
       icon = Json;
-    } else if (extension == "png" || extension == "jpg" || extension == "jpeg" || extension == "gif" || extension == "svg") {
+    } else if (IMAGE_EXTENSIONS.includes(extension)) {
       icon = Image;
     }
 
