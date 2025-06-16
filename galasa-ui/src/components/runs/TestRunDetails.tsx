@@ -11,17 +11,17 @@ import React, { useEffect, useState } from 'react';
 import styles from "@/styles/TestRun.module.css";
 import { Dashboard, Code, CloudLogging, RepoArtifact } from '@carbon/icons-react';
 import OverviewTab from './OverviewTab';
-import InlineText from './InlineText';
 import { ArtifactIndexEntry, Run, TestMethod } from '@/generated/galasaapi';
 import ErrorPage from '@/app/error/page';
 import { RunMetadata } from '@/utils/interfaces';
 import { getIsoTimeDifference, parseIsoDateTime } from '@/utils/timeOperations';
 import MethodsTab from './MethodsTab';
-import StatusCheck from '../common/StatusCheck';
+import StatusIndicator from '../common/StatusIndicator';
 import { ArtifactsTab } from './ArtifactsTab';
 import LogTab from './LogTab';
 import { HOME, TEST_RUNS } from '@/utils/constants/breadcrumb';
 import TestRunSkeleton from './TestRunSkeleton';
+import StatusCheck from '../common/StatusCheck';
 
 interface TestRunDetailsProps {
   runId: string;
@@ -108,11 +108,11 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
       <PageTile title={`Test Run: ${run?.runName}`} />
 
       {
-        !isLoading ? <TestRunSkeleton /> :
+        isLoading ? (
+          <TestRunSkeleton />
+        ) : (
           <div className={styles.testRunContainer}>
-
             <div className={styles.summarySection}>
-
               <div>
                 <span className={styles.summaryStatus}>
                   Status: {run?.status}
@@ -121,13 +121,10 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
                   Result: <StatusCheck status={run?.result!}></StatusCheck>
                 </span>
               </div>
-
               <span className={styles.summaryStatus}>
                 Test: {run?.testName}
               </span>
-
             </div>
-
             <Tabs>
               <TabList iconSize="lg" className={styles.tabs}>
                 <Tab renderIcon={Dashboard} href="#">Overview</Tab>
@@ -150,8 +147,8 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
                 </TabPanel>
               </TabPanels>
             </Tabs>
-
           </div>
+        )
       }
     </main>
   );
