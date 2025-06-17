@@ -4,68 +4,41 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-.statusIcon {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  margin-left: 4px;
-}
-
 .tabContent {
   padding: 16px;
+}
+
+.artifactsContent {
+  padding: 16px;
+  height: 400px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .headingSkeleton {
   margin-bottom: 16px;
 }
 
-.subHeadingSkeleton {
-  margin-bottom: 8px;
-  margin-top: 16px;
-}
-
 .textSkeleton {
   margin-bottom: 8px;
 }
 
-.textSkeletonSmall {
-  margin-bottom: 4px;
-}
-
-.textSkeletonLast {
-  margin-bottom: 16px;
-}
-
-.methodCard {
-  margin-bottom: 16px;
-  padding: 12px;
-  border: 1px solid #e0e0e0;
+.placeholder {
+  width: 90%;
+  height: 128px;
   border-radius: 4px;
-  background-color: #fafafa;
 }
 
 .logContainer {
   background-color: #f4f4f4;
   padding: 12px;
-  border-radius: 4px;
-  font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace;
   height: 250px;
 }
 
 .logLine {
   margin-bottom: 4px;
-}
-
-.artifactsGrid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
-}
-
-@media (min-width: 768px) {
-  .artifactsGrid {
-    grid-template-columns: 1fr 1fr;
-  }
 }
 
 .artifactCard {

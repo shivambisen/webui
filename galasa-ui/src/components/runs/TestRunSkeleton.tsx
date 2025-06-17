@@ -6,7 +6,7 @@
 
 import { SkeletonText, SkeletonPlaceholder, Tabs, TabList, Tab, TabPanels, TabPanel } from '@carbon/react';
 import { Dashboard, Code, CloudLogging, RepoArtifact } from '@carbon/icons-react';
-import styles from '@/styles/TestRun.module.css'; 
+import styles from '@/styles/TestRun.module.css';
 import skeletonStyles from '@/styles/TestRunSkeleton.module.css';
 
 const TestRunSkeleton = () => {
@@ -38,63 +38,44 @@ const TestRunSkeleton = () => {
           <TabPanel>
             {/* Overview Tab Skeleton */}
             <div className={skeletonStyles.tabContent}>
-              <SkeletonText heading width="200px" className={skeletonStyles.headingSkeleton} />
-              <SkeletonText width="20%" className={skeletonStyles.textSkeleton} />
-              <SkeletonText width="20%" className={skeletonStyles.textSkeleton} />
-              <SkeletonText width="20%" className={skeletonStyles.textSkeletonLast} />
-              
-              <SkeletonText heading width="150px" className={skeletonStyles.subHeadingSkeleton} />
-              <SkeletonText width="20%" className={skeletonStyles.textSkeleton} />
-              <SkeletonText width="20%" />
-            </div>
-
-            <div className={skeletonStyles.tabContent}>
-              <SkeletonText heading width="200px" className={skeletonStyles.headingSkeleton} />
-              <SkeletonText width="20%" className={skeletonStyles.textSkeleton} />
-              <SkeletonText width="20%" className={skeletonStyles.textSkeleton} />
-              <SkeletonText width="20%" className={skeletonStyles.textSkeletonLast} />
-              
-              <SkeletonText heading width="150px" className={skeletonStyles.subHeadingSkeleton} />
-              <SkeletonText width="20%" className={skeletonStyles.textSkeleton} />
-              <SkeletonText width="20%" />
+              <SkeletonText width="120px" className={skeletonStyles.headingSkeleton} />
+              <SkeletonText width="120px" className={skeletonStyles.textSkeleton} />
+              <SkeletonText width="120px" className={skeletonStyles.textSkeleton} />
+              <SkeletonText width="120px" className={skeletonStyles.textSkeleton} />
             </div>
           </TabPanel>
           <TabPanel>
             {/* Methods Tab Skeleton */}
             <div className={skeletonStyles.tabContent}>
               <SkeletonText heading width="120px" className={skeletonStyles.headingSkeleton} />
-              {[1, 2, 3].map((item) => (
-                <div key={item} className={skeletonStyles.methodCard}>
-                  <SkeletonText width="150px" className={skeletonStyles.textSkeleton} />
-                  <SkeletonText width="20%" className={skeletonStyles.textSkeletonSmall} />
-                  <SkeletonText width="20%" />
-                </div>
-              ))}
+              <SkeletonText width="150px" className={skeletonStyles.textSkeleton} />
+              <SkeletonText width="20%" className={skeletonStyles.textSkeleton} />
+              <SkeletonText width="20%" />
             </div>
           </TabPanel>
           <TabPanel>
             {/* Log Tab Skeleton */}
             <div className={skeletonStyles.tabContent}>
-              <SkeletonText heading width="100px" className={skeletonStyles.headingSkeleton} />
+              <SkeletonText heading width="100%" className={skeletonStyles.headingSkeleton} />
               <div className={skeletonStyles.logContainer}>
-                {[1, 2, 3, 4, 5].map((item) => (
-                  <SkeletonText key={item} width={`${Math.random() * 40 + 60}%`} className={skeletonStyles.logLine} />
-                ))}
+                <SkeletonText paragraph={true} width={`${Math.random() * 40 + 60}%`} className={skeletonStyles.logLine} />
+                <SkeletonText paragraph={true} width={`${Math.random() * 40 + 60}%`} className={skeletonStyles.logLine} />
+                <SkeletonText paragraph={true} width={`${Math.random() * 40 + 60}%`} className={skeletonStyles.logLine} />
               </div>
             </div>
           </TabPanel>
           <TabPanel>
             {/* Artifacts Tab Skeleton */}
-            <div className={skeletonStyles.tabContent}>
-              <SkeletonText heading width="100px" className={skeletonStyles.headingSkeleton} />
-              <div className={skeletonStyles.artifactsGrid}>
-                {[1, 2, 3, 4].map((item) => (
-                  <div key={item} className={skeletonStyles.artifactCard}>
-                    <SkeletonPlaceholder className={skeletonStyles.artifactPlaceholder} />
-                    <SkeletonText width="80%" className={skeletonStyles.textSkeletonSmall} />
-                    <SkeletonText width="60%" />
-                  </div>
-                ))}
+            <div className={skeletonStyles.artifactsContent}>
+              <div>
+                <SkeletonText heading width="120px" className={skeletonStyles.headingSkeleton} />
+                <SkeletonText width="120px" className={skeletonStyles.logLine} />
+                <SkeletonText width="120px" className={skeletonStyles.logLine} />
+                <SkeletonText width="120px" className={skeletonStyles.logLine} />
+                <SkeletonText width="120px" className={skeletonStyles.logLine} />
+              </div>
+              <div className={skeletonStyles.placeholder}>
+                <SkeletonPlaceholder className={skeletonStyles.placeholder} />
               </div>
             </div>
           </TabPanel>

@@ -101,55 +101,54 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
     return <ErrorPage />;
   }
 
-  if (isLoading) {
-    return <main id="content">
-      <TestRunSkeleton />
-    </main>;
-  }
-
   return (
     <main id="content">
 
       <BreadCrumb breadCrumbItems={[HOME, TEST_RUNS]} />
       <PageTile title={`Test Run: ${run?.runName}`} />
 
-      <div className={styles.testRunContainer}>
-        <div className={styles.summarySection}>
-          <div>
-            <span className={styles.summaryStatus}>
-              Status: {run?.status}
-            </span>
-            <span className={styles.summaryStatus}>
-              Result: <StatusCheck status={run?.result!}></StatusCheck>
-            </span>
+      {
+        isLoading ? <TestRunSkeleton /> :
+
+          <div className={styles.testRunContainer}>
+            <div className={styles.summarySection}>
+              <div>
+                <span className={styles.summaryStatus}>
+                  Status: {run?.status}
+                </span>
+                <span className={styles.summaryStatus}>
+                  Result: <StatusCheck status={run?.result!}></StatusCheck>
+                </span>
+              </div>
+              <span className={styles.summaryStatus}>
+                Test: {run?.testName}
+              </span>
+            </div>
+            <Tabs>
+              <TabList iconSize="lg" className={styles.tabs}>
+                <Tab renderIcon={Dashboard} href="#">Overview</Tab>
+                <Tab renderIcon={Code} href="#">Methods</Tab>
+                <Tab renderIcon={CloudLogging} href="#">Run Log</Tab>
+                <Tab renderIcon={RepoArtifact} href="#">Artifacts</Tab>
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  <OverviewTab metadata={run!} />
+                </TabPanel>
+                <TabPanel>
+                  <MethodsTab methods={methods} />
+                </TabPanel>
+                <TabPanel>
+                  <LogTab logs={logs} />
+                </TabPanel>
+                <TabPanel>
+                  <ArtifactsTab artifacts={artifacts} runId={runId} runName={run?.runName!} />
+                </TabPanel>
+              </TabPanels>
+            </Tabs>
           </div>
-          <span className={styles.summaryStatus}>
-            Test: {run?.testName}
-          </span>
-        </div>
-        <Tabs>
-          <TabList iconSize="lg" className={styles.tabs}>
-            <Tab renderIcon={Dashboard} href="#">Overview</Tab>
-            <Tab renderIcon={Code} href="#">Methods</Tab>
-            <Tab renderIcon={CloudLogging} href="#">Run Log</Tab>
-            <Tab renderIcon={RepoArtifact} href="#">Artifacts</Tab>
-          </TabList>
-          <TabPanels>
-            <TabPanel>
-              <OverviewTab metadata={run!}/>
-            </TabPanel>
-            <TabPanel>
-              <MethodsTab methods={methods}/>
-            </TabPanel>
-            <TabPanel>
-              <LogTab logs={logs}/>
-            </TabPanel>
-            <TabPanel>
-              <ArtifactsTab artifacts={artifacts} runId={runId} runName={run?.runName!}/>
-            </TabPanel>
-          </TabPanels>
-        </Tabs>
-      </div>
+      }
+
     </main>
   );
 };
