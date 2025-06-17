@@ -9,7 +9,7 @@ import AuthCookies from './utils/authCookies';
 import { GALASA_WEBUI_CLIENT_ID, GALASA_WEBUI_HOST_URL, authApiClient, sendAuthRequest } from './utils/auth';
 import { AuthProperties } from './generated/galasaapi';
 import { cookies } from 'next/headers';
-import { CLIENT_API_VERSION } from './utils/constants';
+import { CLIENT_API_VERSION } from './utils/constants/common';
 
 const authenticateWithDevToken = async (devToken: string) => {
   let response = NextResponse.next();

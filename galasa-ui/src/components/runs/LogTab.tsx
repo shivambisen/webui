@@ -5,27 +5,51 @@
  */
 'use client';
 
-import React, { useEffect, useState } from 'react';
-import { Search, OverflowMenu, OverflowMenuItem } from '@carbon/react';
+import React, { useEffect, useState, useRef } from 'react';
+import { Search, OverflowMenu, Button } from '@carbon/react';
 import styles from "@/styles/LogTab.module.css";
 import { Checkbox } from '@carbon/react';
-import { Filter } from '@carbon/icons-react';
+import { Filter, ChevronUp, ChevronDown, CharacterSentenceCase, TextUnderline, CloudDownload } from '@carbon/icons-react';
+import { handleDownload } from '@/utils/artifacts';
+
+interface LogLine {
+  content: string;
+  level: string;
+  lineNumber: number;
+  isVisible: boolean;
+}
+
+enum RegexFlags {
+  AllMatches = 'g',
+  AllMatchesIgnoreCase = 'gi',
+}
 
 export default function LogTab({ logs }: { logs: string }) {
 
   const [logContent, setLogContent] = useState<string>('');
-  const [filteredContent, setFilteredContent] = useState<string>('');
+  const [processedLines, setProcessedLines] = useState<LogLine[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [currentMatchIndex, setCurrentMatchIndex] = useState<number>(-1);
+  const [totalMatches, setTotalMatches] = useState<number>(0);
+  const [matchCase, setMatchCase] = useState<boolean>(false);
+  const [matchWholeWord, setMatchWholeWord] = useState<boolean>(false);
   const [filters, setFilters] = useState({
-    ERROR: false,
-    WARN: false,
-    DEBUG: false,
-    INFO: false,
-    TRACE: false
+    ERROR: true,
+    WARN: true,
+    DEBUG: true,
+    INFO: true,
+    TRACE: true
   });
 
+  const logContainerRef = useRef<HTMLDivElement>(null);
+
   const handleSearchChange = (e: any) => {
-    setSearchTerm(e.target?.value || '');
+    const value = e.target?.value || '';
+    setSearchTerm(value);
+    if (!value.trim()) {
+      setCurrentMatchIndex(-1);
+      setTotalMatches(0);
+    }
   };
 
   const handleFilterChange = (level: string) => {
@@ -35,85 +59,285 @@ export default function LogTab({ logs }: { logs: string }) {
     }));
   };
 
-  const renderLogContent = () => {
-    if (!filteredContent) return null;
-
-    const lines = filteredContent.split('\n');
-
-    return lines.map((line, index) => {
-      // Parse log line to determine level
-      let level = 'INFO';
-      if (line.includes('ERROR')) {
-        level = 'ERROR';
-      } else if (line.includes('WARN')) {
-        level = 'WARN';
-      } else if (line.includes('DEBUG')) {
-        level = 'DEBUG';
-      } else if (line.includes('TRACE')) {
-        level = 'TRACE';
-      }
-
-      // Apply appropriate class based on log level
-      const levelClass = level.toLowerCase();
-      const colorClass = styles[levelClass as keyof typeof styles] || ""; //select color class based on line type (e.g if error then make the color red for that line)
-
-      return (
-        <div
-          key={index}
-          className={`${colorClass} ${styles.logEntry}`}
-        >
-          <pre>    {index + 1}.   {line}</pre>
-        </div>
-      );
-    });
+  const toggleMatchCase = () => {
+    setMatchCase(!matchCase);
   };
 
-  useEffect(() => {
-    let lines = logContent.split('\n');
+  const toggleMatchWholeWord = () => {
+    setMatchWholeWord(!matchWholeWord);
+  };
 
-    // Filter by search term
-    if (searchTerm.trim()) {
-      const term = searchTerm.toLowerCase();
-      lines = lines.filter(line => line.toLowerCase().includes(term));
+  const goToNextMatch = () => {
+    if (totalMatches > 0) {
+      setCurrentMatchIndex((prev) => (prev + 1) % totalMatches);
+    }
+  };
+
+  const goToPreviousMatch = () => {
+    if (totalMatches > 0) {
+      setCurrentMatchIndex((prev) => (prev - 1 + totalMatches) % totalMatches);
+    }
+  };
+
+  const createSearchRegex = (term: string) => {
+
+    let escapedTerm: string = "";
+
+    if (!term.trim()) {
+      escapedTerm = "";
+    } else {
+
+      escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Prefix any special regex character in `term` with a backslash so the whole string is used literally in a RegExp
+      if (matchWholeWord) {
+        escapedTerm = `\\b${escapedTerm}\\b`;
+      }
+
+      // If matchCase is false, we use the 'gi' flag to ignore case
+      const flags = matchCase ? RegexFlags.AllMatches : RegexFlags.AllMatchesIgnoreCase;
+      return new RegExp(escapedTerm, flags);
+
     }
 
-    // Check if any filters are active
+    return escapedTerm;
+
+  };
+
+  const getLogLevel = (line: string) => {
+    let logLevel: string | null = null;
+
+    // Attempt to parse a timestamp and log level by splitting the line.
+    const tokens = line.trim().split(' ');
+    if (tokens.length >= 3 &&
+      tokens[0].length === 10 && // Simple check for DD/MM/YYYY format
+      tokens[0].charAt(2) === '/' &&
+      tokens[0].charAt(5) === '/' &&
+      tokens[1].includes(':') &&
+      tokens[1].includes('.')
+    ) {
+      if (['ERROR', 'WARN', 'DEBUG', 'INFO', 'TRACE'].includes(tokens[2])) {
+        logLevel = tokens[2];
+      }
+    }
+
+    // Fallback: check if the line starts with any log level
+    if (!logLevel) {
+      const trimmedLine = line.trim();
+      if (trimmedLine.startsWith('ERROR')) {
+        logLevel = 'ERROR';
+      } else if (trimmedLine.startsWith('WARN')) {
+        logLevel = 'WARN';
+      } else if (trimmedLine.startsWith('DEBUG')) {
+        logLevel = 'DEBUG';
+      } else if (trimmedLine.startsWith('INFO')) {
+        logLevel = 'INFO';
+      } else if (trimmedLine.startsWith('TRACE')) {
+        logLevel = 'TRACE';
+      }
+    }
+
+    return logLevel;
+  };
+
+  const processLogLines = (content: string) => {
+    const lines = content.split('\n');
+    const processed: LogLine[] = [];
+    let currentLevel = 'INFO'; // Default level
+
+    lines.forEach((line, index) => {
+      const detectedLevel = getLogLevel(line);
+
+      // If we find a new level, update current level
+      if (detectedLevel) {
+        currentLevel = detectedLevel;
+      }
+
+      // All lines get assigned to the current level (either explicit or inherited)
+      processed.push({
+        content: line,
+        level: currentLevel,
+        lineNumber: index + 1,
+        isVisible: true
+      });
+    });
+
+    return processed;
+  };
+
+  const applyFilters = (lines: LogLine[]) => {
+
+    let filteredLines = [];
     const hasActiveFilters = Object.values(filters).some(filter => filter === true);
 
-    // Filter by log level only if there are active filters
-    if (hasActiveFilters) {
-      lines = lines.filter(line => {
-        if (line.includes('ERROR')) return filters.ERROR;
-        if (line.includes('WARN')) return filters.WARN;
-        if (line.includes('DEBUG')) return filters.DEBUG;
-        if (line.includes("TRACE")) return filters.TRACE;
-        return filters.INFO; // Default to INFO if no other level found
-      });
+    if (!hasActiveFilters) {
+      // If no filters are active, hide all lines
+      filteredLines = lines.map(line => ({ ...line, isVisible: false }));
+    } else {
+      // Only show lines whose level is checked in the filters
+      filteredLines = lines.map(line => ({
+        ...line,
+        isVisible: !!filters[line.level as keyof typeof filters]
+      }));
     }
-    // If no filters are active, show all lines (don't filter by log level)
 
-    setFilteredContent(lines.join('\n'));
-  }, [searchTerm, logContent, filters]);
+    return filteredLines;
+
+  };
+
+  const highlightText = (text: string, searchTerm: string, lineIndex: number) => {
+    let result: (string | JSX.Element)[] | string = text;
+
+    if (searchTerm.trim()) {
+      const regex = createSearchRegex(searchTerm);
+
+      if (regex) {
+        const parts = text.split(regex);
+        const matches = text.match(regex);
+
+        if (matches) {
+          let matchIndexInLine = 0;
+          const highlightedResult = [];
+
+          for (let i = 0; i < parts.length; i++) {
+            if (i > 0) {
+              const match = matches[i - 1];
+              const globalMatchIndex = getGlobalMatchIndex(lineIndex, matchIndexInLine);
+              const isCurrentMatch = globalMatchIndex === currentMatchIndex;
+              matchIndexInLine++;
+
+              highlightedResult.push(
+                <span
+                  key={`match-${i}`}
+                  className={`${styles.highlight} ${isCurrentMatch ? styles.currentHighlight : ''}`}
+                  id={isCurrentMatch ? 'current-match' : undefined}
+                >
+                  {match}
+                </span>
+              );
+            }
+            if (parts[i]) {
+              highlightedResult.push(parts[i]);
+            }
+          }
+
+          result = highlightedResult;
+        }
+      }
+    }
+
+    return result;
+  };
+
+  const getGlobalMatchIndex = (lineIndex: number, matchIndexInLine: number) => {
+    let result = -1;
+
+    if (searchTerm.trim()) {
+      const visibleLines = processedLines.filter(line => line.isVisible);
+      let globalIndex = 0;
+
+      for (let i = 0; i < lineIndex; i++) {
+        if (i < visibleLines.length) {
+          const regex = createSearchRegex(searchTerm);
+          if (regex) {
+            const matches = visibleLines[i].content.match(regex);
+            if (matches) {
+              globalIndex += matches.length;
+            }
+          }
+        }
+      }
+
+      result = globalIndex + matchIndexInLine;
+    }
+
+    return result;
+  };
+
+  const countMatches = (lines: LogLine[], searchTerm: string) => {
+    if (!searchTerm.trim()) return 0;
+    const regex = createSearchRegex(searchTerm);
+    if (!regex) return 0;
+
+    const visibleContent = lines
+      .filter(line => line.isVisible)
+      .map(line => line.content)
+      .join('\n');
+
+    const matches = visibleContent.match(regex);
+    return matches ? matches.length : 0;
+  };
+
+  const renderLogContent = () => {
+    let result: JSX.Element[] | null = null;
+
+    if (processedLines.length) {
+      const renderedLines: JSX.Element[] = [];
+
+      processedLines.forEach((logLine, index) => {
+        // Only process visible lines
+        if (logLine.isVisible) {
+          // Apply appropriate class based on log level
+          const levelClass = logLine.level.toLowerCase();
+          const colorClass = styles[levelClass as keyof typeof styles] || "";
+
+          renderedLines.push(
+            <div
+              key={logLine.lineNumber}
+              className={`${colorClass} ${styles.logEntry}`}
+            >
+              <span className={styles.lineNumberCol}>
+                {logLine.lineNumber}.
+              </span>
+              <pre>{highlightText(logLine.content, searchTerm, index)}</pre>
+            </div>
+          );
+        }
+      });
+
+      result = renderedLines;
+    }
+
+    return result;
+  };
+
+  // Scroll to current match
+  useEffect(() => {
+    if (currentMatchIndex >= 0) {
+      const currentMatchElement = document.getElementById('current-match');
+      if (currentMatchElement) {
+        currentMatchElement.scrollIntoView({
+          behavior: 'smooth',
+          block: 'center'
+        });
+      }
+    }
+  }, [currentMatchIndex]);
+
+  // Update total matches when search term, match options, or processed lines change
+  useEffect(() => {
+    const matches = countMatches(processedLines, searchTerm);
+    setTotalMatches(matches);
+
+    if (matches > 0 && currentMatchIndex === -1) {
+      setCurrentMatchIndex(0);
+    } else if (matches === 0) {
+      setCurrentMatchIndex(-1);
+    } else if (currentMatchIndex >= matches) {
+      setCurrentMatchIndex(matches - 1);
+    }
+  }, [searchTerm, processedLines, matchCase, matchWholeWord]);
+
+  // Process log content and apply filters
+  useEffect(() => {
+    if (logContent) {
+      const processed = processLogLines(logContent);
+      const filtered = applyFilters(processed);
+      setProcessedLines(filtered);
+    }
+  }, [logContent, filters]);
 
   useEffect(() => {
     setLogContent(logs);
   }, [logs]);
-
-  useEffect(() => {
-    if (!searchTerm.trim()) {
-      setFilteredContent(logContent);
-    } else {
-      // Filter log content based on search term
-      const term = searchTerm.toLowerCase();
-      const lines = logContent.split('\n');
-      const filteredLines = lines.filter(line =>
-        line.toLowerCase().includes(term)
-      );
-
-      setFilteredContent(filteredLines.join('\n'));
-    }
-
-  }, [searchTerm, logContent]);
 
   return (
     <div className={styles.tabContent}>
@@ -121,14 +345,57 @@ export default function LogTab({ logs }: { logs: string }) {
       <p>A step-by-step log of what happened over time when the Run was preparing a TestClass for execution, what happened when the TestClass was executed, and when the test environment was cleaned up.
         The RunLog is an Artifact, which can be downloaded and viewed.</p>
       <div className={styles.logContainer}>
-        <Search
-          placeholder="Search run log"
-          size="lg"
-          value={searchTerm}
-          onChange={handleSearchChange}
-        />
+        <div className={styles.searchContainer}>
+          <Search
+            placeholder="Find in run log"
+            size="lg"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+          {searchTerm && (
+            <div className={styles.findControls}>
+              <span className={styles.matchCounter}>
+                {totalMatches > 0 ? `${currentMatchIndex + 1} of ${totalMatches}` : 'No matches'}
+              </span>
+              <Button
+                kind="ghost"
+                size="sm"
+                onClick={goToPreviousMatch}
+                disabled={totalMatches === 0}
+                renderIcon={ChevronUp}
+                iconDescription="Previous match"
+                hasIconOnly
+              />
+              <Button
+                kind="ghost"
+                size="sm"
+                onClick={goToNextMatch}
+                disabled={totalMatches === 0}
+                renderIcon={ChevronDown}
+                iconDescription="Next match"
+                hasIconOnly
+              />
+              <Button
+                kind={matchCase ? "primary" : "ghost"}
+                size="sm"
+                onClick={toggleMatchCase}
+                renderIcon={CharacterSentenceCase}
+                iconDescription="Match case"
+                hasIconOnly
+              />
+              <Button
+                kind={matchWholeWord ? "primary" : "ghost"}
+                size="sm"
+                onClick={toggleMatchWholeWord}
+                renderIcon={TextUnderline}
+                iconDescription="Match whole word"
+                hasIconOnly
+              />
+            </div>
+          )}
+        </div>
         <div className={styles.filterBtn}>
-          <OverflowMenu iconOnly size="lg" renderIcon={Filter} flipped={true}>
+          <OverflowMenu size="lg" iconDescription={"Hide / Show Content"} renderIcon={Filter} flipped={true}>
             <Checkbox
               id="checkbox-error"
               labelText="Error"
@@ -142,16 +409,16 @@ export default function LogTab({ logs }: { logs: string }) {
               onChange={() => handleFilterChange('WARN')}
             />
             <Checkbox
-              id="checkbox-debug"
-              labelText="Debug"
-              checked={filters.DEBUG}
-              onChange={() => handleFilterChange('DEBUG')}
-            />
-            <Checkbox
               id="checkbox-info"
               labelText="Info"
               checked={filters.INFO}
               onChange={() => handleFilterChange('INFO')}
+            />
+            <Checkbox
+              id="checkbox-debug"
+              labelText="Debug"
+              checked={filters.DEBUG}
+              onChange={() => handleFilterChange('DEBUG')}
             />
             <Checkbox
               id="checkbox-trace"
@@ -161,13 +428,19 @@ export default function LogTab({ logs }: { logs: string }) {
             />
           </OverflowMenu>
         </div>
+        <Button
+          kind="ghost"
+          renderIcon={CloudDownload}
+          hasIconOnly
+          iconDescription="Download Run Log"
+          onClick={() => handleDownload(logContent, "run.log")}
+        />
       </div>
       <div className={styles.runLog}>
-        <div className={styles.runLogContent}>
+        <div className={styles.runLogContent} ref={logContainerRef}>
           {renderLogContent()}
         </div>
       </div>
     </div>
-
   );
-};
+}

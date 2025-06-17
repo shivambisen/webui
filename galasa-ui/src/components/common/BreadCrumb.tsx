@@ -11,11 +11,25 @@ import { Breadcrumb, BreadcrumbItem, Theme } from "@carbon/react";
 import "@/styles/global.scss";
 import styles from "@/styles/BreadCrumb.module.css";
 
-function BreadCrumb() {
+interface BreadCrumbProps {
+
+  title: string;
+  route: string;
+
+}
+
+function BreadCrumb({breadCrumbItems} : {breadCrumbItems : BreadCrumbProps[]}) {
+
   return (
     <Theme theme="g10">
       <Breadcrumb className={styles.crumbContainer}>
-        <BreadcrumbItem isCurrentPage={false} href="/">Home</BreadcrumbItem>
+        {
+          breadCrumbItems.map((item, idx) => {
+            return (
+              <BreadcrumbItem key={idx} isCurrentPage={false} href={item.route}>{item.title}</BreadcrumbItem>
+            );
+          })
+        }
       </Breadcrumb>
     </Theme>
   );
