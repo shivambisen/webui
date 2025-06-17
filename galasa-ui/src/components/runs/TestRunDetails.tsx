@@ -16,7 +16,6 @@ import ErrorPage from '@/app/error/page';
 import { RunMetadata } from '@/utils/interfaces';
 import { getIsoTimeDifference, parseIsoDateTime } from '@/utils/timeOperations';
 import MethodsTab from './MethodsTab';
-import StatusIndicator from '../common/StatusIndicator';
 import { ArtifactsTab } from './ArtifactsTab';
 import LogTab from './LogTab';
 import { HOME, TEST_RUNS } from '@/utils/constants/breadcrumb';
@@ -71,9 +70,10 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
 
   useEffect(() => {
 
-    setIsLoading(true);
+    const loadRunDetails = async () => {
 
-    const loadUser = async () => {
+      setIsLoading(true);
+
       try {
 
         const runDetails = await runDetailsPromise;
@@ -93,12 +93,18 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
       }
     };
 
-    loadUser();
+    loadRunDetails();
 
   }, [runDetailsPromise, runArtifactsPromise, runLogPromise]);
 
   if (isError) {
     return <ErrorPage />;
+  }
+
+  if (isLoading) {
+    return <main id="content">
+      <TestRunSkeleton />
+    </main>;
   }
 
   return (
@@ -107,49 +113,43 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
       <BreadCrumb breadCrumbItems={[HOME, TEST_RUNS]} />
       <PageTile title={`Test Run: ${run?.runName}`} />
 
-      {
-        isLoading ? (
-          <TestRunSkeleton />
-        ) : (
-          <div className={styles.testRunContainer}>
-            <div className={styles.summarySection}>
-              <div>
-                <span className={styles.summaryStatus}>
-                  Status: {run?.status}
-                </span>
-                <span className={styles.summaryStatus}>
-                  Result: <StatusCheck status={run?.result!}></StatusCheck>
-                </span>
-              </div>
-              <span className={styles.summaryStatus}>
-                Test: {run?.testName}
-              </span>
-            </div>
-            <Tabs>
-              <TabList iconSize="lg" className={styles.tabs}>
-                <Tab renderIcon={Dashboard} href="#">Overview</Tab>
-                <Tab renderIcon={Code} href="#">Methods</Tab>
-                <Tab renderIcon={CloudLogging} href="#">Run Log</Tab>
-                <Tab renderIcon={RepoArtifact} href="#">Artifacts</Tab>
-              </TabList>
-              <TabPanels>
-                <TabPanel>
-                  <OverviewTab metadata={run!} />
-                </TabPanel>
-                <TabPanel>
-                  <MethodsTab methods={methods} />
-                </TabPanel>
-                <TabPanel>
-                  <LogTab logs={logs} />
-                </TabPanel>
-                <TabPanel>
-                  <ArtifactsTab artifacts={artifacts} runId={runId} runName={run?.runName!} />
-                </TabPanel>
-              </TabPanels>
-            </Tabs>
+      <div className={styles.testRunContainer}>
+        <div className={styles.summarySection}>
+          <div>
+            <span className={styles.summaryStatus}>
+              Status: {run?.status}
+            </span>
+            <span className={styles.summaryStatus}>
+              Result: <StatusCheck status={run?.result!}></StatusCheck>
+            </span>
           </div>
-        )
-      }
+          <span className={styles.summaryStatus}>
+            Test: {run?.testName}
+          </span>
+        </div>
+        <Tabs>
+          <TabList iconSize="lg" className={styles.tabs}>
+            <Tab renderIcon={Dashboard} href="#">Overview</Tab>
+            <Tab renderIcon={Code} href="#">Methods</Tab>
+            <Tab renderIcon={CloudLogging} href="#">Run Log</Tab>
+            <Tab renderIcon={RepoArtifact} href="#">Artifacts</Tab>
+          </TabList>
+          <TabPanels>
+            <TabPanel>
+              <OverviewTab metadata={run!}/>
+            </TabPanel>
+            <TabPanel>
+              <MethodsTab methods={methods}/>
+            </TabPanel>
+            <TabPanel>
+              <LogTab logs={logs}/>
+            </TabPanel>
+            <TabPanel>
+              <ArtifactsTab artifacts={artifacts} runId={runId} runName={run?.runName!}/>
+            </TabPanel>
+          </TabPanels>
+        </Tabs>
+      </div>
     </main>
   );
 };

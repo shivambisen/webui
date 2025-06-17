@@ -5,77 +5,78 @@
  */
 
 .statusIcon {
-    display: inline-block;
-    width: 16px;
-    height: 16px;
-    margin-left: 4px;
-  }
-  
-  .tabContent {
-    padding: 16px;
-  }
-  
-  .headingSkeleton {
-    margin-bottom: 16px;
-  }
-  
-  .subHeadingSkeleton {
-    margin-bottom: 8px;
-    margin-top: 16px;
-  }
-  
-  .textSkeleton {
-    margin-bottom: 8px;
-  }
-  
-  .textSkeletonSmall {
-    margin-bottom: 4px;
-  }
-  
-  .textSkeletonLast {
-    margin-bottom: 16px;
-  }
-  
-  .methodCard {
-    margin-bottom: 16px;
-    padding: 12px;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    background-color: #fafafa;
-  }
-  
-  .logContainer {
-    background-color: #f4f4f4;
-    padding: 12px;
-    border-radius: 4px;
-    font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace;
-  }
-  
-  .logLine {
-    margin-bottom: 4px;
-  }
-  
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-left: 4px;
+}
+
+.tabContent {
+  padding: 16px;
+}
+
+.headingSkeleton {
+  margin-bottom: 16px;
+}
+
+.subHeadingSkeleton {
+  margin-bottom: 8px;
+  margin-top: 16px;
+}
+
+.textSkeleton {
+  margin-bottom: 8px;
+}
+
+.textSkeletonSmall {
+  margin-bottom: 4px;
+}
+
+.textSkeletonLast {
+  margin-bottom: 16px;
+}
+
+.methodCard {
+  margin-bottom: 16px;
+  padding: 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  background-color: #fafafa;
+}
+
+.logContainer {
+  background-color: #f4f4f4;
+  padding: 12px;
+  border-radius: 4px;
+  font-family: 'IBM Plex Mono', 'Menlo', 'DejaVu Sans Mono', 'Bitstream Vera Sans Mono', Courier, monospace;
+  height: 250px;
+}
+
+.logLine {
+  margin-bottom: 4px;
+}
+
+.artifactsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+@media (min-width: 768px) {
   .artifactsGrid {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 16px;
+    grid-template-columns: 1fr 1fr;
   }
-  
-  @media (min-width: 768px) {
-    .artifactsGrid {
-      grid-template-columns: 1fr 1fr;
-    }
-  }
-  
-  .artifactCard {
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    padding: 12px;
-    background-color: #fafafa;
-  }
-  
-  .artifactPlaceholder {
-    width: 100%;
-    height: 128px;
-    margin-bottom: 8px;
-  }
+}
+
+.artifactCard {
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 12px;
+  background-color: #fafafa;
+}
+
+.artifactPlaceholder {
+  width: 100%;
+  height: 128px;
+  margin-bottom: 8px;
+}

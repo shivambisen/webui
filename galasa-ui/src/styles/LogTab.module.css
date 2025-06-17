@@ -28,9 +28,6 @@
   flex: 1;
 }
 
-.lineNumberCol {
-  
-}
 
 .findControls {
   display: flex;
@@ -54,7 +51,7 @@
 }
 
 .logEntry {
-  line-height: 1.5;
+  line-height: 1;
   margin-bottom: 0.25rem;
   display: flex;
   align-items: center;
@@ -80,12 +77,11 @@
 .runLog {
   border: 1px solid var(--galasa-border);
   border-radius: var(--border-radius);
-  background-color: #0a0a0a;
   padding: 1rem;
   font-family: 'IBM Plex Mono', monospace;
-  height: 500px;
+  height: 75vh;
   overflow-y: auto;
-  color: #f4f4f4;
+  color: black;
 }
 
 .runLogContent {

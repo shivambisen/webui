@@ -11,7 +11,7 @@ import { Breadcrumb, BreadcrumbItem, Theme } from "@carbon/react";
 import "@/styles/global.scss";
 import styles from "@/styles/BreadCrumb.module.css";
 
-export interface BreadCrumbProps {
+interface BreadCrumbProps {
 
   title: string;
   route: string;

@@ -103,28 +103,39 @@ export default function LogTab({ logs }: { logs: string }) {
   };
 
   const getLogLevel = (line: string) => {
+    let logLevel: string | null = null;
 
-    let filteredType = null;
-
-    // This regex looks for a log level keyword ONLY if it follows a timestamp pattern at the start of the line.
-    const match = line.match(/^\s*[\d\s\-:T,.]*Z?\s?(ERROR|WARN|DEBUG|INFO|TRACE)/);
-    if (match && match[1]) {
-      // If a match is found in the expected position, return it as the correct level.
-      filteredType = match[1];
-
-    } else {
-
-      const trimmedLine = line.trim();
-      if (trimmedLine.startsWith('ERROR')) filteredType = 'ERROR';
-      if (trimmedLine.startsWith('WARN')) filteredType = 'WARN';
-      if (trimmedLine.startsWith('DEBUG')) filteredType = 'DEBUG';
-      if (trimmedLine.startsWith('INFO')) filteredType = 'INFO';
-      if (trimmedLine.startsWith('TRACE')) filteredType = 'TRACE';
-
+    // Attempt to parse a timestamp and log level by splitting the line.
+    const tokens = line.trim().split(' ');
+    if (tokens.length >= 3 &&
+      tokens[0].length === 10 && // Simple check for DD/MM/YYYY format
+      tokens[0].charAt(2) === '/' &&
+      tokens[0].charAt(5) === '/' &&
+      tokens[1].includes(':') &&
+      tokens[1].includes('.')
+    ) {
+      if (['ERROR', 'WARN', 'DEBUG', 'INFO', 'TRACE'].includes(tokens[2])) {
+        logLevel = tokens[2];
+      }
     }
 
-    // If no level can be determined, return null so it can inherit the level from the previous line.
-    return filteredType;
+    // Fallback: check if the line starts with any log level
+    if (!logLevel) {
+      const trimmedLine = line.trim();
+      if (trimmedLine.startsWith('ERROR')) {
+        logLevel = 'ERROR';
+      } else if (trimmedLine.startsWith('WARN')) {
+        logLevel = 'WARN';
+      } else if (trimmedLine.startsWith('DEBUG')) {
+        logLevel = 'DEBUG';
+      } else if (trimmedLine.startsWith('INFO')) {
+        logLevel = 'INFO';
+      } else if (trimmedLine.startsWith('TRACE')) {
+        logLevel = 'TRACE';
+      }
+    }
+
+    return logLevel;
   };
 
   const processLogLines = (content: string) => {
@@ -154,21 +165,22 @@ export default function LogTab({ logs }: { logs: string }) {
 
   const applyFilters = (lines: LogLine[]) => {
 
-    const hasActiveFilters = Object.values(filters).some(filter => filter === true);
     let filteredLines = [];
+    const hasActiveFilters = Object.values(filters).some(filter => filter === true);
 
     if (!hasActiveFilters) {
-      // none selected → hide all
+      // If no filters are active, hide all lines
       filteredLines = lines.map(line => ({ ...line, isVisible: false }));
+    } else {
+      // Only show lines whose level is checked in the filters
+      filteredLines = lines.map(line => ({
+        ...line,
+        isVisible: !!filters[line.level as keyof typeof filters]
+      }));
     }
 
-    // only show lines whose level is still checked
-    filteredLines = lines.map(line => ({
-      ...line,
-      isVisible: !!filters[line.level as keyof typeof filters]
-    }));
-
     return filteredLines;
+
   };
 
   const highlightText = (text: string, searchTerm: string, lineIndex: number) => {
@@ -312,7 +324,7 @@ export default function LogTab({ logs }: { logs: string }) {
     } else if (currentMatchIndex >= matches) {
       setCurrentMatchIndex(matches - 1);
     }
-  }, [searchTerm, logContent, filters, matchCase, matchWholeWord]);
+  }, [searchTerm, processedLines, matchCase, matchWholeWord]);
 
   // Process log content and apply filters
   useEffect(() => {
