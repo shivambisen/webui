@@ -5,7 +5,7 @@
  */
 'use client';
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { Search, OverflowMenu, Button } from '@carbon/react';
 import styles from "@/styles/LogTab.module.css";
 import { Checkbox } from '@carbon/react';
@@ -17,6 +17,13 @@ interface LogLine {
   level: string;
   lineNumber: number;
   isVisible: boolean;
+}
+
+interface MatchInfo {
+  lineIndex: number;
+  start: number;
+  end: number;
+  globalIndex: number;
 }
 
 enum RegexFlags {
@@ -41,6 +48,9 @@ export default function LogTab({ logs }: { logs: string }) {
     TRACE: true
   });
 
+  // Cache for search results to avoid recomputation
+  const [searchCache, setSearchCache] = useState<Map<string, MatchInfo[]>>(new Map());
+
   const logContainerRef = useRef<HTMLDivElement>(null);
 
   const handleSearchChange = (e: any) => {
@@ -61,10 +71,12 @@ export default function LogTab({ logs }: { logs: string }) {
 
   const toggleMatchCase = () => {
     setMatchCase(!matchCase);
+    setSearchCache(new Map()); // Clear cache when search options change
   };
 
   const toggleMatchWholeWord = () => {
     setMatchWholeWord(!matchWholeWord);
+    setSearchCache(new Map()); // Clear cache when search options change
   };
 
   const goToNextMatch = () => {
@@ -79,28 +91,21 @@ export default function LogTab({ logs }: { logs: string }) {
     }
   };
 
-  const createSearchRegex = (term: string) => {
+  // Memoized regex creation to avoid recreating the same regex repeatedly
+  const searchRegex = useMemo(() => {
+    let regex: RegExp | null = null;
 
-    let escapedTerm: string = "";
-
-    if (!term.trim()) {
-      escapedTerm = "";
-    } else {
-
-      escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Prefix any special regex character in `term` with a backslash so the whole string is used literally in a RegExp
+    if (searchTerm.trim()) {
+      let escapedTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       if (matchWholeWord) {
         escapedTerm = `\\b${escapedTerm}\\b`;
       }
-
-      // If matchCase is false, we use the 'gi' flag to ignore case
       const flags = matchCase ? RegexFlags.AllMatches : RegexFlags.AllMatchesIgnoreCase;
-      return new RegExp(escapedTerm, flags);
-
+      regex = new RegExp(escapedTerm, flags);
     }
 
-    return escapedTerm;
-
-  };
+    return regex;
+  }, [searchTerm, matchCase, matchWholeWord]);
 
   const getLogLevel = (line: string) => {
     let logLevel: string | null = null;
@@ -183,117 +188,140 @@ export default function LogTab({ logs }: { logs: string }) {
 
   };
 
-  const highlightText = (text: string, searchTerm: string, lineIndex: number) => {
-    let result: (string | JSX.Element)[] | string = text;
+  // Optimized search function that computes all matches once and caches results
+  const computeSearchMatches = useCallback((lines: LogLine[], regex: RegExp | null): MatchInfo[] => {
+    let result: MatchInfo[] = [];
 
-    if (searchTerm.trim()) {
-      const regex = createSearchRegex(searchTerm);
+    if (!regex || !searchTerm.trim()) {
+      result = [];
+    } else {
+      try {
+        // Create cache key
+        const cacheKey = `${searchTerm}-${matchCase}-${matchWholeWord}-${lines.map(l => l.isVisible).join('')}`;
 
-      if (regex) {
-        const parts = text.split(regex);
-        const matches = text.match(regex);
+        // Check cache first
+        if (searchCache.has(cacheKey)) {
+          result = searchCache.get(cacheKey)!;
+        } else {
+          const matches: MatchInfo[] = [];
+          let globalIndex = 0;
 
-        if (matches) {
-          let matchIndexInLine = 0;
-          const highlightedResult = [];
+          lines.forEach((line, lineIndex) => {
+            if (!line.isVisible) return;
 
-          for (let i = 0; i < parts.length; i++) {
-            if (i > 0) {
-              const match = matches[i - 1];
-              const globalMatchIndex = getGlobalMatchIndex(lineIndex, matchIndexInLine);
-              const isCurrentMatch = globalMatchIndex === currentMatchIndex;
-              matchIndexInLine++;
+            // Reset regex lastIndex to ensure we get all matches
+            regex.lastIndex = 0;
+            let match;
 
-              highlightedResult.push(
-                <span
-                  key={`match-${i}`}
-                  className={`${styles.highlight} ${isCurrentMatch ? styles.currentHighlight : ''}`}
-                  id={isCurrentMatch ? 'current-match' : undefined}
-                >
-                  {match}
-                </span>
-              );
+            while ((match = regex.exec(line.content)) !== null) {
+              matches.push({
+                lineIndex,
+                start: match.index,
+                end: match.index + match[0].length,
+                globalIndex: globalIndex++
+              });
+
+              // Prevent infinite loop on zero-length matches
+              if (match.index === regex.lastIndex) {
+                regex.lastIndex++;
+              }
             }
-            if (parts[i]) {
-              highlightedResult.push(parts[i]);
-            }
-          }
+          });
 
-          result = highlightedResult;
+          // Cache the results
+          setSearchCache(prev => new Map(prev).set(cacheKey, matches));
+          result = matches;
         }
+      } catch (error) {
+        // If regex execution fails, return empty array
+        console.warn('Regex execution error:', error);
+        result = [];
+        
       }
     }
 
     return result;
-  };
+  }, [searchTerm, matchCase, matchWholeWord, searchCache]);
 
-  const getGlobalMatchIndex = (lineIndex: number, matchIndexInLine: number) => {
-    let result = -1;
+  // Memoized search matches
+  const searchMatches = useMemo(() => {
+    return computeSearchMatches(processedLines, searchRegex);
+  }, [processedLines, searchRegex, computeSearchMatches]);
 
-    if (searchTerm.trim()) {
-      const visibleLines = processedLines.filter(line => line.isVisible);
-      let globalIndex = 0;
+  // Optimized highlight function
+  const highlightText = useCallback((text: string, lineIndex: number): React.ReactNode => {
+    let result: React.ReactNode = text;
 
-      for (let i = 0; i < lineIndex; i++) {
-        if (i < visibleLines.length) {
-          const regex = createSearchRegex(searchTerm);
-          if (regex) {
-            const matches = visibleLines[i].content.match(regex);
-            if (matches) {
-              globalIndex += matches.length;
-            }
+    if (searchRegex && searchTerm.trim()) {
+      // Find matches for this specific line
+      const lineMatches = searchMatches.filter(match => match.lineIndex === lineIndex);
+
+      if (lineMatches.length > 0) {
+        const resultArray: React.ReactNode[] = [];
+        let lastEnd = 0;
+
+        lineMatches.forEach((match, matchIndex) => {
+          // Add text before match
+          if (match.start > lastEnd) {
+            resultArray.push(text.substring(lastEnd, match.start));
           }
-        }
-      }
 
-      result = globalIndex + matchIndexInLine;
+          // Add highlighted match
+          const isCurrentMatch = match.globalIndex === currentMatchIndex;
+          const matchText = text.substring(match.start, match.end);
+
+          resultArray.push(
+            <span
+              key={`match-${lineIndex}-${matchIndex}`}
+              className={`${styles.highlight} ${isCurrentMatch ? styles.currentHighlight : ''}`}
+              id={isCurrentMatch ? 'current-match' : undefined}
+            >
+              {matchText}
+            </span>
+          );
+
+          lastEnd = match.end;
+        });
+
+        // Add remaining text after last match
+        if (lastEnd < text.length) {
+          resultArray.push(text.substring(lastEnd));
+        }
+
+        result = resultArray;
+      }
     }
 
     return result;
-  };
+  }, [searchRegex, searchTerm, searchMatches, currentMatchIndex]);
 
-  const countMatches = (lines: LogLine[], searchTerm: string) => {
-    if (!searchTerm.trim()) return 0;
-    const regex = createSearchRegex(searchTerm);
-    if (!regex) return 0;
-
-    const visibleContent = lines
-      .filter(line => line.isVisible)
-      .map(line => line.content)
-      .join('\n');
-
-    const matches = visibleContent.match(regex);
-    return matches ? matches.length : 0;
-  };
+  // Memoized filtered lines for rendering
+  const visibleLines = useMemo(() => {
+    return processedLines.filter(line => line.isVisible);
+  }, [processedLines]);
 
   const renderLogContent = () => {
     let result: JSX.Element[] | null = null;
 
-    if (processedLines.length) {
-      const renderedLines: JSX.Element[] = [];
+    if (visibleLines.length === 0) {
+      result = null;
+    } else {
+      result = visibleLines.map((logLine) => {
+        const levelClass = logLine.level.toLowerCase();
+        const colorClass = styles[levelClass as keyof typeof styles] || "";
 
-      processedLines.forEach((logLine, index) => {
-        // Only process visible lines
-        if (logLine.isVisible) {
-          // Apply appropriate class based on log level
-          const levelClass = logLine.level.toLowerCase();
-          const colorClass = styles[levelClass as keyof typeof styles] || "";
-
-          renderedLines.push(
-            <div
-              key={logLine.lineNumber}
-              className={`${colorClass} ${styles.logEntry}`}
-            >
-              <span className={styles.lineNumberCol}>
-                {logLine.lineNumber}.
-              </span>
-              <pre>{highlightText(logLine.content, searchTerm, index)}</pre>
-            </div>
-          );
-        }
+        return (
+          <div
+            key={logLine.lineNumber}
+            className={`${colorClass} ${styles.logEntry}`}
+          >
+            <span className={styles.lineNumberCol}>
+              {logLine.lineNumber}.
+            </span>
+            <pre>{highlightText(logLine.content, processedLines.indexOf(logLine))}</pre>
+          </div>
+        );
       });
-
-      result = renderedLines;
     }
 
     return result;
@@ -312,19 +340,19 @@ export default function LogTab({ logs }: { logs: string }) {
     }
   }, [currentMatchIndex]);
 
-  // Update total matches when search term, match options, or processed lines change
+  // Update total matches and current match index
   useEffect(() => {
-    const matches = countMatches(processedLines, searchTerm);
-    setTotalMatches(matches);
+    const matchCount = searchMatches.length;
+    setTotalMatches(matchCount);
 
-    if (matches > 0 && currentMatchIndex === -1) {
+    if (matchCount > 0 && currentMatchIndex === -1) {
       setCurrentMatchIndex(0);
-    } else if (matches === 0) {
+    } else if (matchCount === 0) {
       setCurrentMatchIndex(-1);
-    } else if (currentMatchIndex >= matches) {
-      setCurrentMatchIndex(matches - 1);
+    } else if (currentMatchIndex >= matchCount) {
+      setCurrentMatchIndex(matchCount - 1);
     }
-  }, [searchTerm, processedLines, matchCase, matchWholeWord]);
+  }, [searchMatches, currentMatchIndex]);
 
   // Process log content and apply filters
   useEffect(() => {
@@ -334,6 +362,11 @@ export default function LogTab({ logs }: { logs: string }) {
       setProcessedLines(filtered);
     }
   }, [logContent, filters]);
+
+  // Clear cache when filters change
+  useEffect(() => {
+    setSearchCache(new Map());
+  }, [filters]);
 
   useEffect(() => {
     setLogContent(logs);
