@@ -54,8 +54,8 @@ export default async function MySettings() {
 
   return (
     <main id="content">
-      <BreadCrumb breadCrumbItems={[HOME]}/>
-      <PageTile title={"My Settings"} />
+      <BreadCrumb breadCrumbItems={[HOME]} />
+      <PageTile translationKey="MySettings.title" />
       <AccessTokensSection accessTokensPromise={fetchAccessTokens(userLoginId)} isAddBtnVisible={true}/>
       <TokenResponseModal refreshToken={refreshToken} clientId={clientId} onLoad={deleteCookies} />
       <ExperimentalFeaturesSection />

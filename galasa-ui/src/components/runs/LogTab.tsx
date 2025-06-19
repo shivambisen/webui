@@ -3,14 +3,22 @@
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-'use client';
+"use client";
 
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { Search, OverflowMenu, Button } from '@carbon/react';
 import styles from "@/styles/LogTab.module.css";
-import { Checkbox } from '@carbon/react';
-import { Filter, ChevronUp, ChevronDown, CharacterSentenceCase, TextUnderline, CloudDownload } from '@carbon/icons-react';
-import { handleDownload } from '@/utils/artifacts';
+import { Checkbox } from "@carbon/react";
+import {
+  Filter,
+  ChevronUp,
+  ChevronDown,
+  CharacterSentenceCase,
+  TextUnderline,
+  CloudDownload,
+} from "@carbon/icons-react";
+import { handleDownload } from "@/utils/artifacts";
+import { useTranslations } from "next-intl";
 
 interface LogLine {
   content: string;
@@ -27,13 +35,14 @@ interface MatchInfo {
 }
 
 enum RegexFlags {
-  AllMatches = 'g',
-  AllMatchesIgnoreCase = 'gi',
+  AllMatches = "g",
+  AllMatchesIgnoreCase = "gi",
 }
 
 export default function LogTab({ logs }: { logs: string }) {
+  const translations = useTranslations("LogTab");
 
-  const [logContent, setLogContent] = useState<string>('');
+  const [logContent, setLogContent] = useState<string>("");
   const [processedLines, setProcessedLines] = useState<LogLine[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>('');
@@ -46,7 +55,7 @@ export default function LogTab({ logs }: { logs: string }) {
     WARN: true,
     DEBUG: true,
     INFO: true,
-    TRACE: true
+    TRACE: true,
   });
 
   // Cache for search results to avoid recomputation
@@ -57,7 +66,7 @@ export default function LogTab({ logs }: { logs: string }) {
   const DEBOUNCE_DELAY_MILLISECONDS = 300;
 
   const handleSearchChange = (e: any) => {
-    const value = e.target?.value || '';
+    const value = e.target?.value || "";
     setSearchTerm(value);
 
     // Clear any existing timeout
@@ -128,15 +137,16 @@ export default function LogTab({ logs }: { logs: string }) {
     let logLevel: string | null = null;
 
     // Attempt to parse a timestamp and log level by splitting the line.
-    const tokens = line.trim().split(' ');
-    if (tokens.length >= 3 &&
+    const tokens = line.trim().split(" ");
+    if (
+      tokens.length >= 3 &&
       tokens[0].length === 10 && // Simple check for DD/MM/YYYY format
-      tokens[0].charAt(2) === '/' &&
-      tokens[0].charAt(5) === '/' &&
-      tokens[1].includes(':') &&
-      tokens[1].includes('.')
+      tokens[0].charAt(2) === "/" &&
+      tokens[0].charAt(5) === "/" &&
+      tokens[1].includes(":") &&
+      tokens[1].includes(".")
     ) {
-      if (['ERROR', 'WARN', 'DEBUG', 'INFO', 'TRACE'].includes(tokens[2])) {
+      if (["ERROR", "WARN", "DEBUG", "INFO", "TRACE"].includes(tokens[2])) {
         logLevel = tokens[2];
       }
     }
@@ -144,16 +154,16 @@ export default function LogTab({ logs }: { logs: string }) {
     // Fallback: check if the line starts with any log level
     if (!logLevel) {
       const trimmedLine = line.trim();
-      if (trimmedLine.startsWith('ERROR')) {
-        logLevel = 'ERROR';
-      } else if (trimmedLine.startsWith('WARN')) {
-        logLevel = 'WARN';
-      } else if (trimmedLine.startsWith('DEBUG')) {
-        logLevel = 'DEBUG';
-      } else if (trimmedLine.startsWith('INFO')) {
-        logLevel = 'INFO';
-      } else if (trimmedLine.startsWith('TRACE')) {
-        logLevel = 'TRACE';
+      if (trimmedLine.startsWith("ERROR")) {
+        logLevel = "ERROR";
+      } else if (trimmedLine.startsWith("WARN")) {
+        logLevel = "WARN";
+      } else if (trimmedLine.startsWith("DEBUG")) {
+        logLevel = "DEBUG";
+      } else if (trimmedLine.startsWith("INFO")) {
+        logLevel = "INFO";
+      } else if (trimmedLine.startsWith("TRACE")) {
+        logLevel = "TRACE";
       }
     }
 
@@ -161,9 +171,9 @@ export default function LogTab({ logs }: { logs: string }) {
   };
 
   const processLogLines = (content: string) => {
-    const lines = content.split('\n');
+    const lines = content.split("\n");
     const processed: LogLine[] = [];
-    let currentLevel = 'INFO'; // Default level
+    let currentLevel = "INFO"; // Default level
 
     lines.forEach((line, index) => {
       const detectedLevel = getLogLevel(line);
@@ -178,7 +188,7 @@ export default function LogTab({ logs }: { logs: string }) {
         content: line,
         level: currentLevel,
         lineNumber: index + 1,
-        isVisible: true
+        isVisible: true,
       });
     });
 
@@ -186,23 +196,23 @@ export default function LogTab({ logs }: { logs: string }) {
   };
 
   const applyFilters = (lines: LogLine[]) => {
-
     let filteredLines = [];
-    const hasActiveFilters = Object.values(filters).some(filter => filter === true);
+    const hasActiveFilters = Object.values(filters).some(
+      (filter) => filter === true,
+    );
 
     if (!hasActiveFilters) {
       // If no filters are active, hide all lines
-      filteredLines = lines.map(line => ({ ...line, isVisible: false }));
+      filteredLines = lines.map((line) => ({ ...line, isVisible: false }));
     } else {
       // Only show lines whose level is checked in the filters
-      filteredLines = lines.map(line => ({
+      filteredLines = lines.map((line) => ({
         ...line,
-        isVisible: !!filters[line.level as keyof typeof filters]
+        isVisible: !!filters[line.level as keyof typeof filters],
       }));
     }
 
     return filteredLines;
-
   };
 
   // Search function that computes all matches once and caches results
@@ -343,11 +353,11 @@ export default function LogTab({ logs }: { logs: string }) {
   // Scroll to current match
   useEffect(() => {
     if (currentMatchIndex >= 0) {
-      const currentMatchElement = document.getElementById('current-match');
+      const currentMatchElement = document.getElementById("current-match");
       if (currentMatchElement) {
         currentMatchElement.scrollIntoView({
-          behavior: 'smooth',
-          block: 'center'
+          behavior: "smooth",
+          block: "center",
         });
       }
     }
@@ -395,21 +405,25 @@ export default function LogTab({ logs }: { logs: string }) {
 
   return (
     <div className={styles.tabContent}>
-      <h3>Run Log</h3>
-      <p>A step-by-step log of what happened over time when the Run was preparing a TestClass for execution, what happened when the TestClass was executed, and when the test environment was cleaned up.
-        The RunLog is an Artifact, which can be downloaded and viewed.</p>
+      <h3>{translations("title")}</h3>
+      <p>{translations("description")}</p>
       <div className={styles.logContainer}>
         <div className={styles.searchContainer}>
           <Search
-            placeholder="Find in run log"
+            placeholder={translations("search_placeholder")}
             size="lg"
             value={searchTerm}
             onChange={handleSearchChange}
           />
           {debouncedSearchTerm && (
             <div className={styles.findControls}>
-              <span className={styles.matchCounter}>
-                {totalMatches > 0 ? `${currentMatchIndex + 1} of ${totalMatches}` : 'No matches'}
+              <span className={styles.matchCounter} data-testid="match-counter">
+                {totalMatches > 0
+                  ? translations("match_counter", {
+                    current: currentMatchIndex + 1,
+                    total: totalMatches,
+                  })
+                  : translations("no_matches")}
               </span>
               <Button
                 kind="ghost"
@@ -417,7 +431,7 @@ export default function LogTab({ logs }: { logs: string }) {
                 onClick={goToPreviousMatch}
                 disabled={totalMatches === 0}
                 renderIcon={ChevronUp}
-                iconDescription="Previous match"
+                iconDescription={translations("match_previous")}
                 hasIconOnly
               />
               <Button
@@ -426,7 +440,7 @@ export default function LogTab({ logs }: { logs: string }) {
                 onClick={goToNextMatch}
                 disabled={totalMatches === 0}
                 renderIcon={ChevronDown}
-                iconDescription="Next match"
+                iconDescription={translations("match_next")}
                 hasIconOnly
               />
               <Button
@@ -434,7 +448,7 @@ export default function LogTab({ logs }: { logs: string }) {
                 size="sm"
                 onClick={toggleMatchCase}
                 renderIcon={CharacterSentenceCase}
-                iconDescription="Match case"
+                iconDescription={translations("match_case")}
                 hasIconOnly
               />
               <Button
@@ -442,43 +456,48 @@ export default function LogTab({ logs }: { logs: string }) {
                 size="sm"
                 onClick={toggleMatchWholeWord}
                 renderIcon={TextUnderline}
-                iconDescription="Match whole word"
+                iconDescription={translations("match_whole_word")}
                 hasIconOnly
               />
             </div>
           )}
         </div>
         <div className={styles.filterBtn}>
-          <OverflowMenu size="lg" iconDescription={"Hide / Show Content"} renderIcon={Filter} flipped={true}>
+          <OverflowMenu
+            size="lg"
+            iconDescription={translations("filters_menu_title")}
+            renderIcon={Filter}
+            flipped={true}
+          >
             <Checkbox
               id="checkbox-error"
-              labelText="Error"
+              labelText={translations("filter_error")}
               checked={filters.ERROR}
-              onChange={() => handleFilterChange('ERROR')}
+              onChange={() => handleFilterChange("ERROR")}
             />
             <Checkbox
               id="checkbox-warn"
-              labelText="Warning"
+              labelText={translations("filter_warn")}
               checked={filters.WARN}
-              onChange={() => handleFilterChange('WARN')}
+              onChange={() => handleFilterChange("WARN")}
             />
             <Checkbox
               id="checkbox-info"
-              labelText="Info"
+              labelText={translations("filter_info")}
               checked={filters.INFO}
-              onChange={() => handleFilterChange('INFO')}
+              onChange={() => handleFilterChange("INFO")}
             />
             <Checkbox
               id="checkbox-debug"
-              labelText="Debug"
+              labelText={translations("filter_debug")}
               checked={filters.DEBUG}
-              onChange={() => handleFilterChange('DEBUG')}
+              onChange={() => handleFilterChange("DEBUG")}
             />
             <Checkbox
               id="checkbox-trace"
-              labelText="Trace"
+              labelText={translations("filter_trace")}
               checked={filters.TRACE}
-              onChange={() => handleFilterChange('TRACE')}
+              onChange={() => handleFilterChange("TRACE")}
             />
           </OverflowMenu>
         </div>
@@ -486,7 +505,7 @@ export default function LogTab({ logs }: { logs: string }) {
           kind="ghost"
           renderIcon={CloudDownload}
           hasIconOnly
-          iconDescription="Download Run Log"
+          iconDescription={translations("download_button")}
           onClick={() => handleDownload(logContent, "run.log")}
         />
       </div>
