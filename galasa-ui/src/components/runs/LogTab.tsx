@@ -84,12 +84,16 @@ export default function LogTab({ logs }: { logs: string }) {
 
   const toggleMatchCase = () => {
     setMatchCase(!matchCase);
-    setSearchCache(new Map()); // Clear cache when search options change
+
+    // Clear cache when search options change
+    setSearchCache(new Map()); 
   };
 
   const toggleMatchWholeWord = () => {
     setMatchWholeWord(!matchWholeWord);
-    setSearchCache(new Map()); // Clear cache when search options change
+
+    // Clear cache when search options change
+    setSearchCache(new Map()); 
   };
 
   const goToNextMatch = () => {
@@ -305,7 +309,6 @@ export default function LogTab({ logs }: { logs: string }) {
     return result;
   }, [searchRegex, debouncedSearchTerm, searchMatches, currentMatchIndex]);
 
-  // Memoized filtered lines for rendering
   const visibleLines = useMemo(() => {
     return processedLines.filter(line => line.isVisible);
   }, [processedLines]);

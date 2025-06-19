@@ -333,6 +333,33 @@ Line with $dollar and ^caret`;
       });
     });
 
+    describe('Debounce Functionality', () => {
+      beforeAll(() => {
+        jest.useFakeTimers();
+      });
+
+      afterAll(() => {
+        jest.useRealTimers();
+      });
+
+      it('debounces the search input and updates after delay', async () => {
+        render(<LogTab logs={sampleLogs} />);
+        const searchInput = screen.getByTestId('search-input');
+
+        fireEvent.change(searchInput, { target: { value: 'XYZ' } });
+
+        // Before debounce delay, the match counter should not be updated.
+        expect(screen.queryByText('No matches')).not.toBeInTheDocument();
+
+        // Fast-forward time by debounce delay (300ms).
+        jest.advanceTimersByTime(300);
+
+        // Wait for the UI to update after debounced search.
+        await waitFor(() => {
+          expect(screen.getByText('No matches')).toBeInTheDocument();
+        });
+      });
+    });
   });
 
 });
