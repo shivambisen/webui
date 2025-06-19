@@ -5,8 +5,8 @@
  */
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
-import { Search, OverflowMenu, Button } from "@carbon/react";
+import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
+import { Search, OverflowMenu, Button } from '@carbon/react';
 import styles from "@/styles/LogTab.module.css";
 import { Checkbox } from "@carbon/react";
 import {
@@ -27,6 +27,13 @@ interface LogLine {
   isVisible: boolean;
 }
 
+interface MatchInfo {
+  lineIndex: number;
+  start: number;
+  end: number;
+  globalIndex: number;
+}
+
 enum RegexFlags {
   AllMatches = "g",
   AllMatchesIgnoreCase = "gi",
@@ -37,7 +44,8 @@ export default function LogTab({ logs }: { logs: string }) {
 
   const [logContent, setLogContent] = useState<string>("");
   const [processedLines, setProcessedLines] = useState<LogLine[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>('');
   const [currentMatchIndex, setCurrentMatchIndex] = useState<number>(-1);
   const [totalMatches, setTotalMatches] = useState<number>(0);
   const [matchCase, setMatchCase] = useState<boolean>(false);
@@ -50,15 +58,30 @@ export default function LogTab({ logs }: { logs: string }) {
     TRACE: true,
   });
 
+  // Cache for search results to avoid recomputation
+  const [searchCache, setSearchCache] = useState<Map<string, MatchInfo[]>>(new Map());
+
   const logContainerRef = useRef<HTMLDivElement>(null);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const DEBOUNCE_DELAY_MILLISECONDS = 300;
 
   const handleSearchChange = (e: any) => {
     const value = e.target?.value || "";
     setSearchTerm(value);
-    if (!value.trim()) {
-      setCurrentMatchIndex(-1);
-      setTotalMatches(0);
+
+    // Clear any existing timeout
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
     }
+
+    // Set a new timeout
+    debounceTimeoutRef.current = setTimeout(() => {
+      setDebouncedSearchTerm(value);
+      if (!value.trim()) {
+        setCurrentMatchIndex(-1);
+        setTotalMatches(0);
+      }
+    }, DEBOUNCE_DELAY_MILLISECONDS);
   };
 
   const handleFilterChange = (level: string) => {
@@ -70,10 +93,16 @@ export default function LogTab({ logs }: { logs: string }) {
 
   const toggleMatchCase = () => {
     setMatchCase(!matchCase);
+
+    // Clear cache when search options change
+    setSearchCache(new Map()); 
   };
 
   const toggleMatchWholeWord = () => {
     setMatchWholeWord(!matchWholeWord);
+
+    // Clear cache when search options change
+    setSearchCache(new Map()); 
   };
 
   const goToNextMatch = () => {
@@ -88,26 +117,21 @@ export default function LogTab({ logs }: { logs: string }) {
     }
   };
 
-  const createSearchRegex = (term: string) => {
-    let escapedTerm: string = "";
+  // Memoized regex creation to avoid recreating the same regex repeatedly
+  const searchRegex = useMemo(() => {
+    let regex: RegExp | null = null;
 
-    if (!term.trim()) {
-      escapedTerm = "";
-    } else {
-      escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"); // Prefix any special regex character in `term` with a backslash so the whole string is used literally in a RegExp
+    if (debouncedSearchTerm.trim()) {
+      let escapedTerm = debouncedSearchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       if (matchWholeWord) {
         escapedTerm = `\\b${escapedTerm}\\b`;
       }
-
-      // If matchCase is false, we use the 'gi' flag to ignore case
-      const flags = matchCase
-        ? RegexFlags.AllMatches
-        : RegexFlags.AllMatchesIgnoreCase;
-      return new RegExp(escapedTerm, flags);
+      const flags = matchCase ? RegexFlags.AllMatches : RegexFlags.AllMatchesIgnoreCase;
+      regex = new RegExp(escapedTerm, flags);
     }
 
-    return escapedTerm;
-  };
+    return regex;
+  }, [debouncedSearchTerm, matchCase, matchWholeWord]);
 
   const getLogLevel = (line: string) => {
     let logLevel: string | null = null;
@@ -191,124 +215,136 @@ export default function LogTab({ logs }: { logs: string }) {
     return filteredLines;
   };
 
-  const highlightText = (
-    text: string,
-    searchTerm: string,
-    lineIndex: number,
-  ) => {
-    let result: (string | JSX.Element)[] | string = text;
+  // Search function that computes all matches once and caches results
+  const computeSearchMatches = useCallback((lines: LogLine[], regex: RegExp | null): MatchInfo[] => {
+    let result: MatchInfo[] = [];
 
-    if (searchTerm.trim()) {
-      const regex = createSearchRegex(searchTerm);
+    if (!regex || !debouncedSearchTerm.trim()) {
+      result = [];
+    } else {
+      try {
+        // Create cache key
+        const cacheKey = `${debouncedSearchTerm}-${matchCase}-${matchWholeWord}-${lines.map(l => l.isVisible).join('')}`;
 
-      if (regex) {
-        const parts = text.split(regex);
-        const matches = text.match(regex);
+        // Check cache first
+        if (searchCache.has(cacheKey)) {
+          result = searchCache.get(cacheKey)!;
+        } else {
+          const matches: MatchInfo[] = [];
+          let globalIndex = 0;
 
-        if (matches) {
-          let matchIndexInLine = 0;
-          const highlightedResult = [];
+          lines.forEach((line, lineIndex) => {
+            if (!line.isVisible) return;
 
-          for (let i = 0; i < parts.length; i++) {
-            if (i > 0) {
-              const match = matches[i - 1];
-              const globalMatchIndex = getGlobalMatchIndex(
+            // Reset regex lastIndex to ensure we get all matches
+            regex.lastIndex = 0;
+            let match;
+
+            while ((match = regex.exec(line.content)) !== null) {
+              matches.push({
                 lineIndex,
-                matchIndexInLine,
-              );
-              const isCurrentMatch = globalMatchIndex === currentMatchIndex;
-              matchIndexInLine++;
+                start: match.index,
+                end: match.index + match[0].length,
+                globalIndex: globalIndex++
+              });
 
-              highlightedResult.push(
-                <span
-                  key={`match-${i}`}
-                  className={`${styles.highlight} ${isCurrentMatch ? styles.currentHighlight : ""}`}
-                  id={isCurrentMatch ? "current-match" : undefined}
-                >
-                  {match}
-                </span>,
-              );
+              // Prevent infinite loop on zero-length matches
+              if (match.index === regex.lastIndex) {
+                regex.lastIndex++;
+              }
             }
-            if (parts[i]) {
-              highlightedResult.push(parts[i]);
-            }
-          }
+          });
 
-          result = highlightedResult;
+          // Cache the results
+          setSearchCache(prev => new Map(prev).set(cacheKey, matches));
+          result = matches;
         }
+      } catch (error) {
+
+        console.warn('Regex execution error:', error);
+        result = [];
+
       }
     }
 
     return result;
-  };
+  }, [debouncedSearchTerm, matchCase, matchWholeWord, searchCache]);
 
-  const getGlobalMatchIndex = (lineIndex: number, matchIndexInLine: number) => {
-    let result = -1;
+  const searchMatches = useMemo(() => {
+    return computeSearchMatches(processedLines, searchRegex);
+  }, [processedLines, searchRegex, computeSearchMatches]);
 
-    if (searchTerm.trim()) {
-      const visibleLines = processedLines.filter((line) => line.isVisible);
-      let globalIndex = 0;
+  const highlightText = useCallback((text: string, lineIndex: number): React.ReactNode => {
+    let result: React.ReactNode = text;
 
-      for (let i = 0; i < lineIndex; i++) {
-        if (i < visibleLines.length) {
-          const regex = createSearchRegex(searchTerm);
-          if (regex) {
-            const matches = visibleLines[i].content.match(regex);
-            if (matches) {
-              globalIndex += matches.length;
-            }
+    if (searchRegex && debouncedSearchTerm.trim()) {
+      const lineMatches = searchMatches.filter(match => match.lineIndex === lineIndex);
+
+      if (lineMatches.length > 0) {
+        const resultArray: React.ReactNode[] = [];
+        let lastEnd = 0;
+
+        lineMatches.forEach((match, matchIndex) => {
+          // Add text before match
+          if (match.start > lastEnd) {
+            resultArray.push(text.substring(lastEnd, match.start));
           }
-        }
-      }
 
-      result = globalIndex + matchIndexInLine;
+          // Add highlighted match
+          const isCurrentMatch = match.globalIndex === currentMatchIndex;
+          const matchText = text.substring(match.start, match.end);
+
+          resultArray.push(
+            <span
+              key={`match-${lineIndex}-${matchIndex}`}
+              className={`${styles.highlight} ${isCurrentMatch ? styles.currentHighlight : ''}`}
+              id={isCurrentMatch ? 'current-match' : undefined}
+            >
+              {matchText}
+            </span>
+          );
+
+          lastEnd = match.end;
+        });
+
+        // Add remaining text after last match
+        if (lastEnd < text.length) {
+          resultArray.push(text.substring(lastEnd));
+        }
+
+        result = resultArray;
+      }
     }
 
     return result;
-  };
+  }, [searchRegex, debouncedSearchTerm, searchMatches, currentMatchIndex]);
 
-  const countMatches = (lines: LogLine[], searchTerm: string) => {
-    if (!searchTerm.trim()) return 0;
-    const regex = createSearchRegex(searchTerm);
-    if (!regex) return 0;
-
-    const visibleContent = lines
-      .filter((line) => line.isVisible)
-      .map((line) => line.content)
-      .join("\n");
-
-    const matches = visibleContent.match(regex);
-    return matches ? matches.length : 0;
-  };
+  const visibleLines = useMemo(() => {
+    return processedLines.filter(line => line.isVisible);
+  }, [processedLines]);
 
   const renderLogContent = () => {
     let result: JSX.Element[] | null = null;
 
-    if (processedLines.length) {
-      const renderedLines: JSX.Element[] = [];
+    if (visibleLines.length === 0) {
+      result = null;
+    } else {
+      result = visibleLines.map((logLine) => {
+        const levelClass = logLine.level.toLowerCase();
+        const colorClass = styles[levelClass as keyof typeof styles] || "";
 
-      processedLines.forEach((logLine, index) => {
-        // Only process visible lines
-        if (logLine.isVisible) {
-          // Apply appropriate class based on log level
-          const levelClass = logLine.level.toLowerCase();
-          const colorClass = styles[levelClass as keyof typeof styles] || "";
-
-          renderedLines.push(
-            <div
-              key={logLine.lineNumber}
-              className={`${colorClass} ${styles.logEntry}`}
-            >
-              <span className={styles.lineNumberCol}>
-                {logLine.lineNumber}.
-              </span>
-              <pre>{highlightText(logLine.content, searchTerm, index)}</pre>
-            </div>,
-          );
-        }
+        return (
+          <div
+            key={logLine.lineNumber}
+            className={`${colorClass} ${styles.logEntry}`}
+          >
+            <span className={styles.lineNumberCol}>
+              {logLine.lineNumber}.
+            </span>
+            <pre>{highlightText(logLine.content, processedLines.indexOf(logLine))}</pre>
+          </div>
+        );
       });
-
-      result = renderedLines;
     }
 
     return result;
@@ -327,19 +363,18 @@ export default function LogTab({ logs }: { logs: string }) {
     }
   }, [currentMatchIndex]);
 
-  // Update total matches when search term, match options, or processed lines change
   useEffect(() => {
-    const matches = countMatches(processedLines, searchTerm);
-    setTotalMatches(matches);
+    const matchCount = searchMatches.length;
+    setTotalMatches(matchCount);
 
-    if (matches > 0 && currentMatchIndex === -1) {
+    if (matchCount > 0 && currentMatchIndex === -1) {
       setCurrentMatchIndex(0);
-    } else if (matches === 0) {
+    } else if (matchCount === 0) {
       setCurrentMatchIndex(-1);
-    } else if (currentMatchIndex >= matches) {
-      setCurrentMatchIndex(matches - 1);
+    } else if (currentMatchIndex >= matchCount) {
+      setCurrentMatchIndex(matchCount - 1);
     }
-  }, [searchTerm, processedLines, matchCase, matchWholeWord]);
+  }, [searchMatches, currentMatchIndex, debouncedSearchTerm]);
 
   // Process log content and apply filters
   useEffect(() => {
@@ -350,9 +385,23 @@ export default function LogTab({ logs }: { logs: string }) {
     }
   }, [logContent, filters]);
 
+  // Clear cache when filters change
+  useEffect(() => {
+    setSearchCache(new Map());
+  }, [filters]);
+
   useEffect(() => {
     setLogContent(logs);
   }, [logs]);
+
+  // Cleanup the timeout on component unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className={styles.tabContent}>
@@ -366,7 +415,7 @@ export default function LogTab({ logs }: { logs: string }) {
             value={searchTerm}
             onChange={handleSearchChange}
           />
-          {searchTerm && (
+          {debouncedSearchTerm && (
             <div className={styles.findControls}>
               <span className={styles.matchCounter} data-testid="match-counter">
                 {totalMatches > 0

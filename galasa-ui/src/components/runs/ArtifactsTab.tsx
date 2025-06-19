@@ -77,21 +77,22 @@ export function ArtifactsTab({ artifacts, runId, runName }: { artifacts: Artifac
   }
 
   const handleDownloadClick = () => {
-    if (!artifactDetails.base64Data) return;
+    if (artifactDetails.base64Data) {
+      
+      // (a) Turn Base64 string → binary string
+      const binaryString = atob(artifactDetails.base64Data);
+      // (b) Convert binary string → Uint8Array
+      const len = binaryString.length;
+      const bytes = new Uint8Array(len);
+      for (let i = 0; i < len; i++) {
+        bytes[i] = binaryString.charCodeAt(i);
+      }
+  
+      const cleanFileName = artifactDetails.fileName.startsWith('/') ? artifactDetails.fileName.slice(1) : artifactDetails.fileName; //strip any leading slashes
+  
+      handleDownload(bytes.buffer , cleanFileName);
 
-    // (a) Turn Base64 string → binary string
-    const binaryString = atob(artifactDetails.base64Data);
-    // (b) Convert binary string → Uint8Array
-    const len = binaryString.length;
-    const bytes = new Uint8Array(len);
-    for (let i = 0; i < len; i++) {
-      bytes[i] = binaryString.charCodeAt(i);
     }
-
-    const cleanFileName = artifactDetails.fileName.startsWith('/') ? artifactDetails.fileName.slice(1) : artifactDetails.fileName; //strip any leading slashes
-
-    handleDownload(bytes , cleanFileName);
-    
   };
 
   const downloadArtifact = async (runId: string, artifactUrl: string) => {
