@@ -303,7 +303,7 @@ export default function LogTab({ logs }: { logs: string }) {
     }
 
     return result;
-  }, [searchRegex, debouncedSearchTerm, searchMatches, currentMatchIndex]); // Changed searchTerm to debouncedSearchTerm
+  }, [searchRegex, debouncedSearchTerm, searchMatches, currentMatchIndex]);
 
   // Memoized filtered lines for rendering
   const visibleLines = useMemo(() => {
