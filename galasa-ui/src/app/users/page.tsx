@@ -31,13 +31,11 @@ export default function UsersPage() {
     }
 
     return users;
-
   };
-
   return (
     <main id="content">
-      <BreadCrumb breadCrumbItems={[HOME]}/>
-      <PageTile title={"Users"} />
+      <BreadCrumb breadCrumbItems={[HOME]} />
+      <PageTile translationKey={"UsersPage.title"} />
       <UsersTable usersListPromise={fetchAllUsersFromApiServer()} currentUserPromise={fetchUserFromApiServer("me")} />
     </main>
   );
