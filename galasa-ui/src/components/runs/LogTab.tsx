@@ -36,6 +36,7 @@ export default function LogTab({ logs }: { logs: string }) {
   const [logContent, setLogContent] = useState<string>('');
   const [processedLines, setProcessedLines] = useState<LogLine[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>(''); // New state for debounced term
   const [currentMatchIndex, setCurrentMatchIndex] = useState<number>(-1);
   const [totalMatches, setTotalMatches] = useState<number>(0);
   const [matchCase, setMatchCase] = useState<boolean>(false);
@@ -52,14 +53,25 @@ export default function LogTab({ logs }: { logs: string }) {
   const [searchCache, setSearchCache] = useState<Map<string, MatchInfo[]>>(new Map());
 
   const logContainerRef = useRef<HTMLDivElement>(null);
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Ref to hold the debounce timeout
 
   const handleSearchChange = (e: any) => {
     const value = e.target?.value || '';
-    setSearchTerm(value);
-    if (!value.trim()) {
-      setCurrentMatchIndex(-1);
-      setTotalMatches(0);
+    setSearchTerm(value); // Update searchTerm immediately for input display
+
+    // Clear any existing timeout
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
     }
+
+    // Set a new timeout
+    debounceTimeoutRef.current = setTimeout(() => {
+      setDebouncedSearchTerm(value); // Update debouncedSearchTerm after delay
+      if (!value.trim()) {
+        setCurrentMatchIndex(-1);
+        setTotalMatches(0);
+      }
+    }, 300); // Debounce delay in milliseconds (e.g., 300ms)
   };
 
   const handleFilterChange = (level: string) => {
@@ -95,8 +107,8 @@ export default function LogTab({ logs }: { logs: string }) {
   const searchRegex = useMemo(() => {
     let regex: RegExp | null = null;
 
-    if (searchTerm.trim()) {
-      let escapedTerm = searchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    if (debouncedSearchTerm.trim()) {
+      let escapedTerm = debouncedSearchTerm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       if (matchWholeWord) {
         escapedTerm = `\\b${escapedTerm}\\b`;
       }
@@ -105,7 +117,7 @@ export default function LogTab({ logs }: { logs: string }) {
     }
 
     return regex;
-  }, [searchTerm, matchCase, matchWholeWord]);
+  }, [debouncedSearchTerm, matchCase, matchWholeWord]);
 
   const getLogLevel = (line: string) => {
     let logLevel: string | null = null;
@@ -192,12 +204,13 @@ export default function LogTab({ logs }: { logs: string }) {
   const computeSearchMatches = useCallback((lines: LogLine[], regex: RegExp | null): MatchInfo[] => {
     let result: MatchInfo[] = [];
 
-    if (!regex || !searchTerm.trim()) {
+    // Now uses debouncedSearchTerm for the condition
+    if (!regex || !debouncedSearchTerm.trim()) {
       result = [];
     } else {
       try {
         // Create cache key
-        const cacheKey = `${searchTerm}-${matchCase}-${matchWholeWord}-${lines.map(l => l.isVisible).join('')}`;
+        const cacheKey = `${debouncedSearchTerm}-${matchCase}-${matchWholeWord}-${lines.map(l => l.isVisible).join('')}`;
 
         // Check cache first
         if (searchCache.has(cacheKey)) {
@@ -236,12 +249,12 @@ export default function LogTab({ logs }: { logs: string }) {
         // If regex execution fails, return empty array
         console.warn('Regex execution error:', error);
         result = [];
-        
+
       }
     }
 
     return result;
-  }, [searchTerm, matchCase, matchWholeWord, searchCache]);
+  }, [debouncedSearchTerm, matchCase, matchWholeWord, searchCache]); // Changed searchTerm to debouncedSearchTerm
 
   // Memoized search matches
   const searchMatches = useMemo(() => {
@@ -252,7 +265,8 @@ export default function LogTab({ logs }: { logs: string }) {
   const highlightText = useCallback((text: string, lineIndex: number): React.ReactNode => {
     let result: React.ReactNode = text;
 
-    if (searchRegex && searchTerm.trim()) {
+    // Now depends on debouncedSearchTerm
+    if (searchRegex && debouncedSearchTerm.trim()) {
       // Find matches for this specific line
       const lineMatches = searchMatches.filter(match => match.lineIndex === lineIndex);
 
@@ -293,7 +307,7 @@ export default function LogTab({ logs }: { logs: string }) {
     }
 
     return result;
-  }, [searchRegex, searchTerm, searchMatches, currentMatchIndex]);
+  }, [searchRegex, debouncedSearchTerm, searchMatches, currentMatchIndex]); // Changed searchTerm to debouncedSearchTerm
 
   // Memoized filtered lines for rendering
   const visibleLines = useMemo(() => {
@@ -341,6 +355,7 @@ export default function LogTab({ logs }: { logs: string }) {
   }, [currentMatchIndex]);
 
   // Update total matches and current match index
+  // Now depends on debouncedSearchTerm
   useEffect(() => {
     const matchCount = searchMatches.length;
     setTotalMatches(matchCount);
@@ -352,7 +367,7 @@ export default function LogTab({ logs }: { logs: string }) {
     } else if (currentMatchIndex >= matchCount) {
       setCurrentMatchIndex(matchCount - 1);
     }
-  }, [searchMatches, currentMatchIndex]);
+  }, [searchMatches, currentMatchIndex, debouncedSearchTerm]); // Added debouncedSearchTerm to dependencies
 
   // Process log content and apply filters
   useEffect(() => {
@@ -372,6 +387,15 @@ export default function LogTab({ logs }: { logs: string }) {
     setLogContent(logs);
   }, [logs]);
 
+  // Cleanup the timeout on component unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
+  }, []);
+
   return (
     <div className={styles.tabContent}>
       <h3>Run Log</h3>
@@ -382,10 +406,10 @@ export default function LogTab({ logs }: { logs: string }) {
           <Search
             placeholder="Find in run log"
             size="lg"
-            value={searchTerm}
+            value={searchTerm} // Input value still controlled by immediate searchTerm
             onChange={handleSearchChange}
           />
-          {searchTerm && (
+          {debouncedSearchTerm && ( // Display controls based on debounced term
             <div className={styles.findControls}>
               <span className={styles.matchCounter}>
                 {totalMatches > 0 ? `${currentMatchIndex + 1} of ${totalMatches}` : 'No matches'}
