@@ -36,7 +36,7 @@ export default function LogTab({ logs }: { logs: string }) {
   const [logContent, setLogContent] = useState<string>('');
   const [processedLines, setProcessedLines] = useState<LogLine[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>('');
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>(''); // New state for debounced term
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState<string>('');
   const [currentMatchIndex, setCurrentMatchIndex] = useState<number>(-1);
   const [totalMatches, setTotalMatches] = useState<number>(0);
   const [matchCase, setMatchCase] = useState<boolean>(false);
@@ -53,11 +53,12 @@ export default function LogTab({ logs }: { logs: string }) {
   const [searchCache, setSearchCache] = useState<Map<string, MatchInfo[]>>(new Map());
 
   const logContainerRef = useRef<HTMLDivElement>(null);
-  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null); // Ref to hold the debounce timeout
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const DEBOUNCE_DELAY_MILLISECONDS = 300;
 
   const handleSearchChange = (e: any) => {
     const value = e.target?.value || '';
-    setSearchTerm(value); // Update searchTerm immediately for input display
+    setSearchTerm(value);
 
     // Clear any existing timeout
     if (debounceTimeoutRef.current) {
@@ -66,12 +67,12 @@ export default function LogTab({ logs }: { logs: string }) {
 
     // Set a new timeout
     debounceTimeoutRef.current = setTimeout(() => {
-      setDebouncedSearchTerm(value); // Update debouncedSearchTerm after delay
+      setDebouncedSearchTerm(value);
       if (!value.trim()) {
         setCurrentMatchIndex(-1);
         setTotalMatches(0);
       }
-    }, 300); // Debounce delay in milliseconds (e.g., 300ms)
+    }, DEBOUNCE_DELAY_MILLISECONDS);
   };
 
   const handleFilterChange = (level: string) => {
@@ -200,11 +201,10 @@ export default function LogTab({ logs }: { logs: string }) {
 
   };
 
-  // Optimized search function that computes all matches once and caches results
+  // Search function that computes all matches once and caches results
   const computeSearchMatches = useCallback((lines: LogLine[], regex: RegExp | null): MatchInfo[] => {
     let result: MatchInfo[] = [];
 
-    // Now uses debouncedSearchTerm for the condition
     if (!regex || !debouncedSearchTerm.trim()) {
       result = [];
     } else {
@@ -246,7 +246,7 @@ export default function LogTab({ logs }: { logs: string }) {
           result = matches;
         }
       } catch (error) {
-        // If regex execution fails, return empty array
+
         console.warn('Regex execution error:', error);
         result = [];
 
@@ -254,20 +254,16 @@ export default function LogTab({ logs }: { logs: string }) {
     }
 
     return result;
-  }, [debouncedSearchTerm, matchCase, matchWholeWord, searchCache]); // Changed searchTerm to debouncedSearchTerm
+  }, [debouncedSearchTerm, matchCase, matchWholeWord, searchCache]);
 
-  // Memoized search matches
   const searchMatches = useMemo(() => {
     return computeSearchMatches(processedLines, searchRegex);
   }, [processedLines, searchRegex, computeSearchMatches]);
 
-  // Optimized highlight function
   const highlightText = useCallback((text: string, lineIndex: number): React.ReactNode => {
     let result: React.ReactNode = text;
 
-    // Now depends on debouncedSearchTerm
     if (searchRegex && debouncedSearchTerm.trim()) {
-      // Find matches for this specific line
       const lineMatches = searchMatches.filter(match => match.lineIndex === lineIndex);
 
       if (lineMatches.length > 0) {
@@ -354,8 +350,6 @@ export default function LogTab({ logs }: { logs: string }) {
     }
   }, [currentMatchIndex]);
 
-  // Update total matches and current match index
-  // Now depends on debouncedSearchTerm
   useEffect(() => {
     const matchCount = searchMatches.length;
     setTotalMatches(matchCount);
@@ -367,7 +361,7 @@ export default function LogTab({ logs }: { logs: string }) {
     } else if (currentMatchIndex >= matchCount) {
       setCurrentMatchIndex(matchCount - 1);
     }
-  }, [searchMatches, currentMatchIndex, debouncedSearchTerm]); // Added debouncedSearchTerm to dependencies
+  }, [searchMatches, currentMatchIndex, debouncedSearchTerm]);
 
   // Process log content and apply filters
   useEffect(() => {
@@ -406,10 +400,10 @@ export default function LogTab({ logs }: { logs: string }) {
           <Search
             placeholder="Find in run log"
             size="lg"
-            value={searchTerm} // Input value still controlled by immediate searchTerm
+            value={searchTerm}
             onChange={handleSearchChange}
           />
-          {debouncedSearchTerm && ( // Display controls based on debounced term
+          {debouncedSearchTerm && (
             <div className={styles.findControls}>
               <span className={styles.matchCounter}>
                 {totalMatches > 0 ? `${currentMatchIndex + 1} of ${totalMatches}` : 'No matches'}
