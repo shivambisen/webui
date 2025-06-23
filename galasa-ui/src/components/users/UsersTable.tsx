@@ -19,6 +19,8 @@ import { InlineNotification } from '@carbon/react';
 import { deleteUserFromService } from '@/actions/userServerActions';
 import { DataTableCell, DataTableHeader, DataTableRow } from '@/utils/interfaces';
 import { useTranslations } from 'next-intl';
+import { Theme } from '@carbon/react';
+import { useTheme } from '@carbon/react';
 
 export const dynamic = "force-dynamic";
 
@@ -172,8 +174,10 @@ If the user logs in to the Galasa service after this point, they will be challen
   if (isLoading) {
     return <Loading small={false} active={isLoading}/>;
   }
+  const theme = useTheme();
 
   return (
+    <Theme theme={theme}>
     <div className={styles.userListContainer}>
 
       <DataTable isSortable rows={users} headers={headers}>
@@ -262,5 +266,6 @@ If the user logs in to the Galasa service after this point, they will be challen
       </DataTable>
 
     </div>
+    </Theme>
   );
 }

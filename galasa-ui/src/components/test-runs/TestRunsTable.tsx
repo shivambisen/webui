@@ -32,6 +32,8 @@ import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import ErrorPage from "@/app/error/page";
 import { useTranslations } from "next-intl";
+import { Theme } from "@carbon/react";
+import { useTheme } from "@carbon/react";
 
 interface CustomCellProps {
   header: string;
@@ -195,8 +197,10 @@ export default function TestRunsTable({
   if (!tableRows || tableRows.length === 0) {
     return <p>No test runs found in the last 24 hours.</p>;
   }
+  const theme = useTheme();
 
   return (
+    <Theme theme={theme}>
     <div className={styles.resultsPageContainer}>
       <p className={styles.timeFrameText}>{timeFrameText}</p>
       <div className={styles.testRunsTableContainer}>
@@ -250,5 +254,6 @@ export default function TestRunsTable({
         />
       </div>
     </div>
+    </Theme>
   );
 }
