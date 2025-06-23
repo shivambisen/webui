@@ -42,6 +42,7 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
   const [isLoading, setIsLoading] = useState(false);
   const [isError, setIsError] = useState(false);
   const translations = useTranslations("TestRunDetails");
+  const theme = useTheme();
 
   const extractRunDetails = (runDetails: Run) => {
 
@@ -96,7 +97,6 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
   if (isError) {
     return <ErrorPage />;
   }
-  const theme = useTheme();
   
 
   return (

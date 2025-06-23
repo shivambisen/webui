@@ -20,32 +20,32 @@ const themes = [
 
 export default function ThemeSelector() {
 
-    const { theme, setTheme } = useTheme();
-    const [isPending, startTransition] = useTransition();
-    const selectedItem = themes.find((t) => t.value === theme) || themes[0];
+  const { theme, setTheme } = useTheme();
+  const [isPending, startTransition] = useTransition();
+  const selectedItem = themes.find((t) => t.value === theme) || themes[0];
   
-    const handleThemeChange = ({ selectedItem }: { selectedItem: { id: string; text: string; value: string } }) => {
-      if (!selectedItem) return;
-      startTransition(() => {
-        setTheme(selectedItem.value as ThemeType); 
-      });
-    };
+  const handleThemeChange = ({ selectedItem }: { selectedItem: { id: string; text: string; value: string } }) => {
+    if (!selectedItem) return;
+    startTransition(() => {
+      setTheme(selectedItem.value as ThemeType); 
+    });
+  };
 
 
-    return (
-        <div className={styles.container}>
-          <span className={styles.icon}>Theme :</span>
-          <Dropdown
-            id="theme-selector"
-            items={themes}
-            onChange={handleThemeChange}
-            selectedItem={selectedItem}
-            label="Select theme"
-            itemToString={(item: { id: string; text: string; value: string } | null) => item?.text || ""}
-            size="sm"
-            className={styles.dropdown}
-            disabled={isPending}
-          />
-        </div>
+  return (
+    <div className={styles.container}>
+      <span className={styles.icon}>Theme :</span>
+      <Dropdown
+        id="theme-selector"
+        items={themes}
+        onChange={handleThemeChange}
+        selectedItem={selectedItem}
+        label="Select theme"
+        itemToString={(item: { id: string; text: string; value: string } | null) => item?.text || ""}
+        size="sm"
+        className={styles.dropdown}
+        disabled={isPending}
+      />
+    </div>
   );
 }

@@ -26,8 +26,8 @@ export default async function RootLayout({children,}: {children: React.ReactNode
   const featureFlagsCookie = cookies().get(FeatureFlagCookies.FEATURE_FLAGS)?.value;
   const themeCookie = cookies().get('theme')?.value;
   const initialTheme = ['white','g10','g90','g100'].includes(themeCookie || '') 
-                       ? themeCookie! 
-                       : 'white';
+    ? themeCookie! 
+    : 'white';
 
   return (
     <html lang={locale}>

@@ -7,6 +7,7 @@
 import { act, render, screen, waitFor } from '@testing-library/react';
 import MyProfilePage from '../app/myprofile/page';
 import { RBACRole, UsersAPIApi } from '@/generated/galasaapi';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 const mockUsersApi = UsersAPIApi as jest.Mock;
 
@@ -36,7 +37,10 @@ describe('MyProfilePage', () => {
 
   test('renders loading spinner initially', async () => {
     // When...
-    render(<MyProfilePage />);
+    render(
+      <ThemeProvider >
+        <MyProfilePage />
+      </ThemeProvider>);
 
     // Assert that the loading spinner is shown initially
     const loader = screen.getByTestId('loader');

@@ -23,20 +23,20 @@ function TokenCard({token, selectTokenForDeletion} : {token : AuthToken, selectT
 
   return (
     <Theme theme={theme}>
-    <SelectableTile onClick={() => selectTokenForDeletion(token.tokenId)} value={true} key={token.tokenId} className={styles.cardContainer}>
-      <h5>{token.description}</h5>
+      <SelectableTile onClick={() => selectTokenForDeletion(token.tokenId)} value={true} key={token.tokenId} className={styles.cardContainer}>
+        <h5>{token.description}</h5>
 
-      <div className={styles.infoContainer}>
-        <h6>
-          {translations("createdAt")} {trimmedTime[0]}
-        </h6>
-        <h6>
-          {translations("owner")} {token.owner?.loginId}
-        </h6>
-      </div>
+        <div className={styles.infoContainer}>
+          <h6>
+            {translations("createdAt")} {trimmedTime[0]}
+          </h6>
+          <h6>
+            {translations("owner")} {token.owner?.loginId}
+          </h6>
+        </div>
 
-      <Password className={styles.icon} size={40} />
-    </SelectableTile>
+        <Password className={styles.icon} size={40} />
+      </SelectableTile>
     </Theme>
   );
 }

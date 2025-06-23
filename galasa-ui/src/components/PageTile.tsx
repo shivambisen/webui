@@ -22,7 +22,7 @@ export default function PageTile({
 
   return(
     <Theme theme={theme}>
-    <Tile id="tile">{translations(translationKey)}</Tile>
+      <Tile id="tile">{translations(translationKey)}</Tile>
     </Theme>
-  )
+  );
 }

@@ -35,18 +35,18 @@ export function CreateTokenTable({headers, rows}:
   const row = rows.map(row => rowData(row));
   const theme = useTheme();
   return (
-  <Theme theme={theme}>
-    <Table size="lg" useZebraStyles={false}>
-      <TableHead>
-        <TableRow key='header'>
-          {header}
-        </TableRow>
-      </TableHead>
-      <TableBody>
-        {row}
-      </TableBody>
-    </Table>
-  </Theme>
+    <Theme theme={theme}>
+      <Table size="lg" useZebraStyles={false}>
+        <TableHead>
+          <TableRow key='header'>
+            {header}
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {row}
+        </TableBody>
+      </Table>
+    </Theme>
   );
 };
 
