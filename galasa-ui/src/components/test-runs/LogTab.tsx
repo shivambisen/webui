@@ -170,7 +170,7 @@ export default function LogTab({ logs }: { logs: string }) {
     return logLevel;
   };
 
-  const processLogLines = (content: string) => {
+  const processLogLines = useCallback((content: string) => {
     const lines = content.split("\n");
     const processed: LogLine[] = [];
     let currentLevel = "INFO"; // Default level
@@ -193,9 +193,9 @@ export default function LogTab({ logs }: { logs: string }) {
     });
 
     return processed;
-  };
+  },[]);
 
-  const applyFilters = (lines: LogLine[]) => {
+  const applyFilters = useCallback((lines: LogLine[]) => {
     let filteredLines = [];
     const hasActiveFilters = Object.values(filters).some(
       (filter) => filter === true,
@@ -213,7 +213,7 @@ export default function LogTab({ logs }: { logs: string }) {
     }
 
     return filteredLines;
-  };
+  },[filters]);
 
   // Search function that computes all matches once and caches results
   const computeSearchMatches = useCallback((lines: LogLine[], regex: RegExp | null): MatchInfo[] => {
@@ -383,7 +383,7 @@ export default function LogTab({ logs }: { logs: string }) {
       const filtered = applyFilters(processed);
       setProcessedLines(filtered);
     }
-  }, [logContent, filters]);
+  }, [logContent, filters, processLogLines, applyFilters]);
 
   // Clear cache when filters change
   useEffect(() => {

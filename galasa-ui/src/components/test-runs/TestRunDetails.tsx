@@ -7,7 +7,7 @@
 import BreadCrumb from '@/components/common/BreadCrumb';
 import PageTile from '@/components/PageTile';
 import { Tab, Tabs, TabList, TabPanels, TabPanel, Loading } from '@carbon/react';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import styles from "@/styles/TestRun.module.css";
 import { Dashboard, Code, CloudLogging, RepoArtifact } from '@carbon/icons-react';
 import OverviewTab from './OverviewTab';
@@ -41,7 +41,7 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
   const [isError, setIsError] = useState(false);
   const translations = useTranslations("TestRunDetails");
 
-  const extractRunDetails = (runDetails: Run) => {
+  const extractRunDetails = useCallback((runDetails: Run) => {
 
     setMethods(runDetails.testStructure?.methods || []);
 
@@ -65,7 +65,7 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
     };
 
     setRun(runMetadata);
-  };
+  },[runId]);
 
   useEffect(() => {
     const loadRunDetails = async () => {
@@ -89,7 +89,7 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
     };
 
     loadRunDetails();
-  }, [runDetailsPromise, runArtifactsPromise, runLogPromise]);
+  }, [runDetailsPromise, runArtifactsPromise, runLogPromise, extractRunDetails]);
 
   if (isError) {
     return <ErrorPage />;

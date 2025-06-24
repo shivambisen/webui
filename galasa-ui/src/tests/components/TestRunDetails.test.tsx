@@ -7,8 +7,8 @@ import React from 'react';
 import { render, screen, act } from '@testing-library/react';
 import TestRunDetails from '@/components/test-runs/TestRunDetails';
 
-// Deferred helper (unchanged)
-function deferred<T>() {
+
+function setup<T>() {
   let resolve!: (value: T) => void;
   let reject!: (reason?: any) => void;
   const promise = new Promise<T>((res, rej) => {
@@ -23,13 +23,6 @@ jest.mock('next-intl', () => ({
   useTranslations: () => (key: string, opts?: any) =>
     opts?.runName ? `title:${opts.runName}` : key,
 }));
-
-// Mocking timeOperations
-jest.mock('@/utils/timeOperations', () => ({
-  parseIsoDateTime: (i: string) => `parsed(${i})`,
-  getIsoTimeDifference: (_: string, _2: string) => '1h',
-}));
-
 
 jest.mock('@/components/common/BreadCrumb', () => {
   const BreadCrumb = () => <nav>Breadcrumb</nav>;
@@ -135,6 +128,8 @@ jest.mock('@carbon/react', () => {
 
   [Tab, Tabs, TabList, TabPanels, TabPanel, Loading].forEach(c => {
     // @ts-ignore
+    // Assigning displayName to function components for better debugging in React DevTools.
+    // TypeScript does not allow this by default, so we suppress the error.
     c.displayName = c.name || 'Anonymous';
   });
 
@@ -145,9 +140,9 @@ describe('TestRunDetails', () => {
   const runId = 'run-123';
 
   it('shows the skeleton while loading', async () => {
-    const runDetailsDeferred = deferred<any>();
-    const runArtifactsDeferred = deferred<any[]>();
-    const runLogDeferred = deferred<string>();
+    const runDetailsDeferred = setup<any>();
+    const runArtifactsDeferred = setup<any[]>();
+    const runLogDeferred = setup<string>();
 
     render(
       <TestRunDetails
@@ -184,9 +179,9 @@ describe('TestRunDetails', () => {
   });
 
   it('renders all tabs with correct props after successful load', async () => {
-    const runDetailsDeferred = deferred<any>();
-    const runArtifactsDeferred = deferred<any[]>();
-    const runLogDeferred = deferred<string>();
+    const runDetailsDeferred = setup<any>();
+    const runArtifactsDeferred = setup<any[]>();
+    const runLogDeferred = setup<string>();
 
     render(
       <TestRunDetails
@@ -234,9 +229,9 @@ describe('TestRunDetails', () => {
   });
 
   it('renders the error page if any promise rejects', async () => {
-    const runDetailsDeferred = deferred<any>();
-    const runArtifactsDeferred = deferred<any[]>();
-    const runLogDeferred = deferred<string>();
+    const runDetailsDeferred = setup<any>();
+    const runArtifactsDeferred = setup<any[]>();
+    const runLogDeferred = setup<string>();
 
     render(
       <TestRunDetails

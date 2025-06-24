@@ -73,13 +73,6 @@ jest.mock('@/components/users/UsersTable', () => {
   };
 });
 
-jest.mock('@/utils/constants/breadcrumb', () => ({
-  HOME: { label: 'Home', href: '/' },
-}));
-
-jest.mock('@/utils/constants/common', () => ({
-  CLIENT_API_VERSION: '0.43.0',
-}));
 
 describe('UsersPage', () => {
   const mockApiConfig = { baseURL: 'http://localhost:3000' };
