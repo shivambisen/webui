@@ -146,6 +146,7 @@ export function ArtifactsTab({ artifacts, runId, runName }: { artifacts: Artifac
         try {
           data = JSON.parse(artifactFile);
         } catch (err) {
+          setError("Error parsing JSON content");
           console.error("Error parsing file: ", err);
         }
       }
@@ -320,7 +321,7 @@ export function ArtifactsTab({ artifacts, runId, runName }: { artifacts: Artifac
           {error && (
             <InlineNotification
               title={translations("error_title")}
-              subtitle={translations.rich("error_subtitle", { runName })}
+              subtitle={translations("error_subtitle", { runName })}
             />
           )}
 
@@ -339,6 +340,7 @@ export function ArtifactsTab({ artifacts, runId, runName }: { artifacts: Artifac
                       <button
                         type="button"
                         onClick={handleDownloadClick}
+                        role='download-button'
                         className={styles.downloadButton}
                       >
                         <CloudDownload size={22} color="#0043ce" />
