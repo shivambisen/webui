@@ -74,7 +74,10 @@ describe('MyProfilePage', () => {
 
     // When...
     await act(async () => {
-      return render(<MyProfilePage />);
+      return render(
+        <ThemeProvider>
+          <MyProfilePage />
+        </ThemeProvider>);
     });
 
     // Wait for the data to be fetched and the loading spinner to disappear
@@ -94,7 +97,11 @@ describe('MyProfilePage', () => {
 
     // When...
     await act(async () => {
-      return render(<MyProfilePage />);
+      return render(
+        <ThemeProvider>
+          <MyProfilePage />
+        </ThemeProvider>
+      );
     });
 
     // Wait for the fetch operation to complete

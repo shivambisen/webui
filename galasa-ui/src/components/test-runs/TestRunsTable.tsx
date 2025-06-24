@@ -169,12 +169,14 @@ export default function TestRunsTable({
     return (
       <div>
         <p className={styles.timeFrameText}>Loading test results...</p>
-        <DataTableSkeleton
-          data-testid="loading-table-skeleton"
-          columnCount={headers.length}
-          rowCount={pageSize}
-        />
-        ;
+        <Theme theme={theme}>
+          <DataTableSkeleton
+            data-testid="loading-table-skeleton"
+            columnCount={headers.length}
+            rowCount={pageSize}
+          />
+        </Theme>
+        
       </div>
     );
   }
