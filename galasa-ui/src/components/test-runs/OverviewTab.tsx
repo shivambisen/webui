@@ -12,10 +12,17 @@ import { RunMetadata } from "@/utils/interfaces";
 import { useTranslations } from "next-intl";
 import { Link } from "@carbon/react";
 import { Launch } from "@carbon/icons-react";
+import { getOneMonthAgo, getTwoDaysAgo } from "@/utils/timeOperations";
 
 const OverviewTab = ({ metadata }: { metadata: RunMetadata }) => {
   const tags = metadata?.tags || [];
   const translations = useTranslations("OverviewTab");
+  
+  const TWO_DAYS_GO = getTwoDaysAgo();
+  const MONTH_AGO = getOneMonthAgo();
+  const COMMON_LINK_URL = `/test-runs?runName=${metadata?.testName}&bundle=${metadata?.bundle}&group=${metadata?.group}&package=${metadata?.package}`;
+  const SAME_TEST_RUN_LINK = `${COMMON_LINK_URL}&from=${MONTH_AGO}`;
+  const OTHER_ATTEMPTS_AT_TEST = COMMON_LINK_URL + `&submissionId=${metadata?.submissionId}&from=${TWO_DAYS_GO}`;
 
   return (
     <>
@@ -70,10 +77,10 @@ const OverviewTab = ({ metadata }: { metadata: RunMetadata }) => {
         </div>
 
         <div className={styles.redirectLinks}>
-          <Link href="#" renderIcon={Launch}>
+          <Link href={SAME_TEST_RUN_LINK} renderIcon={Launch}>
             View other runs of this test...
           </Link>
-          <Link href="#" renderIcon={Launch}>
+          <Link href={OTHER_ATTEMPTS_AT_TEST} renderIcon={Launch}>
             View other attempts at running this test run...
           </Link>
         </div>
