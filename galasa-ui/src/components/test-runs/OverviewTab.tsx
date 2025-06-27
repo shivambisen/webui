@@ -10,6 +10,8 @@ import InlineText from "./InlineText";
 import { Tag } from "@carbon/react";
 import { RunMetadata } from "@/utils/interfaces";
 import { useTranslations } from "next-intl";
+import { Link } from "@carbon/react";
+import { Launch } from "@carbon/icons-react";
 
 const OverviewTab = ({ metadata }: { metadata: RunMetadata }) => {
   const tags = metadata?.tags || [];
@@ -65,6 +67,15 @@ const OverviewTab = ({ metadata }: { metadata: RunMetadata }) => {
           ) : (
             <p>{translations("noTags")}</p>
           )}
+        </div>
+
+        <div className={styles.redirectLinks}>
+          <Link href="#" renderIcon={Launch}>
+            View other runs of this test...
+          </Link>
+          <Link href="#" renderIcon={Launch}>
+            View other attempts at running this test run...
+          </Link>
         </div>
       </div>
     </>

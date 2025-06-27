@@ -65,8 +65,6 @@ const fetchAllTestRunsByPaging  = async ({fromDate, toDate}: {fromDate: Date, to
         undefined, // runname
         undefined, // group
         undefined, // submissionId
-        undefined, // detail
-        undefined, // tags
         'true',    // includeCursor
         currentCursor
       );
