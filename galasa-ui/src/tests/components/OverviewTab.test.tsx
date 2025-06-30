@@ -6,13 +6,20 @@
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import OverviewTab from '@/components/test-runs/OverviewTab'; // adjust the path as needed
+import OverviewTab from '@/components/test-runs/OverviewTab';
 import { RunMetadata } from '@/utils/interfaces';
 
 // Mock the Carbon Tag component to simplify assertions
 jest.mock('@carbon/react', () => ({
   Tag: ({ children }: { children: React.ReactNode }) => (
     <span data-testid="mock-tag">{children}</span>
+  ),
+  Link: ({ children, href, renderIcon }: { 
+    children: React.ReactNode; 
+    href: string; 
+    renderIcon?: React.ComponentType 
+  }) => (
+    <a href={href} data-testid="mock-link">{children}</a>
   ),
 }));
 
@@ -43,6 +50,7 @@ const completeMetadata: RunMetadata = {
   group: 'GroupA',
   status: "finished",
   result: "Passed",
+  package: "com.example.tests",
   submissionId: 'SUB123',
   requestor: 'alice@example.com',
   submitted: '2025-06-10T09:00:00Z',
