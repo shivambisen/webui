@@ -20,7 +20,7 @@ const OverviewTab = ({ metadata }: { metadata: RunMetadata }) => {
   
   const TWO_DAYS_GO = getTwoDaysAgo();
   const MONTH_AGO = getOneMonthAgo();
-  const COMMON_LINK_URL = `/test-runs?runName=${metadata?.testName}&bundle=${metadata?.bundle}&group=${metadata?.group}&package=${metadata?.package}`;
+  const COMMON_LINK_URL = `/test-runs?runName=${metadata?.runName}&bundle=${metadata?.bundle}&group=${metadata?.group}&package=${metadata?.package}`;
   const SAME_TEST_RUN_LINK = `${COMMON_LINK_URL}&from=${MONTH_AGO}`;
   const OTHER_ATTEMPTS_AT_TEST = COMMON_LINK_URL + `&submissionId=${metadata?.submissionId}&from=${TWO_DAYS_GO}`;
 
