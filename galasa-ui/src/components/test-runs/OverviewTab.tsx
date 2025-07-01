@@ -21,7 +21,8 @@ const OverviewTab = ({ metadata }: { metadata: RunMetadata }) => {
   
   const MONTH_AGO = getOneMonthAgo();
 
-  const OTHER_RECENT_RUNS = `/test-runs?testName=${metadata?.testName}&bundle=${metadata?.bundle}&group=${metadata?.group}&package=${metadata?.package}&from=${MONTH_AGO}`;
+  const fullTestName = metadata?.package + "." + metadata?.testName;
+  const OTHER_RECENT_RUNS = `/test-runs?testName=${fullTestName}&bundle=${metadata?.bundle}&package=${metadata?.package}&from=${MONTH_AGO}`;
   const RETRIES_FOR_THIS_TEST_RUN = `/test-runs?submissionId=${metadata?.submissionId}&from=${weekBefore}`;
 
   useEffect(() => {
@@ -37,7 +38,7 @@ const OverviewTab = ({ metadata }: { metadata: RunMetadata }) => {
 
     validateTime();
 
-  },[]);
+  },[metadata?.rawSubmittedAt]);
 
   return (
     <>

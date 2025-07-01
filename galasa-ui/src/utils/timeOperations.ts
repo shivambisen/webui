@@ -204,11 +204,11 @@ export function getAWeekBeforeSubmittedTime(submittedAt: string): string | null 
  * 
  * @returns A Date object representing one month ago at midnight.
  */
-export function getOneMonthAgo(): Date {
+export function getOneMonthAgo(): string {
   const date = new Date();
   date.setMonth(date.getMonth() - 1);
   date.setHours(0, 0, 0, 0); // Reset time to midnight
-  return date;
+  return date.toISOString();
 }
 
 /**
