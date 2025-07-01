@@ -8,7 +8,6 @@
 
 import React, { useState, useTransition } from "react";
 import { Dropdown } from "@carbon/react";
-import { Language } from "@carbon/icons-react";
 import { setUserLocale } from "@/utils/locale";
 import styles from "@/styles/Selector.module.css";
 import { useLocale, useTranslations } from "next-intl";

@@ -11,7 +11,6 @@ import styles from "@/styles/Selector.module.css";
 import { ThemeType, useTheme } from "@/contexts/ThemeContext";
 import { Tooltip } from '@carbon/react';
 import { Sun, Moon, Laptop } from '@carbon/icons-react';
-import clsx from 'clsx';
 
 type FullThemeType = ThemeType | 'system';
 
@@ -42,20 +41,22 @@ export default function ThemeSelector() {
 
   return (
     <div className={styles.themeSwitcher}>
-      {themeOptions.map((option) => (
-        <Tooltip key={option.id} label={option.label} align="bottom">
-          <button
-            onClick={() => handleThemeChange(option.id)}
-            className={clsx(styles.iconButton, {
-              [styles.active]: currentTheme === option.id,
-            })}
-            disabled={isPending}
-            aria-label={option.label}
-          >
-            {option.icon}
-          </button>
-        </Tooltip>
-      ))}
+      {themeOptions.map((option) => {
+        const isActive = currentTheme === option.id;
+        const buttonClass = `${styles.iconButton} ${isActive ? styles.active : ''}`;
+        return (
+          <Tooltip key={option.id} label={option.label} align="bottom">
+            <button
+              onClick={() => handleThemeChange(option.id)}
+              className={buttonClass}
+              disabled={isPending}
+              aria-label={option.label}
+            >
+              {option.icon}
+            </button>
+          </Tooltip>
+        );
+      })}
     </div>
   );
 }
