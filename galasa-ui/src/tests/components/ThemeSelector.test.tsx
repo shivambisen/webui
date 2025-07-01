@@ -14,21 +14,21 @@ const renderWithTheme = (ui: React.ReactNode) => {
 };
 
 describe('ThemeSelector', () => {
-    beforeAll(() => {
-        Object.defineProperty(window, 'matchMedia', {
-          writable: true,
-          value: (query: string) => ({
-            matches: query.includes('dark'), // simulate system preference
-            media: query,
-            onchange: null,
-            addListener: jest.fn(), // for older APIs
-            removeListener: jest.fn(),
-            addEventListener: jest.fn(), // for modern APIs
-            removeEventListener: jest.fn(),
-            dispatchEvent: jest.fn(),
-          }),
-        });
-      });
+  beforeAll(() => {
+    Object.defineProperty(window, 'matchMedia', {
+      writable: true,
+      value: (query: string) => ({
+        matches: query.includes('dark'), // simulate system preference
+        media: query,
+        onchange: null,
+        addListener: jest.fn(), // for older APIs
+        removeListener: jest.fn(),
+        addEventListener: jest.fn(), // for modern APIs
+        removeEventListener: jest.fn(),
+        dispatchEvent: jest.fn(),
+      }),
+    });
+  });
       
   it('renders all theme buttons with correct labels', () => {
     renderWithTheme(<ThemeSelector />);
