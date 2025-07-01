@@ -1,10 +1,9 @@
-"use client";
 /*
  * Copyright contributors to the Galasa project
  *
  * SPDX-License-Identifier: EPL-2.0
  */
-
+"use client";
 import React, { useEffect, useState } from "react";
 import styles from "@/styles/OverviewTab.module.css";
 import InlineText from "./InlineText";
@@ -18,7 +17,7 @@ import { getOneMonthAgo, getAWeekBeforeSubmittedTime } from "@/utils/timeOperati
 const OverviewTab = ({ metadata }: { metadata: RunMetadata }) => {
   const tags = metadata?.tags || [];
   const translations = useTranslations("OverviewTab");
-  const [weekBefore, setWeekBefore] = useState("");
+  const [weekBefore, setWeekBefore] = useState<string | null>(null);
   
   const MONTH_AGO = getOneMonthAgo();
 
@@ -30,9 +29,7 @@ const OverviewTab = ({ metadata }: { metadata: RunMetadata }) => {
     const validateTime = () => {
 
       const validatedTime = getAWeekBeforeSubmittedTime(metadata?.rawSubmittedAt!);
-      if (validatedTime === "Invalid date") {
-        setWeekBefore("Invalid date");
-      } else {
+      if (validatedTime !== null) {
         setWeekBefore(validatedTime);
       }
       
@@ -101,7 +98,7 @@ const OverviewTab = ({ metadata }: { metadata: RunMetadata }) => {
 
           {/* Only show the link if date is valid */}
           {
-            weekBefore !== "Invalid date" && (
+            weekBefore !== null && (
               <Link href={RETRIES_FOR_THIS_TEST_RUN} renderIcon={Launch}>
                 {translations("runRetriesLink")}
               </Link>

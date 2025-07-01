@@ -178,13 +178,13 @@ export function getYesterday(): Date {
  * 
  * @returns A Date object representing two days ago at midnight.
  */
-export function getAWeekBeforeSubmittedTime(submittedAt: string): string {
+export function getAWeekBeforeSubmittedTime(submittedAt: string): string | null {
 
-  let result: string;
+  let result: string | null;
   const submittedDate = new Date(submittedAt);
 
   if(isNaN(submittedDate.getTime())) {
-    result = "Invalid date";
+    result = null;
   } else {
 
     const yesterday = new Date();

@@ -175,7 +175,7 @@ describe('OverviewTab - Time and Link Logic', () => {
     const mockMonthAgoDate = new Date('2025-05-10T00:00:00Z');
     
     mockGetOneMonthAgo.mockReturnValue(mockMonthAgoDate);
-    mockGetAWeekBeforeSubmittedTime.mockReturnValue('Invalid date');
+    mockGetAWeekBeforeSubmittedTime.mockReturnValue(null);
 
     render(<OverviewTab metadata={completeMetadata} />);
 
@@ -247,7 +247,7 @@ describe('OverviewTab - Time and Link Logic', () => {
 
   it('updates weekBefore state correctly when time is invalid', async () => {
     mockGetOneMonthAgo.mockReturnValue(new Date('2025-05-10T00:00:00Z'));
-    mockGetAWeekBeforeSubmittedTime.mockReturnValue('Invalid date');
+    mockGetAWeekBeforeSubmittedTime.mockReturnValue(null);
 
     render(<OverviewTab metadata={completeMetadata} />);
 
