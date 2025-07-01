@@ -24,7 +24,7 @@ function BreadCrumb({
   breadCrumbItems: BreadCrumbProps[];
 }) {
   const translations = useTranslations("Breadcrumb");
-  const theme = useTheme().theme == "white"? "g10":"g90";
+  const theme = useTheme().theme == "light"? "g10":"g90";
 
   return (
     <Theme theme={theme}>
