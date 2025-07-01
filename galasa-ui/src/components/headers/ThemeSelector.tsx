@@ -7,47 +7,55 @@
 'use client';
 
 import React, { useTransition } from "react";
-import { Dropdown } from "@carbon/react";
 import styles from "@/styles/Selector.module.css"; 
-import { useTheme } from "@/contexts/ThemeContext";
-import { useTranslations } from "next-intl";
+import { ThemeType, useTheme } from "@/contexts/ThemeContext";
+import { Tooltip } from '@carbon/react';
+import { Sun, Moon, Laptop } from '@carbon/icons-react';
+import clsx from 'clsx';
 
-type ThemeType = "white" | "g100"; 
+type FullThemeType = ThemeType | 'system';
 
-const themes = [
-  { id: "white", text: "White", value: "white" },
-  { id: "g100", text: "Dark", value: "g100" },
+const themeOptions: { id: FullThemeType; label: string; icon: React.ReactNode }[] = [
+  { id: 'light', label: 'Light', icon: <Sun size={20} /> },
+  { id: 'dark', label: 'Dark', icon: <Moon size={20} /> },
+  { id: 'system', label: 'System', icon: <Laptop size={20} /> },
 ];
 
 export default function ThemeSelector() {
-
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, source, setSource } = useTheme();
   const [isPending, startTransition] = useTransition();
-  const selectedItem = themes.find((t) => t.value === theme) || themes[0];
-  const translations = useTranslations('ThemeSelector');
-  
-  const handleThemeChange = ({ selectedItem }: { selectedItem: { id: string; text: string; value: string } }) => {
-    if (!selectedItem) return;
+  const currentTheme = source === 'system' ? 'system' : theme;
+  const handleThemeChange = (id: FullThemeType) => {
     startTransition(() => {
-      setTheme(selectedItem.value as ThemeType); 
+      if (id === 'system') {
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        localStorage.removeItem('preferred-theme');
+        setSource('system');
+        setTheme(prefersDark ? 'dark' : 'light');
+      } else {
+        localStorage.setItem('preferred-theme', id);
+        setSource('manual');
+        setTheme(id as ThemeType);
+      }
     });
   };
 
-
   return (
-    <div className={styles.container}>
-      <span className={styles.icon}>{translations('label')} :</span>
-      <Dropdown
-        id="theme-selector"
-        items={themes}
-        onChange={handleThemeChange}
-        selectedItem={selectedItem}
-        label="Select theme"
-        itemToString={(item: { id: string; text: string; value: string } | null) => item?.text || ""}
-        size="sm"
-        className={styles.dropdown}
-        disabled={isPending}
-      />
+    <div className={styles.themeSwitcher}>
+      {themeOptions.map((option) => (
+        <Tooltip key={option.id} label={option.label} align="bottom">
+          <button
+            onClick={() => handleThemeChange(option.id)}
+            className={clsx(styles.iconButton, {
+              [styles.active]: currentTheme === option.id,
+            })}
+            disabled={isPending}
+            aria-label={option.label}
+          >
+            {option.icon}
+          </button>
+        </Tooltip>
+      ))}
     </div>
   );
 }

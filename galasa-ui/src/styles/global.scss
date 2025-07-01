@@ -14,11 +14,11 @@
    :root {
      @include themes.theme($g100); /*Use dark theme for dark system preference*/}}
  
- [data-carbon-theme='white'] {
+ [data-carbon-theme='light'] {
    @include themes.theme($white);
  }
  
- [data-carbon-theme='g100'] {
+ [data-carbon-theme='dark'] {
    @include themes.theme($g100);
  }
  

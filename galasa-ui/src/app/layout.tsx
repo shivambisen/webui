@@ -23,11 +23,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   const galasaServiceName = process.env.GALASA_SERVICE_NAME?.trim() || "Galasa Service";
   const featureFlagsCookie = cookies().get(FeatureFlagCookies.FEATURE_FLAGS)?.value;
-  const themeCookie = cookies().get('preferred-theme')?.value;
-  const initialTheme: ThemeType = themeCookie === 'g100' ? 'g100' : 'white'; // safe fallback
 
   return (
-    <html lang={locale} data-carbon-theme={initialTheme}>
+    <html lang={locale}>
       <head>
         <title>{galasaServiceName}</title>
         <meta name="description" content="Galasa Ecosystem Web UI" />
@@ -35,7 +33,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <NextIntlClientProvider>
           <FeatureFlagProvider initialFlags={featureFlagsCookie}>
-            <ThemeProvider initialTheme={initialTheme}>
+            <ThemeProvider>
               <PageHeader galasaServiceName={galasaServiceName} />
               {children}
               <Footer serviceHealthyPromise={getServiceHealthStatus()}clientVersionPromise={getClientApiVersion()}/>

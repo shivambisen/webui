@@ -19,3 +19,38 @@
   color: white;
   width: 120px;
 }
+
+.themeSwitcher {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  width: fit-content;
+}
+
+.iconButton {
+  background: none;
+  border: none;
+  padding: 0.5rem;
+  cursor: pointer;
+  color: var(--cds-icon-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.iconButton:hover {
+  background-color: var(--cds-layer-hover);
+}
+
+.iconButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.active {
+  background-color: var(--cds-layer-selected);
+  color: var(--cds-icon-on-color);
+}

@@ -6,7 +6,6 @@ exports[`Layout renders the web UI layout 1`] = `
   "baseElement": <body>
     <div>
       <html
-        data-carbon-theme="white"
         lang="en"
       >
         <head>
@@ -169,7 +168,6 @@ exports[`Layout renders the web UI layout 1`] = `
   </body>,
   "container": <div>
     <html
-      data-carbon-theme="white"
       lang="en"
     >
       <head>

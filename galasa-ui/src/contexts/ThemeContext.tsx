@@ -8,50 +8,51 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-type ThemeType = 'white' | 'g100';
+export type ThemeType = 'light' | 'dark';
+export type ThemeSource = 'manual' | 'system';
 
 interface ThemeContextType {
   theme: ThemeType;
   setTheme: (theme: ThemeType) => void;
+  source: ThemeSource;
+  setSource: (source: ThemeSource) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: 'white',
+  theme: 'light',
   setTheme: () => {},
+  source: 'manual',
+  setSource: () => {},
 });
 
-export const ThemeProvider = ({
-  children,
-  initialTheme = 'white',
-}: {
-  children: React.ReactNode;
-  initialTheme?: ThemeType;
-}) => {
-  const [theme, setThemeState] = useState<ThemeType>(initialTheme);
+export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
+  const [theme, setThemeState] = useState<ThemeType>('light');
+  const [source, setSource] = useState<ThemeSource>('manual');
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const setTheme = (newTheme: ThemeType) => {
     setThemeState(newTheme);
-    if (typeof window !== 'undefined') {
-      document.documentElement.setAttribute('data-carbon-theme', newTheme);
-      localStorage.setItem('preferred-theme', newTheme);
-      document.cookie = `preferred-theme=${newTheme}; path=/; max-age=${60 * 60 * 24 * 365}`;
-    }
+    document.documentElement.setAttribute('data-carbon-theme', newTheme);
+    localStorage.setItem('preferred-theme', newTheme);
   };
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const storedTheme = localStorage.getItem('preferred-theme') as ThemeType;
-      if (storedTheme === 'white' || storedTheme === 'g100') {
-        setTheme(storedTheme);
-      } else {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        setTheme(prefersDark ? 'g100' : 'white');
-      }
+    const stored = localStorage.getItem('preferred-theme');
+    if (stored === 'light' || stored === 'dark') {
+      setTheme(stored);
+      setSource('manual');
+    } else {
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      setTheme(prefersDark ? 'dark' : 'light');
+      setSource('system');
     }
+    setIsLoaded(true);
   }, []);
 
+  if (!isLoaded) return null; // Prevent flash by not rendering anything until theme is loaded
+
   return (
-    <ThemeContext.Provider value={{ theme, setTheme }}>
+    <ThemeContext.Provider value={{ theme, setTheme, source, setSource }}>
       {children}
     </ThemeContext.Provider>
   );

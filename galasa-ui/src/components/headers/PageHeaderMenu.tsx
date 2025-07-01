@@ -41,13 +41,13 @@ function PageHeaderMenu({ galasaServiceName }: { galasaServiceName: string }) {
     if (!isInternationalizationEnabled) {
       setUserLocale("en");
     }
-    setTheme(isFeatureEnabled(FEATURE_FLAGS.THEME) ? theme : 'white'); 
+    setTheme(isFeatureEnabled(FEATURE_FLAGS.THEME) ? theme : 'light'); 
   }, [isInternationalizationEnabled,isThemeEnabled]);
 
   return (
     <HeaderGlobalBar data-testid="header-menu">
-      {isThemeEnabled && <ThemeSelector />}
       {isInternationalizationEnabled && (<LanguageSelector/>)}
+      {isThemeEnabled && <ThemeSelector />}
       <HeaderName prefix="">{galasaServiceName}</HeaderName>
       <OverflowMenu
         data-floating-menu-container
