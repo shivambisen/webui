@@ -36,11 +36,11 @@ const OverviewTab = ({ metadata }: { metadata: RunMetadata }) => {
         setWeekBefore(validatedTime);
       }
       
-    }
+    };
 
     validateTime();
 
-  },[])
+  },[]);
 
   return (
     <>
