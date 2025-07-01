@@ -8,6 +8,7 @@ import React from 'react';
 import { render, screen } from '@testing-library/react';
 import OverviewTab from '@/components/test-runs/OverviewTab';
 import { RunMetadata } from '@/utils/interfaces';
+import { getOneMonthAgo, getAWeekBeforeSubmittedTime } from '@/utils/timeOperations';
 
 // Mock the Carbon Tag component to simplify assertions
 jest.mock('@carbon/react', () => ({
@@ -21,6 +22,11 @@ jest.mock('@carbon/react', () => ({
   }) => (
     <a href={href} data-testid="mock-link">{children}</a>
   ),
+}));
+
+jest.mock('@/utils/timeOperations', () => ({
+  getOneMonthAgo: jest.fn(),
+  getAWeekBeforeSubmittedTime: jest.fn(),
 }));
 
 jest.mock("next-intl", () => ({
@@ -59,6 +65,9 @@ const completeMetadata: RunMetadata = {
   duration: '10m',
   tags: ['smoke', 'regression'],
 };
+
+const mockGetOneMonthAgo = getOneMonthAgo as jest.MockedFunction<typeof getOneMonthAgo>;
+const mockGetAWeekBeforeSubmittedTime = getAWeekBeforeSubmittedTime as jest.MockedFunction<typeof getAWeekBeforeSubmittedTime>;
 
 describe('OverviewTab', () => {
   it('renders all top-level InlineText entries', () => {
@@ -110,5 +119,146 @@ describe('OverviewTab', () => {
     expect(
       screen.getByText('No tags were associated with this test run.')
     ).toBeInTheDocument();
+  });
+});
+
+describe('OverviewTab - Time and Link Logic', () => {
+  beforeEach(() => {
+    mockGetOneMonthAgo.mockReset();
+    mockGetAWeekBeforeSubmittedTime.mockReset();
+  });
+
+  it('renders recent runs link with correct href', async () => {
+    const mockMonthAgoDate = new Date('2025-05-10T00:00:00Z');
+    mockGetOneMonthAgo.mockReturnValue(mockMonthAgoDate);
+    mockGetAWeekBeforeSubmittedTime.mockReturnValue('2025-06-03T09:00:00Z');
+
+    render(<OverviewTab metadata={completeMetadata} />);
+
+    await screen.findAllByTestId('mock-link');
+
+    const links = screen.getAllByTestId('mock-link');
+    const recentRunsLink = links.find(link => 
+      link.getAttribute('href')?.includes('testName=')
+    );
+    
+    const expectedHref = `/test-runs?testName=${completeMetadata.testName}&bundle=${completeMetadata.bundle}&group=${completeMetadata.group}&package=${completeMetadata.package}&from=${mockMonthAgoDate.toString()}`;
+    
+    expect(recentRunsLink).toHaveAttribute('href', expectedHref);
+  });
+
+  it('renders both links when weekBefore is valid', async () => {
+    const mockMonthAgoDate = new Date('2025-05-10T00:00:00Z');
+    const mockWeekBefore = '2025-06-03T09:00:00Z';
+    
+    mockGetOneMonthAgo.mockReturnValue(mockMonthAgoDate);
+    mockGetAWeekBeforeSubmittedTime.mockReturnValue(mockWeekBefore);
+
+    render(<OverviewTab metadata={completeMetadata} />);
+
+    await screen.findAllByTestId('mock-link');
+
+    const links = screen.getAllByTestId('mock-link');
+    expect(links).toHaveLength(2);
+
+    // Check the retries link href
+    const retriesLink = links.find(link => 
+      link.getAttribute('href')?.includes('submissionId')
+    );
+    expect(retriesLink).toHaveAttribute(
+      'href', 
+      `/test-runs?submissionId=${completeMetadata.submissionId}&from=${mockWeekBefore}`
+    );
+  });
+
+  it('renders only recent runs link when weekBefore is invalid', async () => {
+    const mockMonthAgoDate = new Date('2025-05-10T00:00:00Z');
+    
+    mockGetOneMonthAgo.mockReturnValue(mockMonthAgoDate);
+    mockGetAWeekBeforeSubmittedTime.mockReturnValue('Invalid date');
+
+    render(<OverviewTab metadata={completeMetadata} />);
+
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    const links = screen.getAllByTestId('mock-link');
+    expect(links).toHaveLength(1);
+
+    expect(links[0]).toHaveAttribute('href', expect.stringContaining('testName='));
+    expect(links[0]).not.toHaveAttribute('href', expect.stringContaining('submissionId='));
+  });
+
+  it('calls getAWeekBeforeSubmittedTime with correct parameter', () => {
+    const metadataWithRawSubmittedAt: RunMetadata = {
+      ...completeMetadata,
+      rawSubmittedAt: '2025-06-10T09:00:00Z'
+    };
+
+    mockGetOneMonthAgo.mockReturnValue(new Date('2025-05-10T00:00:00Z'));
+    mockGetAWeekBeforeSubmittedTime.mockReturnValue('2025-06-03T09:00:00Z');
+
+    render(<OverviewTab metadata={metadataWithRawSubmittedAt} />);
+
+    expect(mockGetAWeekBeforeSubmittedTime).toHaveBeenCalledWith('2025-06-10T09:00:00Z');
+    expect(mockGetAWeekBeforeSubmittedTime).toHaveBeenCalledTimes(1);
+  });
+
+  it('calls getOneMonthAgo during component initialization', () => {
+    mockGetOneMonthAgo.mockReturnValue(new Date('2025-05-10T00:00:00Z'));
+    mockGetAWeekBeforeSubmittedTime.mockReturnValue('2025-06-03T09:00:00Z');
+
+    render(<OverviewTab metadata={completeMetadata} />);
+
+    expect(mockGetOneMonthAgo).toHaveBeenCalled();
+    expect(mockGetOneMonthAgo).toHaveBeenCalledWith();
+  });
+
+  it('handles missing rawSubmittedAt gracefully', () => {
+    const metadataWithoutRawSubmittedAt: RunMetadata = {
+      ...completeMetadata,
+      rawSubmittedAt: undefined
+    };
+
+    mockGetOneMonthAgo.mockReturnValue(new Date('2025-05-10T00:00:00Z'));
+    mockGetAWeekBeforeSubmittedTime.mockReturnValue('Invalid date');
+
+    render(<OverviewTab metadata={metadataWithoutRawSubmittedAt} />);
+
+    expect(mockGetAWeekBeforeSubmittedTime).toHaveBeenCalledWith(undefined);
+  });
+
+  it('updates weekBefore state correctly when time is valid', async () => {
+    const mockWeekBefore = '2025-06-03T09:00:00Z';
+    
+    mockGetOneMonthAgo.mockReturnValue(new Date('2025-05-10T00:00:00Z'));
+    mockGetAWeekBeforeSubmittedTime.mockReturnValue(mockWeekBefore);
+
+    render(<OverviewTab metadata={completeMetadata} />);
+
+    await screen.findAllByTestId('mock-link');
+
+    const links = screen.getAllByTestId('mock-link');
+    const retriesLink = links.find(link => 
+      link.getAttribute('href')?.includes('submissionId')
+    );
+    
+    expect(retriesLink).toBeDefined();
+  });
+
+  it('updates weekBefore state correctly when time is invalid', async () => {
+    mockGetOneMonthAgo.mockReturnValue(new Date('2025-05-10T00:00:00Z'));
+    mockGetAWeekBeforeSubmittedTime.mockReturnValue('Invalid date');
+
+    render(<OverviewTab metadata={completeMetadata} />);
+
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    const links = screen.getAllByTestId('mock-link');
+    expect(links).toHaveLength(1);
+    
+    const retriesLink = links.find(link => 
+      link.getAttribute('href')?.includes('submissionId')
+    );
+    expect(retriesLink).toBeUndefined();
   });
 });

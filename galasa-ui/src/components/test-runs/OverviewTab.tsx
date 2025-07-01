@@ -1,10 +1,11 @@
+"use client";
 /*
  * Copyright contributors to the Galasa project
  *
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import styles from "@/styles/OverviewTab.module.css";
 import InlineText from "./InlineText";
 import { Tag } from "@carbon/react";
@@ -12,17 +13,34 @@ import { RunMetadata } from "@/utils/interfaces";
 import { useTranslations } from "next-intl";
 import { Link } from "@carbon/react";
 import { Launch } from "@carbon/icons-react";
-import { getOneMonthAgo, getTwoDaysAgo } from "@/utils/timeOperations";
+import { getOneMonthAgo, getAWeekBeforeSubmittedTime } from "@/utils/timeOperations";
 
 const OverviewTab = ({ metadata }: { metadata: RunMetadata }) => {
   const tags = metadata?.tags || [];
   const translations = useTranslations("OverviewTab");
+  const [weekBefore, setWeekBefore] = useState("");
   
-  const TWO_DAYS_GO = getTwoDaysAgo();
   const MONTH_AGO = getOneMonthAgo();
-  const COMMON_LINK_URL = `/test-runs?runName=${metadata?.runName}&bundle=${metadata?.bundle}&group=${metadata?.group}&package=${metadata?.package}`;
-  const SAME_TEST_RUN_LINK = `${COMMON_LINK_URL}&from=${MONTH_AGO}`;
-  const OTHER_ATTEMPTS_AT_TEST = COMMON_LINK_URL + `&submissionId=${metadata?.submissionId}&from=${TWO_DAYS_GO}`;
+
+  const OTHER_RECENT_RUNS = `/test-runs?testName=${metadata?.testName}&bundle=${metadata?.bundle}&group=${metadata?.group}&package=${metadata?.package}&from=${MONTH_AGO}`;
+  const RETRIES_FOR_THIS_TEST_RUN = `/test-runs?submissionId=${metadata?.submissionId}&from=${weekBefore}`;
+
+  useEffect(() => {
+
+    const validateTime = () => {
+
+      const validatedTime = getAWeekBeforeSubmittedTime(metadata?.rawSubmittedAt!);
+      if (validatedTime === "Invalid date") {
+        setWeekBefore("Invalid date");
+      } else {
+        setWeekBefore(validatedTime);
+      }
+      
+    }
+
+    validateTime();
+
+  },[])
 
   return (
     <>
@@ -77,12 +95,18 @@ const OverviewTab = ({ metadata }: { metadata: RunMetadata }) => {
         </div>
 
         <div className={styles.redirectLinks}>
-          <Link href={SAME_TEST_RUN_LINK} renderIcon={Launch}>
-            View other runs of this test...
+          <Link href={OTHER_RECENT_RUNS} renderIcon={Launch}>
+            {translations("recentRunsLink")}
           </Link>
-          <Link href={OTHER_ATTEMPTS_AT_TEST} renderIcon={Launch}>
-            View other attempts at running this test run...
-          </Link>
+
+          {/* Only show the link if date is valid */}
+          {
+            weekBefore !== "Invalid date" && (
+              <Link href={RETRIES_FOR_THIS_TEST_RUN} renderIcon={Launch}>
+                {translations("runRetriesLink")}
+              </Link>
+            )
+          }
         </div>
       </div>
     </>

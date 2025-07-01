@@ -178,13 +178,25 @@ export function getYesterday(): Date {
  * 
  * @returns A Date object representing two days ago at midnight.
  */
-export function getTwoDaysAgo(): Date {
-  const yesterday = new Date();
-  yesterday.setDate(yesterday.getDate() - 2); 
+export function getAWeekBeforeSubmittedTime(submittedAt: string): string {
 
-  // Reset time to midnight
-  yesterday.setHours(0, 0, 0, 0); 
-  return yesterday;
+  let result: string;
+  const submittedDate = new Date(submittedAt);
+
+  if(isNaN(submittedDate.getTime())) {
+    result = "Invalid date";
+  } else {
+
+    const yesterday = new Date();
+    yesterday.setDate(yesterday.getDate() - 7); 
+
+    // Reset time to midnight
+    yesterday.setHours(0, 0, 0, 0); 
+    result = yesterday.toISOString();
+  
+  }
+
+  return result;
 };
 
 /**
