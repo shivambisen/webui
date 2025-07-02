@@ -187,12 +187,12 @@ export function getAWeekBeforeSubmittedTime(submittedAt: string): string | null 
     result = null;
   } else {
 
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 7); 
+    const weekBefore = new Date();
+    weekBefore.setDate(weekBefore.getDate() - 7); 
 
     // Reset time to midnight
-    yesterday.setHours(0, 0, 0, 0); 
-    result = yesterday.toISOString();
+    weekBefore.setHours(0, 0, 0, 0); 
+    result = weekBefore.toISOString();
   
   }
 
