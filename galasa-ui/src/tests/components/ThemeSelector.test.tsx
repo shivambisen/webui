@@ -29,31 +29,56 @@ describe('ThemeSelector', () => {
       }),
     });
   });
-      
-  it('renders all theme buttons with correct labels', () => {
-    renderWithTheme(<ThemeSelector />);
 
-    expect(screen.getByLabelText(/Light/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/Dark/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/System/i)).toBeInTheDocument();
+  beforeEach(() => {
+    localStorage.clear();
+    document.documentElement.removeAttribute('data-carbon-theme');
   });
 
-  it('sets theme to dark on clicking Dark button', () => {
+  it('starts in system mode (aria-label "System", effective theme dark)', () => {
     renderWithTheme(<ThemeSelector />);
-    const darkBtn = screen.getByLabelText(/Dark/i);
-    fireEvent.click(darkBtn);
-
-    expect(document.documentElement.getAttribute('data-carbon-theme')).toBe('dark');
-    expect(localStorage.getItem('preferred-theme')).toBe('dark');
+    const btn = screen.getByRole('button');
+    // Mode is "System"
+    expect(btn).toHaveAttribute('aria-label', 'System');
+    // Effective applied theme is dark
+    expect(document.documentElement).toHaveAttribute('data-carbon-theme', 'dark');
   });
 
-  it('sets theme to light on clicking Light button', () => {
+  it('cycles to Light on first click', () => {
     renderWithTheme(<ThemeSelector />);
-    const lightBtn = screen.getByLabelText(/Light/i);
-    fireEvent.click(lightBtn);
+    const btn = screen.getByRole('button');
 
-    expect(document.documentElement.getAttribute('data-carbon-theme')).toBe('light');
+    fireEvent.click(btn);
+
+    expect(btn).toHaveAttribute('aria-label', 'Light');
     expect(localStorage.getItem('preferred-theme')).toBe('light');
+    expect(document.documentElement).toHaveAttribute('data-carbon-theme', 'light');
   });
 
+  it('cycles to Dark on second click', () => {
+    renderWithTheme(<ThemeSelector />);
+    const btn = screen.getByRole('button');
+
+    // 1st click → Light
+    fireEvent.click(btn);
+    // 2nd click → Dark
+    fireEvent.click(btn);
+
+    expect(btn).toHaveAttribute('aria-label', 'Dark');
+    expect(localStorage.getItem('preferred-theme')).toBe('dark');
+    expect(document.documentElement).toHaveAttribute('data-carbon-theme', 'dark');
+  });
+
+  it('cycles back to System on third click', () => {
+    renderWithTheme(<ThemeSelector />);
+    const btn = screen.getByRole('button');
+
+    fireEvent.click(btn);
+    fireEvent.click(btn);
+    fireEvent.click(btn);
+
+    expect(btn).toHaveAttribute('aria-label', 'System');
+    expect(localStorage.getItem('preferred-theme')).toBeNull();
+    expect(document.documentElement).toHaveAttribute('data-carbon-theme', 'dark'); // OS still dark
+  });
 });

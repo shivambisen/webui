@@ -8,43 +8,40 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-export type ThemeType = 'light' | 'dark';
-export type ThemeSource = 'manual' | 'system';
+export type ThemeType = 'light' | 'dark' | 'system';
 
 interface ThemeContextType {
   theme: ThemeType;
   setTheme: (theme: ThemeType) => void;
-  source: ThemeSource;
-  setSource: (source: ThemeSource) => void;
 }
 
 const ThemeContext = createContext<ThemeContextType>({
-  theme: 'light',
+  theme: 'system',
   setTheme: () => {},
-  source: 'manual',
-  setSource: () => {},
 });
 
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
-  const [theme, setThemeState] = useState<ThemeType>('light');
-  const [source, setSource] = useState<ThemeSource>('manual');
+  const [theme, setThemeState] = useState<ThemeType>('system');
   const [isLoaded, setIsLoaded] = useState(false);
 
+  const apply = (t: ThemeType) => {
+    const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const effective = t === 'system' ? (isDark ? 'dark' : 'light') : t;
+    document.documentElement.setAttribute('data-carbon-theme', effective);
+  };
   const setTheme = (newTheme: ThemeType) => {
     setThemeState(newTheme);
-    document.documentElement.setAttribute('data-carbon-theme', newTheme);
-    localStorage.setItem('preferred-theme', newTheme);
+    if (newTheme === 'system') localStorage.removeItem('preferred-theme');
+    else localStorage.setItem('preferred-theme', newTheme);
+    apply(newTheme);
   };
 
   useEffect(() => {
-    const stored = localStorage.getItem('preferred-theme');
-    if (stored === 'light' || stored === 'dark') {
+    const stored = localStorage.getItem('preferred-theme') as ThemeType | null;
+    if (stored === 'light' || stored === 'dark'){
       setTheme(stored);
-      setSource('manual');
-    } else {
-      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setTheme(prefersDark ? 'dark' : 'light');
-      setSource('system');
+    }else{
+      setTheme('system');
     }
     setIsLoaded(true);
   }, []);
@@ -52,7 +49,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   if (!isLoaded) return null; // Prevent flash by not rendering anything until theme is loaded
 
   return (
-    <ThemeContext.Provider value={{ theme, setTheme, source, setSource }}>
+    <ThemeContext.Provider value={{ theme, setTheme }}>
       {children}
     </ThemeContext.Provider>
   );

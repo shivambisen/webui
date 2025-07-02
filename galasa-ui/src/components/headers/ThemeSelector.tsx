@@ -9,7 +9,6 @@
 import React, { useTransition } from "react";
 import styles from "@/styles/Selector.module.css"; 
 import { ThemeType, useTheme } from "@/contexts/ThemeContext";
-import { Tooltip } from '@carbon/react';
 import { Sun, Moon, Laptop } from '@carbon/icons-react';
 
 type FullThemeType = ThemeType | 'system';
@@ -21,42 +20,32 @@ const themeOptions: { id: FullThemeType; label: string; icon: React.ReactNode }[
 ];
 
 export default function ThemeSelector() {
-  const { theme, setTheme, source, setSource } = useTheme();
+  const { theme, setTheme } = useTheme();
   const [isPending, startTransition] = useTransition();
-  const currentTheme = source === 'system' ? 'system' : theme;
-  const handleThemeChange = (id: FullThemeType) => {
+  const idx = themeOptions.findIndex((o) => o.id === theme);
+  const currentTheme = themeOptions[idx] || themeOptions[0];
+  const next = themeOptions[(idx + 1) % themeOptions.length];
+
+  const cycleTheme = () => {
     startTransition(() => {
-      if (id === 'system') {
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        localStorage.removeItem('preferred-theme');
-        setSource('system');
-        setTheme(prefersDark ? 'dark' : 'light');
+      if (next.id === 'system') {
+        setTheme('system');
       } else {
-        localStorage.setItem('preferred-theme', id);
-        setSource('manual');
-        setTheme(id as ThemeType);
+        setTheme(next.id as ThemeType);
       }
     });
   };
 
   return (
     <div className={styles.themeSwitcher}>
-      {themeOptions.map((option) => {
-        const isActive = currentTheme === option.id;
-        const buttonClass = `${styles.iconButton} ${isActive ? styles.active : ''}`;
-        return (
-          <Tooltip key={option.id} label={option.label} align="bottom">
-            <button
-              onClick={() => handleThemeChange(option.id)}
-              className={buttonClass}
-              disabled={isPending}
-              aria-label={option.label}
-            >
-              {option.icon}
-            </button>
-          </Tooltip>
-        );
-      })}
+      <button
+        onClick={cycleTheme}
+        className={styles.iconButton + (currentTheme.id === theme ? ` ${styles.active}` : '')}
+        disabled={isPending}
+        aria-label={currentTheme.label}
+      >
+        {currentTheme.icon}
+      </button>
     </div>
   );
 }
