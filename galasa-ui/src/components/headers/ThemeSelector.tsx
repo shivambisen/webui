@@ -10,13 +10,12 @@ import React, { useTransition } from "react";
 import styles from "@/styles/Selector.module.css"; 
 import { ThemeType, useTheme } from "@/contexts/ThemeContext";
 import { Sun, Moon, Laptop } from '@carbon/icons-react';
+import { Tooltip } from '@carbon/react';
 
-type FullThemeType = ThemeType | 'system';
-
-const themeOptions: { id: FullThemeType; label: string; icon: React.ReactNode }[] = [
-  { id: 'light', label: 'Light', icon: <Sun size={20} /> },
-  { id: 'dark', label: 'Dark', icon: <Moon size={20} /> },
-  { id: 'system', label: 'System', icon: <Laptop size={20} /> },
+const themeOptions: { id: ThemeType; label: string; icon: React.ReactNode; tooltip: string }[] = [
+  { id: 'light', label: 'Light', icon: <Sun size={20} />, tooltip: 'Switch to light mode' },
+  { id: 'dark', label: 'Dark', icon: <Moon size={20} />, tooltip: 'Switch to dark mode' },
+  { id: 'system', label: 'System', icon: <Laptop size={20} />, tooltip: 'Switch to system preference' },
 ];
 
 export default function ThemeSelector() {
@@ -28,24 +27,22 @@ export default function ThemeSelector() {
 
   const cycleTheme = () => {
     startTransition(() => {
-      if (next.id === 'system') {
-        setTheme('system');
-      } else {
-        setTheme(next.id as ThemeType);
-      }
+      setTheme(next.id as ThemeType);
     });
   };
 
   return (
     <div className={styles.themeSwitcher}>
-      <button
-        onClick={cycleTheme}
-        className={styles.iconButton + (currentTheme.id === theme ? ` ${styles.active}` : '')}
-        disabled={isPending}
-        aria-label={currentTheme.label}
-      >
-        {currentTheme.icon}
-      </button>
+      <Tooltip label={next.tooltip} align="bottom">
+        <button
+          onClick={cycleTheme}
+          className={styles.iconButton + (currentTheme.id === theme ? ` ${styles.active}` : '')}
+          disabled={isPending}
+          aria-label={currentTheme.label}
+        >
+          {currentTheme.icon}
+        </button>
+      </Tooltip>
     </div>
-  );
+  );  
 }

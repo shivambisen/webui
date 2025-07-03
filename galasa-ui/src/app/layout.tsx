@@ -16,7 +16,6 @@ import { getLocale } from 'next-intl/server';
 import { ThemeProvider } from '@/contexts/ThemeContext';
 
 export const dynamic = "force-dynamic";
-type ThemeType = "white" | "g100"; 
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();

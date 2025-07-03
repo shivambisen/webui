@@ -25,14 +25,17 @@ function BreadCrumb({
 }) {
   const translations = useTranslations("Breadcrumb");
   const current = useTheme().theme;
-  const theme: 'g10' | 'g90' = 
-    current === 'light'
-      ? 'g10'
-      : current === 'dark'
-        ? 'g90'
-        : window.matchMedia('(prefers-color-scheme: dark)').matches
-          ? 'g90'
-          : 'g10';
+  let theme: 'g10' | 'g90';
+
+  if (current === 'light') {
+    theme = 'g10';
+  } else if (current === 'dark') {
+    theme = 'g90';
+  } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    theme = 'g90';
+  } else {
+    theme = 'g10';
+  }
 
   return (
     <Theme theme={theme}>

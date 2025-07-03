@@ -23,17 +23,16 @@ const ThemeContext = createContext<ThemeContextType>({
 export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [theme, setThemeState] = useState<ThemeType>('system');
   const [isLoaded, setIsLoaded] = useState(false);
-
-  const apply = (t: ThemeType) => {
+  const applyThemeToDocument = (theme: ThemeType) => {
     const isDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const effective = t === 'system' ? (isDark ? 'dark' : 'light') : t;
-    document.documentElement.setAttribute('data-carbon-theme', effective);
+    const effectiveTheme = theme === 'system' ? (isDark ? 'dark' : 'light') : theme;
+    document.documentElement.setAttribute('data-carbon-theme', effectiveTheme);
   };
   const setTheme = (newTheme: ThemeType) => {
     setThemeState(newTheme);
     if (newTheme === 'system') localStorage.removeItem('preferred-theme');
     else localStorage.setItem('preferred-theme', newTheme);
-    apply(newTheme);
+    applyThemeToDocument(newTheme);
   };
 
   useEffect(() => {
