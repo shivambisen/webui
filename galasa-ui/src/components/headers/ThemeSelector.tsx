@@ -11,6 +11,7 @@ import styles from "@/styles/Selector.module.css";
 import { ThemeType, useTheme } from "@/contexts/ThemeContext";
 import { Sun, Moon, Laptop } from '@carbon/icons-react';
 import { Tooltip } from '@carbon/react';
+import { Theme } from "@carbon/react";
 
 const themeOptions: { id: ThemeType; label: string; icon: React.ReactNode; tooltip: string }[] = [
   { id: 'light', label: 'Light', icon: <Sun size={20} />, tooltip: 'Switch to light mode' },
@@ -30,19 +31,33 @@ export default function ThemeSelector() {
       setTheme(next.id as ThemeType);
     });
   };
+    let current: 'g10' | 'g90';
+  
+    if (theme === 'light') {
+      current = 'g10';
+    } else if (theme === 'dark') {
+      current = 'g90';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+      current = 'g90';
+    } else {
+      current = 'g10';
+    }
+
 
   return (
     <div className={styles.themeSwitcher}>
-      <Tooltip label={next.tooltip} align="bottom">
-        <button
-          onClick={cycleTheme}
-          className={styles.iconButton + (currentTheme.id === theme ? ` ${styles.active}` : '')}
-          disabled={isPending}
-          aria-label={currentTheme.label}
-        >
-          {currentTheme.icon}
-        </button>
-      </Tooltip>
+      <Theme theme={current} className={styles.themeContainer}>
+        <Tooltip label={next.tooltip} align="bottom">
+          <button
+            onClick={cycleTheme}
+            className={styles.iconButton + (currentTheme.id === theme ? ` ${styles.active}` : '')}
+            disabled={isPending}
+            aria-label={currentTheme.label}
+          >
+            {currentTheme.icon}
+          </button>
+        </Tooltip>
+      </Theme>
     </div>
   );  
 }
