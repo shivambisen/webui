@@ -31,17 +31,17 @@ export default function ThemeSelector() {
       setTheme(next.id as ThemeType);
     });
   };
-    let current: 'g10' | 'g90';
+  let current: 'g10' | 'g90';
   
-    if (theme === 'light') {
-      current = 'g10';
-    } else if (theme === 'dark') {
-      current = 'g90';
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      current = 'g90';
-    } else {
-      current = 'g10';
-    }
+  if (theme === 'light') {
+    current = 'g10';
+  } else if (theme === 'dark') {
+    current = 'g90';
+  } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    current = 'g90';
+  } else {
+    current = 'g10';
+  }
 
 
   return (
