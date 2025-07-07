@@ -134,13 +134,14 @@
     overflow-y: auto;
     border: 1px solid var(--cds-border-subtle, #e0e0e0);
     background-color: var(--cds-background, #ffffff);
+    color: var(--cds-text-primary, #161616);
 }
 
 .tagOption {
     padding: 0.5rem 1rem;
     cursor: pointer;
     &:hover {
-        background-color: var(--cds-interactive-hover, #f4f4f4);
+        background-color: rgba(136, 136, 136, 0.2);
     }
 }
 
