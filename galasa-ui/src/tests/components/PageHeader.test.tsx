@@ -38,6 +38,22 @@ jest.mock('next-intl', () => ({
     return translations[key] || `Translated ${key}`;
   }
 }));
+// Mock matchMedia
+beforeAll(() => {
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: jest.fn().mockImplementation(query => ({
+      matches: false, // or true, depending on your test case
+      media: query,
+      onchange: null,
+      addListener: jest.fn(), // deprecated
+      removeListener: jest.fn(), // deprecated
+      addEventListener: jest.fn(), // modern
+      removeEventListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+    })),
+  });
+});
 
 
 afterEach(() => {
