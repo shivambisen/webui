@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import React from 'react';
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import TestRunDetails from '@/components/test-runs/TestRunDetails';
 
 function setup<T>() {
