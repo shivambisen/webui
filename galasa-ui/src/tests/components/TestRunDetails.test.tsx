@@ -154,6 +154,13 @@ jest.mock('@carbon/react', () => {
   const TabPanels = ({ children }: any) => <div>{children}</div>;
   const TabPanel = ({ children }: any) => <div>{children}</div>;
   const Loading = () => <div>Loading</div>;
+  const Tile = ({ children }: any) => <div data-testid="tile">{children}</div>;
+  const Tooltip = ({ label, children }: any) => (
+    <div data-testid="tooltip">
+       {label}
+       {children}
+     </div>
+   );
 
   [Tab, Tabs, TabList, TabPanels, TabPanel, Loading].forEach(c => {
     // @ts-ignore
@@ -161,9 +168,21 @@ jest.mock('@carbon/react', () => {
     // TypeScript does not allow this by default, so we suppress the error.
     c.displayName = c.name || 'Anonymous';
   });
+  Tile.displayName = 'Tile';
+  Tooltip.displayName = 'Tooltip';
 
-  return { Tab, Tabs, TabList, TabPanels, TabPanel, Loading };
+  return { Tab, Tabs, TabList, TabPanels, TabPanel, Loading, Tile, Tooltip, };
 });
+
+
+beforeAll(() => {
+  Object.assign(navigator, {
+    clipboard: {
+      writeText: jest.fn(),
+    },
+  });
+});
+
 
 describe('TestRunDetails', () => {
   const runId = 'run-123';
