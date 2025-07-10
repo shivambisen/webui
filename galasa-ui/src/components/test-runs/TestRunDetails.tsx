@@ -138,7 +138,7 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
               className={styles.shareButton}
               data-testid="icon-Share"
             >
-                <Share size={20}/>
+              <Share size={20}/>
             </button>
           </Tooltip>
         </div>

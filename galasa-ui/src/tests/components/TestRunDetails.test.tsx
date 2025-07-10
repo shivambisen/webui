@@ -157,10 +157,10 @@ jest.mock('@carbon/react', () => {
   const Tile = ({ children }: any) => <div data-testid="tile">{children}</div>;
   const Tooltip = ({ label, children }: any) => (
     <div data-testid="tooltip">
-       {label}
-       {children}
-     </div>
-   );
+      {label}
+      {children}
+    </div>
+  );
 
   [Tab, Tabs, TabList, TabPanels, TabPanel, Loading].forEach(c => {
     // @ts-ignore
@@ -356,5 +356,32 @@ describe('TestRunDetails', () => {
     // Final check to ensure breadcrumb still has the correct route after loading
     expect(breadcrumb).toHaveAttribute('data-route', `/test-runs?${queryString}`);
   });
+  it('copies the URL when share button is clicked', async () => {
+    const runDetailsDeferred = setup<any>();
+    const runArtifactsDeferred = setup<any[]>();
+    const runLogDeferred = setup<string>();
+
+    render(
+      <TestRunDetails
+        runId="run-123"
+        runDetailsPromise={runDetailsDeferred.promise}
+        runArtifactsPromise={runArtifactsDeferred.promise}
+        runLogPromise={runLogDeferred.promise}
+      />
+    );
+  
+    await act(async () => {
+      runDetailsDeferred.resolve({ testStructure: { methods: [], result: 'PASS', status: 'OK', runName: 'X', testShortName: 't', bundle: '', submissionId: '', group: '', requestor: '', queued: '', startTime: '', endTime: '', tags: [] } });
+      runArtifactsDeferred.resolve([]);
+      runLogDeferred.resolve('');
+    });
+  
+    const spy = jest.spyOn(navigator.clipboard, 'writeText');
+    fireEvent.click(screen.getByTestId('icon-Share'));
+  
+    expect(spy).toHaveBeenCalledWith(window.location.href);
+    spy.mockRestore();
+  });
+  
 
 });
