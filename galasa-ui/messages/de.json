@@ -198,8 +198,8 @@
     "duration": "Dauer",
     "tags": "Tags",
     "noTags": "Keine Tags vorhanden.",
-    "recentRunsLink": "Andere kürzlich durchgeführte Durchläufe desselben Tests anzeigen…",
-    "runRetriesLink": "Erneute Versuche dieses Testlaufs anzeigen…"
+    "recentRunsLink": "Zeige letzte Ausführungen desselben Tests...",
+    "runRetriesLink": "Zeige alle Versuche dieses Testlaufs..."
   },
   "TestRunDetails": {
     "title": "Testlauf: {runName}",
