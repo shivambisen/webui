@@ -15,7 +15,7 @@ export function encodeStateToUrlParam(queryString: string) : string {
   let encodedQuery = '';
   if (queryString !== null && queryString !== '') {
     const compressed = pako.deflate(queryString);
-    queryString = Base64.fromUint8Array(compressed, true);
+    encodedQuery = Base64.fromUint8Array(compressed, true);
   }
   return encodedQuery;
 }
@@ -23,13 +23,15 @@ export function encodeStateToUrlParam(queryString: string) : string {
 /**
  * Decodes a URL-safe Base64 string and decompresses it back to the original query string.
  */
-export function decodeStateFromUrlParam(encodedParam: string): string | null {
-  if (!encodedParam) return null;
-  try {
-    const compressed = Base64.toUint8Array(encodedParam);
-    return pako.inflate(compressed, { to: 'string' });
-  } catch (error) {
-    console.error("Failed to decode URL state:", error);
-    return null;
+export function decodeStateFromUrlParam(encodedParam: string): string | null{
+  let decodedQuery = null;
+  if (encodedParam !== null && encodedParam !== '') {
+    try {
+      const compressed = Base64.toUint8Array(encodedParam);
+      decodedQuery = pako.inflate(compressed, { to: 'string' });
+    } catch (error) {
+      console.error("Failed to decode URL state:", error);
+    }
   }
+  return decodedQuery;
 }

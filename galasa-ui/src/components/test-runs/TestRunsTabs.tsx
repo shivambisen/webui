@@ -95,6 +95,9 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
   const [isInitialized, setIsInitialized] = useState(false);
   useEffect(() => {setIsInitialized(true);}, []);
 
+  // State to track if the URL parameters have been decoded
+  const [isDecoded, setIsDecoded] = useState(false);
+
   // Define the tabs with their corresponding labels
   const TABS_CONFIG: TabConfig[] = [
     { id: TABS_IDS[0], label: translations('tabs.timeframe') },
@@ -109,7 +112,23 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
   
   // Save to URL parameters (only after initialization)
   useEffect(() => {
-    if (!isInitialized) return;
+    if (isDecoded) return;
+
+    const encodedQueryString = searchParams.get('q');
+    if (encodedQueryString) {
+      const decodedQuery = decodeStateFromUrlParam(encodedQueryString);
+      if (decodedQuery) {
+        const params = new URLSearchParams(decodedQuery);
+        // Replace the router for the child components to use the decoded parameters
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+      }
+      setIsDecoded(true);
+    }
+  }, [isDecoded, pathname, router, searchParams]);
+
+  // Save to URL parameters (only after initialization and parameters are decoded)
+  useEffect(() => {
+    if (!isInitialized || !isDecoded) return;
 
     const currentTab = TABS_CONFIG[selectedIndex];
     const visibleColumnsParam = selectedVisibleColumns.join(",");
