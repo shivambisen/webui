@@ -16,6 +16,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from 'react';
 import { RESULTS_TABLE_COLUMNS, COLUMNS_IDS, RUN_QUERY_PARAMS} from '@/utils/constants/common';
 import { useQuery } from '@tanstack/react-query';
+import { decodeStateFromUrlParam } from '@/utils/urlEncoder';
 
 
 interface TabConfig {
@@ -73,6 +74,9 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
   const [isInitialized, setIsInitialized] = useState(false);
   useEffect(() => {setIsInitialized(true);}, []);
 
+  // State to track if the URL parameters have been decoded
+  const [isDecoded, setIsDecoded] = useState(false);
+
   // Define the tabs with their corresponding labels
   const TABS_CONFIG: TabConfig[] = [
     { id: TABS_IDS[0], label: translations('tabs.timeframe') },
@@ -81,9 +85,25 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
     { id: TABS_IDS[3], label: translations('tabs.results') },
   ];
 
-  // Save to URL parameters (only after initialization)
+  // Decode URL parameters to set initial state (must be done at the first mount only)
   useEffect(() => {
-    if (!isInitialized) return;
+    if (isDecoded) return;
+
+    const encodedQueryString = searchParams.get('q');
+    if (encodedQueryString) {
+      const decodedQuery = decodeStateFromUrlParam(encodedQueryString);
+      if (decodedQuery) {
+        const params = new URLSearchParams(decodedQuery);
+        // Replace the router for the child components to use the decoded parameters
+        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+      }
+      setIsDecoded(true);
+    }
+  }, [isDecoded, pathname, router, searchParams]);
+
+  // Save to URL parameters (only after initialization and parameters are decoded)
+  useEffect(() => {
+    if (!isInitialized || !isDecoded) return;
 
     const currentTab = TABS_CONFIG[selectedIndex];
     const visibleColumnsParam = selectedVisibleColumns.join(",");
@@ -100,7 +120,7 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
     params.set(RUN_QUERY_PARAMS.COLUMNS_ORDER, columnsOrderParam);
 
     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [selectedVisibleColumns, columnsOrder, isInitialized, pathname, router, selectedIndex]);
+  }, [selectedVisibleColumns, columnsOrder, isInitialized, isDecoded, pathname, router, selectedIndex, searchParams]);
 
   const handleTabChange = (event: {selectedIndex : number}) => {
     const currentIndex = event.selectedIndex;
