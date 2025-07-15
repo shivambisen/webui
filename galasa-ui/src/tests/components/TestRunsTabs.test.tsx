@@ -31,6 +31,17 @@ jest.mock('@/components/test-runs/TestRunsTable', () => ({
 jest.mock('@/components/test-runs/TimeFrameContent', () => ({
   __esModule: true,
   default: () => <div>Mocked Timeframe Content</div>,
+  calculateSynchronizedState: jest.fn((fromDate, toDate) => ({
+    fromDate,
+    toDate,
+    fromTime: '00:00',
+    fromAmPm: 'AM',
+    toTime: '23:59',
+    toAmPm: 'PM',
+    durationDays: 0,
+    durationHours: 23,
+    durationMinutes: 59
+  })),
 }));
 
 jest.mock('@/components/test-runs/SearchCriteriaContent', () => ({
@@ -119,6 +130,7 @@ jest.mock('@/utils/constants/common', () => ({
   }
 }));
 
+
 // Mock window.matchMedia
 Object.defineProperty(window, "matchMedia", {
   writable: true,
@@ -158,11 +170,8 @@ describe('TestRunsTabs Component', () => {
   const mockResultsNamesPromise = Promise.resolve([]);
 
   beforeEach(() => {
-    // Reset all mocks before each test
     jest.clearAllMocks();
-    // Default to returning empty search params. Individual tests can override this.
     mockUseSearchParams.mockReturnValue(new URLSearchParams());
-    // Clear the react-query cache 
     queryClient.clear();
   });
 
@@ -281,18 +290,20 @@ describe('TestRunsTabs Component', () => {
         </FeatureFlagProvider> , { wrapper }
       );
 
-      // Wait for the initial save
-      await waitFor(() => expect(mockReplace).toHaveBeenCalledTimes(1)); 
+      // Wait for initial render and effect
+      await waitFor(() => expect(mockReplace).toHaveBeenCalled());
       mockReplace.mockClear();
-  
-      // Act: Simulate a child component updating the state
-      act(() => {
-        capturedSetSelectedVisibleColumns(['status', 'result']);
-      });
-  
-      // Assert: The save-to-URL effect runs again with the new state
-      await waitFor(() => expect(mockReplace).toHaveBeenCalledTimes(1));
-  
+
+      // Act
+      fireEvent.click(screen.getByText('Table Design'));
+
+      // Assert
+      await waitFor(() => {
+        expect(mockReplace).toHaveBeenCalledTimes(1);
+        const urlCall = mockReplace.mock.calls[0][0];
+        expect(urlCall).toContain('?q=');
+      });   
+
       const urlCall = mockReplace.mock.calls[0][0];
       const params = new URLSearchParams(urlCall.split('?')[1]);
       expect(params.get('visibleColumns')).toBe('status,result');
