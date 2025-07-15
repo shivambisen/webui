@@ -14,7 +14,7 @@ import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { TestRunsData } from "@/utils/testRuns";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from 'react';
-import { RESULTS_TABLE_COLUMNS, COLUMNS_IDS, RUN_QUERY_PARAMS, DAY_MS} from '@/utils/constants/common';
+import { RESULTS_TABLE_COLUMNS, COLUMNS_IDS, RUN_QUERY_PARAMS, DAY_MS, TABS_IDS, SEARCH_CRITERIA_KEYS} from '@/utils/constants/common';
 import { useQuery } from '@tanstack/react-query';
 import { ColumnDefinition, runStructure, sortOrderType } from '@/utils/interfaces';
 import { Run } from '@/generated/galasaapi';

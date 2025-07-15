@@ -227,7 +227,7 @@ export default function SearchCriteriaContent({
     // Props for the checkbox list component
     const checkboxProps = {
       title: field.description,
-      items: (field.id === RUN_QUERY_PARAMS.RESULT) ? resultsNames : TEST_RUNS_STATUS,
+      items: (field.id === RUN_QUERY_PARAMS.RESULT) ? resultsNames : Object.values(TEST_RUNS_STATUS),
       selectedItems: (field.id === RUN_QUERY_PARAMS.RESULT) ? selectedResults : selectedStatuses,
       onChange: (field.id === RUN_QUERY_PARAMS.RESULT) ? setSelectedResults : setSelectedStatuses, 
       onSubmit: handleSave,
