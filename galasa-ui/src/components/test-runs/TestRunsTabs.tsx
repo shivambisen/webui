@@ -6,7 +6,7 @@
 'use client';
 import { Tabs, Tab, TabList, TabPanels, TabPanel } from '@carbon/react'; 
 import styles from '@/styles/TestRunsPage.module.css';
-import TimeframeContent from './TimeFrameContent';
+import TimeframeContent, { calculateSynchronizedState } from './TimeFrameContent';
 import TestRunsTable from './TestRunsTable';
 import SearchCriteriaContent from "./SearchCriteriaContent";
 import TableDesignContent from './TableDesignContent';
@@ -14,9 +14,10 @@ import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { TestRunsData } from "@/utils/testRuns";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from 'react';
-import { RESULTS_TABLE_COLUMNS, COLUMNS_IDS, RUN_QUERY_PARAMS} from '@/utils/constants/common';
+import { RESULTS_TABLE_COLUMNS, COLUMNS_IDS, RUN_QUERY_PARAMS, DAY_MS} from '@/utils/constants/common';
 import { useQuery } from '@tanstack/react-query';
-import { decodeStateFromUrlParam } from '@/utils/urlEncoder';
+import { decodeStateFromUrlParam, encodeStateToUrlParam } from '@/utils/urlEncoder';
+import { TimeFrameValues } from '@/utils/interfaces';
 
 
 interface TabConfig {
@@ -29,12 +30,33 @@ interface TestRunsTabProps {
   resultsNamesPromise: Promise<string[]>;
 }
 
+const TABS_IDS = ['timeframe', 'table-design', 'search-criteria', 'results'];
+
+// Keys that are managed by the SearchCriteriaContent component
+const SEARCH_CRITERIA_KEYS = [
+  RUN_QUERY_PARAMS.RUN_NAME, RUN_QUERY_PARAMS.REQUESTOR, RUN_QUERY_PARAMS.GROUP,
+  RUN_QUERY_PARAMS.SUBMISSION_ID, RUN_QUERY_PARAMS.BUNDLE, RUN_QUERY_PARAMS.TEST_NAME, 
+  RUN_QUERY_PARAMS.RESULT, RUN_QUERY_PARAMS.STATUS, RUN_QUERY_PARAMS.TAGS
+];
+
 export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromise}: TestRunsTabProps) {
   const translations = useTranslations("TestRunsTabs");
   const router = useRouter();
   const pathname = usePathname();
-  const searchParams = useSearchParams();
-  const TABS_IDS = ['timeframe', 'table-design', 'search-criteria', 'results'];
+  const rawSearchParams = useSearchParams();
+
+  // Decode the search params from the URL every time the searchParams change
+  const searchParams = useMemo(() => {
+    const encodedQueryString = rawSearchParams.get('q');
+    if (encodedQueryString) {
+      const decodedQueryString = decodeStateFromUrlParam(encodedQueryString);
+      console.log("Decoded query string:", decodedQueryString);
+      if (decodedQueryString) {
+        return new URLSearchParams(decodedQueryString);
+      }
+    }
+    return rawSearchParams;
+  }, [rawSearchParams]);
 
   // Initialize selectedIndex based on URL parameters or default to first tab
   const [selectedIndex, setSelectedIndex] = useState(() => {
@@ -69,58 +91,82 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
 
     return correctOrder;
   });
+
+  // Initialize timeframe values based on URL parameters or default to last 24 hours
+  const [timeframeValues, setTimeframeValues] = useState<TimeFrameValues>(() => {
+    const fromParam = searchParams.get('from');
+    const toParam = searchParams.get('to');
+    const initialToDate = toParam ? new Date(toParam) : new Date();
+    const initialFromDate = fromParam ? new Date(fromParam) : new Date(initialToDate.getTime() - DAY_MS);
+    return calculateSynchronizedState(initialFromDate, initialToDate);
+  });
+
+  // Initialize search criteria based on URL parameters
+  const [searchCriteria, setSearchCriteria] = useState<Record<string, string>>(() => {
+    const criteria: Record<string, string> = {};
+    SEARCH_CRITERIA_KEYS.forEach(key => {
+      if (searchParams.has(key)) {
+        criteria[key] = searchParams.get(key) || '';
+      }
+    });
+    return criteria;
+  });
     
   // State to track if the component has been initialized
   const [isInitialized, setIsInitialized] = useState(false);
   useEffect(() => {setIsInitialized(true);}, []);
 
-  // State to track if the URL parameters have been decoded
-  const [isDecoded, setIsDecoded] = useState(false);
-
-  // Define the tabs with their corresponding labels
-  const TABS_CONFIG: TabConfig[] = [
+  // Define the tabs with their corresponding labels, memoized to avoid unnecessary re-renders
+  const TABS_CONFIG: TabConfig[] = useMemo(() => [
     { id: TABS_IDS[0], label: translations('tabs.timeframe') },
     { id: TABS_IDS[1], label: translations('tabs.tableDesign') },
     { id: TABS_IDS[2], label: translations('tabs.searchCriteria') },
     { id: TABS_IDS[3], label: translations('tabs.results') },
-  ];
+  ], [translations]);
 
-  // Decode URL parameters to set initial state (must be done at the first mount only)
+  // Save and encode current state to the URL. This is the single source of truth for URL updates.
   useEffect(() => {
-    if (isDecoded) return;
+    if (!isInitialized) return;
 
-    const encodedQueryString = searchParams.get('q');
-    if (encodedQueryString) {
-      const decodedQuery = decodeStateFromUrlParam(encodedQueryString);
-      if (decodedQuery) {
-        const params = new URLSearchParams(decodedQuery);
-        // Replace the router for the child components to use the decoded parameters
-        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-      }
-      setIsDecoded(true);
-    }
-  }, [isDecoded, pathname, router, searchParams]);
+    // Build the query string from the current state
+    const params = new URLSearchParams();
 
-  // Save to URL parameters (only after initialization and parameters are decoded)
-  useEffect(() => {
-    if (!isInitialized || !isDecoded) return;
+    // Tab
+    params.set(RUN_QUERY_PARAMS.TAB, TABS_CONFIG[selectedIndex].id);
 
-    const currentTab = TABS_CONFIG[selectedIndex];
-    const visibleColumnsParam = selectedVisibleColumns.join(",");
-    const columnsOrderParam = columnsOrder.map(col => col.id).join(",");
-    
-    const params = new URLSearchParams(searchParams.toString());
-    params.set(RUN_QUERY_PARAMS.TAB, currentTab.id);
+    // Table Design
     if(selectedVisibleColumns.length > 0) {
-      params.set(RUN_QUERY_PARAMS.VISIBLE_COLUMNS, visibleColumnsParam);
+      params.set(RUN_QUERY_PARAMS.VISIBLE_COLUMNS, selectedVisibleColumns.join(","));
     } else {
       // If no columns are selected, we can clear the parameter
       params.delete(RUN_QUERY_PARAMS.VISIBLE_COLUMNS);
     }
-    params.set(RUN_QUERY_PARAMS.COLUMNS_ORDER, columnsOrderParam);
+    params.set(RUN_QUERY_PARAMS.COLUMNS_ORDER, columnsOrder.map(col => col.id).join(","));
 
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-  }, [selectedVisibleColumns, columnsOrder, isInitialized, isDecoded, pathname, router, selectedIndex, searchParams]);
+    // Timeframe
+    params.set(RUN_QUERY_PARAMS.FROM, timeframeValues.fromDate.toISOString());
+    params.set(RUN_QUERY_PARAMS.TO, timeframeValues.toDate.toISOString());
+
+    // Search Criteria
+    Object.entries(searchCriteria).forEach(([key, value]) => {
+      if (value) {
+        params.set(key, value);
+      } else {
+        // Remove empty criteria
+        params.delete(key);
+      }
+    });
+
+    // Encode the URL parameters to shorten the URL
+    const encodedQuery = encodeStateToUrlParam(params.toString());
+    console.log("Encoded query:", encodedQuery);
+    if (encodedQuery) {
+      router.replace(`${pathname}?q=${encodedQuery}`, { scroll: false });
+    } else {
+      // If there are no params, clear the URL.
+      router.replace(pathname, { scroll: false });
+    }
+  }, [selectedVisibleColumns, columnsOrder, isInitialized, pathname, router, selectedIndex, searchParams, timeframeValues,searchCriteria, TABS_CONFIG]);
 
   const handleTabChange = (event: {selectedIndex : number}) => {
     const currentIndex = event.selectedIndex;
@@ -187,7 +233,9 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
       </TabList>
       <TabPanels>
         <TabPanel>
-          <div className={styles.tabContent}><TimeframeContent /></div>
+          <div className={styles.tabContent}>
+            <TimeframeContent values={timeframeValues} setValues={setTimeframeValues}/>
+          </div>
         </TabPanel>
         <TabPanel>
           <div className={styles.tabContent}>
@@ -204,6 +252,8 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
             <SearchCriteriaContent
               requestorNamesPromise={requestorNamesPromise}
               resultsNamesPromise={resultsNamesPromise}
+              searchCriteria={searchCriteria}
+              setSearchCriteria={setSearchCriteria}
             />
           </div>
         </TabPanel>

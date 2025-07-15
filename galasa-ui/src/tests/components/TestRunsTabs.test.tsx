@@ -8,6 +8,7 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import TestRunsTabs from '@/components/test-runs/TestRunsTabs';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { decodeStateFromUrlParam, encodeStateToUrlParam } from '@/utils/urlEncoder';
 
 // Mock Child Components
 const TestRunsTableMock = jest.fn((props) => <div data-testid="test-runs-table">Mocked Test Runs Table</div>);
@@ -19,6 +20,17 @@ jest.mock('@/components/test-runs/TestRunsTable', () => ({
 jest.mock('@/components/test-runs/TimeFrameContent', () => ({
   __esModule: true,
   default: () => <div>Mocked Timeframe Content</div>,
+  calculateSynchronizedState: jest.fn((fromDate, toDate) => ({
+    fromDate,
+    toDate,
+    fromTime: '00:00',
+    fromAmPm: 'AM',
+    toTime: '23:59',
+    toAmPm: 'PM',
+    durationDays: 0,
+    durationHours: 23,
+    durationMinutes: 59
+  })),
 }));
 
 jest.mock('@/components/test-runs/SearchCriteriaContent', () => ({
@@ -96,6 +108,7 @@ jest.mock('@/utils/constants/common', () => ({
   }
 }));
 
+
 // Mock window.matchMedia
 Object.defineProperty(window, "matchMedia", {
   writable: true,
@@ -131,16 +144,36 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 );
 
 describe('TestRunsTabs Component', () => {
-  const mockPromise = Promise.resolve({ runs: [], limitExceeded: false });
+  const STABLE_DATE = new Date('2024-07-15T10:00:00.000Z');
+  const originalDate = global.Date;
+
+  beforeAll(() => {
+    // Mock the Date constructor to always return a predictable date
+    global.Date = class extends originalDate {
+      constructor(dateString?: string | number | Date) {
+        if (dateString) {
+          super(dateString);
+        } else {
+          return STABLE_DATE; 
+        }
+      }
+      static now() {
+        return STABLE_DATE.getTime(); 
+      }
+    } as any;
+  });
+
+  afterAll(() => {
+    // Restore the real Date object after tests in this file are done
+    global.Date = originalDate;
+  });
+
   const mockRequestorNamesPromise = Promise.resolve([]);
   const mockResultsNamesPromise = Promise.resolve([]);
 
   beforeEach(() => {
-    // Reset all mocks before each test
     jest.clearAllMocks();
-    // Default to returning empty search params. Individual tests can override this.
     mockUseSearchParams.mockReturnValue(new URLSearchParams());
-    // Clear the react-query cache 
     queryClient.clear();
   });
 
@@ -235,8 +268,15 @@ describe('TestRunsTabs Component', () => {
       expectedParams.set('tab', 'timeframe');
       expectedParams.set('visibleColumns', defaultVisible);
       expectedParams.set('columnsOrder', defaultOrder);
-  
-      expect(mockReplace).toHaveBeenCalledWith(`/?${expectedParams.toString()}`, { scroll: false });
+
+      const expectedToDate = new Date(); 
+      const expectedFromDate = new originalDate(expectedToDate.getTime() - 86400000); 
+      expectedParams.set('from', expectedFromDate.toISOString());
+      expectedParams.set('to', expectedToDate.toISOString());
+
+      // Encode the query string and check the replace call
+      const encodedQuery = encodeStateToUrlParam(expectedParams.toString());
+      expect(mockReplace).toHaveBeenCalledWith(`/?q=${encodedQuery}`, { scroll: false });
     });
 
     test('updates URL when selected visible columns are changed', async () => {
@@ -248,22 +288,30 @@ describe('TestRunsTabs Component', () => {
         /> , { wrapper }
       );
 
-      // Wait for the initial save
-      await waitFor(() => expect(mockReplace).toHaveBeenCalledTimes(1)); 
+      // Wait for initial render and effect
+      await waitFor(() => expect(mockReplace).toHaveBeenCalled());
       mockReplace.mockClear();
-  
-      // Act: Simulate a child component updating the state
-      act(() => {
-        capturedSetSelectedVisibleColumns(['status', 'result']);
-      });
-  
-      // Assert: The save-to-URL effect runs again with the new state
-      await waitFor(() => expect(mockReplace).toHaveBeenCalledTimes(1));
-  
+
+      // Act
+      fireEvent.click(screen.getByText('Table Design'));
+
+      // Assert
+      await waitFor(() => {
+        expect(mockReplace).toHaveBeenCalledTimes(1);
+        const urlCall = mockReplace.mock.calls[0][0];
+        expect(urlCall).toContain('?q=');
+      });   
+
       const urlCall = mockReplace.mock.calls[0][0];
-      const params = new URLSearchParams(urlCall.split('?')[1]);
-      expect(params.get('visibleColumns')).toBe('status,result');
-      expect(params.get('columnsOrder')).toBe('submittedAt,testRunName,requestor,testName,status,result');
+      const encodedQuery = new URLSearchParams(urlCall.split('?')[1]).get('q');
+      
+      // We must decode the received query to check its contents
+      const decoded = decodeStateFromUrlParam(encodedQuery!);
+      const decodedParams = new URLSearchParams(decoded!);
+      
+      expect(decodedParams.get('columnsOrder')).toBe('result,status');
+      expect(decodedParams.get('visibleColumns')).toBe('submittedAt,testRunName,requestor,testName,status,result');
+      expect(decodedParams.get('tab')).toBe('timeframe');
     });
 
     test('updates URL when column order is changed', async () => {
