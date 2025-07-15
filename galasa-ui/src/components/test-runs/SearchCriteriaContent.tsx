@@ -12,7 +12,6 @@ import {
   StructuredListRow, 
   StructuredListBody,
 } from "@carbon/react";
-import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { FormEvent, useCallback, useEffect, useState } from "react";
 import CustomSearchComponent from "./CustomSearchComponent";
 import CustomCheckBoxList from "./CustomCheckBoxList";

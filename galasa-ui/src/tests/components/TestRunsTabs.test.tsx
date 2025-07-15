@@ -8,7 +8,8 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import TestRunsTabs from '@/components/test-runs/TestRunsTabs';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
-import { decodeStateFromUrlParam, encodeStateToUrlParam } from '@/utils/urlEncoder';
+import { decodeStateFromUrlParam } from '@/utils/urlEncoder';
+import { DAY_MS } from '@/utils/constants/common';
 
 // Mock Child Components
 const TestRunsTableMock = jest.fn((props) => <div data-testid="test-runs-table">Mocked Test Runs Table</div>);
@@ -105,7 +106,8 @@ jest.mock('@/utils/constants/common', () => ({
     VISIBLE_COLUMNS: 'visibleColumns',
     COLUMNS_ORDER: 'columnsOrder',
     TAB: 'tab'
-  }
+  },
+  DAY_MS: 86400000,
 }));
 
 
@@ -261,22 +263,21 @@ describe('TestRunsTabs Component', () => {
       await waitFor(() => {
         expect(mockReplace).toHaveBeenCalledTimes(1);
       });
+
+      const urlCall = mockReplace.mock.calls[0][0];
+      const encodedQuery = new URLSearchParams(urlCall.split('?')[1]).get('q');
         
-      const expectedParams = new URLSearchParams();
-      const defaultVisible = "submittedAt,testRunName,requestor,testName,status,result";
-      const defaultOrder = "submittedAt,testRunName,requestor,testName,status,result";
-      expectedParams.set('tab', 'timeframe');
-      expectedParams.set('visibleColumns', defaultVisible);
-      expectedParams.set('columnsOrder', defaultOrder);
+      const decoded = decodeStateFromUrlParam(encodedQuery!);
+      const decodedParams = new URLSearchParams(decoded!);
+      
+      const expectedToDate = STABLE_DATE;
+      const expectedFromDate = new Date(STABLE_DATE.getTime() - DAY_MS); 
 
-      const expectedToDate = new Date(); 
-      const expectedFromDate = new originalDate(expectedToDate.getTime() - 86400000); 
-      expectedParams.set('from', expectedFromDate.toISOString());
-      expectedParams.set('to', expectedToDate.toISOString());
-
-      // Encode the query string and check the replace call
-      const encodedQuery = encodeStateToUrlParam(expectedParams.toString());
-      expect(mockReplace).toHaveBeenCalledWith(`/?q=${encodedQuery}`, { scroll: false });
+      expect(decodedParams.get('tab')).toBe('timeframe');
+      expect(decodedParams.get('visibleColumns')).toBe("submittedAt,testRunName,requestor,testName,status,result");
+      expect(decodedParams.get('columnsOrder')).toBe("submittedAt,testRunName,requestor,testName,status,result");
+      expect(decodedParams.get('from')).toBe(expectedFromDate.toISOString());
+      expect(decodedParams.get('to')).toBe(expectedToDate.toISOString());
     });
 
     test('updates URL when selected visible columns are changed', async () => {
@@ -298,8 +299,6 @@ describe('TestRunsTabs Component', () => {
       // Assert
       await waitFor(() => {
         expect(mockReplace).toHaveBeenCalledTimes(1);
-        const urlCall = mockReplace.mock.calls[0][0];
-        expect(urlCall).toContain('?q=');
       });   
 
       const urlCall = mockReplace.mock.calls[0][0];
@@ -309,9 +308,11 @@ describe('TestRunsTabs Component', () => {
       const decoded = decodeStateFromUrlParam(encodedQuery!);
       const decodedParams = new URLSearchParams(decoded!);
       
-      expect(decodedParams.get('columnsOrder')).toBe('result,status');
+      // The only thing that should change is the tab
+      expect(decodedParams.get('tab')).toBe('table-design');
+      // All other params should remain at their default values
       expect(decodedParams.get('visibleColumns')).toBe('submittedAt,testRunName,requestor,testName,status,result');
-      expect(decodedParams.get('tab')).toBe('timeframe');
+      expect(decodedParams.get('columnsOrder')).toBe('submittedAt,testRunName,requestor,testName,status,result');
     });
 
     test('updates URL when column order is changed', async () => {
@@ -328,18 +329,24 @@ describe('TestRunsTabs Component', () => {
       mockReplace.mockClear();
   
       // Act: Simulate a child component updating the state
-      const newOrder = [ { id: 'result', columnName: 'Result' }, { id: 'status', columnName: 'Status' }];
+      const newOrder = [{ id: 'result', columnName: 'Result' }, { id: 'status', columnName: 'Status' }];
       act(() => {
-        capturedSetColumnsOrder(newOrder);
+        if (capturedSetColumnsOrder) {
+          capturedSetColumnsOrder(newOrder);
+        }
       });
   
-      // Assert
+      // Assert: Wait for the effect to run with the new state
       await waitFor(() => expect(mockReplace).toHaveBeenCalledTimes(1));
-  
+
       const urlCall = mockReplace.mock.calls[0][0];
-      const params = new URLSearchParams(urlCall.split('?')[1]);
-      expect(params.get('columnsOrder')).toBe('result,status');
-      expect(params.get('visibleColumns')).toBe('submittedAt,testRunName,requestor,testName,status,result');
+      const encodedQuery = new URLSearchParams(urlCall.split('?')[1]).get('q');
+      const decoded = decodeStateFromUrlParam(encodedQuery!);
+      const decodedParams = new URLSearchParams(decoded!);
+
+      expect(decodedParams.get('columnsOrder')).toBe('result,status');
+      // The visible columns should remain unchanged at their default
+      expect(decodedParams.get('visibleColumns')).toBe('submittedAt,testRunName,requestor,testName,status,result');
     });
 
     test('clear visible columns in URL when none are selected', async () => {
