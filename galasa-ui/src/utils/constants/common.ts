@@ -24,12 +24,21 @@ const HOUR_MS = 60 * MINUTE_MS;
 const DAY_MS = 24 * HOUR_MS;
 const MAX_RANGE_MONTHS = 3;
 
-const TEST_RUNS_STATUS = ['Queued', 'Started', 'Generating', 
-  'Building', 'Provstart', 'Running', 'Rundone', 'Ending', 'Finished',];
+const TEST_RUNS_STATUS: Record<string, string> = {
+  QUEUED: 'Queued',
+  STARTED: 'Started',
+  GENERATING: 'Generating',
+  BUILDING: 'Building',
+  PROVSTART: 'Provstart',
+  RUNNING: 'Running',
+  RUNDONE: 'Rundone',
+  ENDING: 'Ending',
+  FINISHED: 'Finished'
+};
 
 const COLUMNS_IDS = {
   SUBMITTED_AT: "submittedAt",
-  TEST_RUN_NAME: "testRunName",
+  TEST_RUN_NAME: "runName",
   REQUESTOR: "requestor",
   SUBMISSION_ID: "submissionId",
   GROUP: "group",
@@ -72,9 +81,19 @@ const RUN_QUERY_PARAMS = {
   COLUMNS_ORDER: "columnsOrder",
   TAB: "tab",
 };
+
+const TABS_IDS = ['timeframe', 'table-design', 'search-criteria', 'results'];
+
+// Keys that are managed by the SearchCriteriaContent component
+const SEARCH_CRITERIA_KEYS = [
+  RUN_QUERY_PARAMS.RUN_NAME, RUN_QUERY_PARAMS.REQUESTOR, RUN_QUERY_PARAMS.GROUP,
+  RUN_QUERY_PARAMS.SUBMISSION_ID, RUN_QUERY_PARAMS.BUNDLE, RUN_QUERY_PARAMS.TEST_NAME, 
+  RUN_QUERY_PARAMS.RESULT, RUN_QUERY_PARAMS.STATUS, RUN_QUERY_PARAMS.TAGS
+];
   
 const BATCH_SIZE = 100;
 
 export { CLIENT_API_VERSION,COLORS, MAX_RECORDS, MINUTE_MS, 
-  HOUR_MS, DAY_MS, MAX_RANGE_MONTHS, TEST_RUNS_STATUS,
-  BATCH_SIZE, RESULTS_TABLE_COLUMNS, COLUMNS_IDS, RUN_QUERY_PARAMS};
+  HOUR_MS, DAY_MS, MAX_RANGE_MONTHS, TEST_RUNS_STATUS, 
+  BATCH_SIZE, RESULTS_TABLE_COLUMNS, COLUMNS_IDS, RUN_QUERY_PARAMS,
+  TABS_IDS, SEARCH_CRITERIA_KEYS};

@@ -14,7 +14,7 @@ import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { TestRunsData } from "@/utils/testRuns";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from 'react';
-import { RESULTS_TABLE_COLUMNS, COLUMNS_IDS, RUN_QUERY_PARAMS, DAY_MS} from '@/utils/constants/common';
+import { RESULTS_TABLE_COLUMNS, COLUMNS_IDS, RUN_QUERY_PARAMS, DAY_MS, TABS_IDS, SEARCH_CRITERIA_KEYS} from '@/utils/constants/common';
 import { useQuery } from '@tanstack/react-query';
 import { decodeStateFromUrlParam, encodeStateToUrlParam } from '@/utils/urlEncoder';
 import { TimeFrameValues } from '@/utils/interfaces';
@@ -30,14 +30,7 @@ interface TestRunsTabProps {
   resultsNamesPromise: Promise<string[]>;
 }
 
-const TABS_IDS = ['timeframe', 'table-design', 'search-criteria', 'results'];
 
-// Keys that are managed by the SearchCriteriaContent component
-const SEARCH_CRITERIA_KEYS = [
-  RUN_QUERY_PARAMS.RUN_NAME, RUN_QUERY_PARAMS.REQUESTOR, RUN_QUERY_PARAMS.GROUP,
-  RUN_QUERY_PARAMS.SUBMISSION_ID, RUN_QUERY_PARAMS.BUNDLE, RUN_QUERY_PARAMS.TEST_NAME, 
-  RUN_QUERY_PARAMS.RESULT, RUN_QUERY_PARAMS.STATUS, RUN_QUERY_PARAMS.TAGS
-];
 
 export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromise}: TestRunsTabProps) {
   const translations = useTranslations("TestRunsTabs");
