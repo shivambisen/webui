@@ -272,6 +272,16 @@ export default function SearchCriteriaContent({
   return (
     <div>
       <p>{translations('description')}</p>
+      <div className={styles.resetToDefaultsButtonContainer}>
+        <Button 
+          type="button"
+          kind="secondary"
+          onClick={handleResetToDefaults}
+          disabled={isClearFiltersDisabled}
+        >
+          {translations("clearFilters")}
+        </Button>
+      </div>
       <div className={styles.searchCriteriaContainer}>
         <div className={styles.structuredListContainer}>
           <StructuredListWrapper selection>
@@ -301,15 +311,6 @@ export default function SearchCriteriaContent({
         </div>
         {renderComponent(selectedFilterField)}
       </div>
-      <Button 
-        type="button"
-        kind="secondary"
-        className={styles.resetToDefaultsButton}
-        onClick={handleResetToDefaults}
-        disabled={isClearFiltersDisabled}
-      >
-        {translations("clearFilters")}
-      </Button>
     </div>
   );
 };

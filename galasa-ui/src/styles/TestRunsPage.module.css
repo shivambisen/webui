@@ -127,10 +127,11 @@
     justify-content: flex-end;
 }
 
-.resetToDefaultsButton {
-  position: absolute;
-  top: 13rem;
-  right: 5rem;
+.resetToDefaultsButtonContainer {
+    display: flex;
+    justify-content: flex-end;
+    padding-top: 1rem;
+    width: 38%;
 }
 
 .tagsListbox {
