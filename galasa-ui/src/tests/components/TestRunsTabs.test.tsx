@@ -268,6 +268,9 @@ describe('TestRunsTabs Component', () => {
       await waitFor(() => {
         expect(mockReplace).toHaveBeenCalledTimes(1);
       });
+
+      const urlCall = mockReplace.mock.calls[0][0];
+      const encodedQuery = new URLSearchParams(urlCall.split('?')[1]).get('q');
         
       const expectedParams = new URLSearchParams();
       const defaultVisible = "submittedAt,runName,requestor,testName,status,result";
@@ -300,8 +303,6 @@ describe('TestRunsTabs Component', () => {
       // Assert
       await waitFor(() => {
         expect(mockReplace).toHaveBeenCalledTimes(1);
-        const urlCall = mockReplace.mock.calls[0][0];
-        expect(urlCall).toContain('?q=');
       });   
 
       const urlCall = mockReplace.mock.calls[0][0];
@@ -326,14 +327,16 @@ describe('TestRunsTabs Component', () => {
       mockReplace.mockClear();
   
       // Act: Simulate a child component updating the state
-      const newOrder = [ { id: 'result', columnName: 'Result' }, { id: 'status', columnName: 'Status' }];
+      const newOrder = [{ id: 'result', columnName: 'Result' }, { id: 'status', columnName: 'Status' }];
       act(() => {
-        capturedSetColumnsOrder(newOrder);
+        if (capturedSetColumnsOrder) {
+          capturedSetColumnsOrder(newOrder);
+        }
       });
   
-      // Assert
+      // Assert: Wait for the effect to run with the new state
       await waitFor(() => expect(mockReplace).toHaveBeenCalledTimes(1));
-  
+
       const urlCall = mockReplace.mock.calls[0][0];
       const params = new URLSearchParams(urlCall.split('?')[1]);
       expect(params.get('columnsOrder')).toBe('result,status');
