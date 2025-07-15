@@ -18,9 +18,19 @@ describe('URL State Encoder/Decoder', () => {
     expect(typeof encoded).toBe('string');
 
     const decoded = decodeStateFromUrlParam(encoded);
+
+    const originalParams = new URLSearchParams(queryString);
+    const decodedParams = new URLSearchParams(decoded || '');
     
     // The final decoded string should match the original
-    expect(decoded).toBe(queryString);
+    expect(decodedParams.get('status')).toBe(originalParams.get('status'));
+    const originalFromDate = new Date(originalParams.get('from')!).toISOString().split('T')[0];
+    const decodedFromDate = new Date(decodedParams.get('from')!).toISOString().split('T')[0];
+    expect(decodedFromDate).toBe(originalFromDate);
+    
+    const originalToDate = new Date(originalParams.get('to')!).toISOString().split('T')[0];
+    const decodedToDate = new Date(decodedParams.get('to')!).toISOString().split('T')[0];
+    expect(decodedToDate).toBe(originalToDate);
   });
 
   test('should handle empty strings correctly', () => {

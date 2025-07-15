@@ -6,6 +6,7 @@
 
 import { RUN_QUERY_PARAMS, TABS_IDS, TEST_RUNS_STATUS } from "./constants/common";
 
+// Mappings for keys and values to minify the URL state
 const keyMap: Record<string, string> = {
   [RUN_QUERY_PARAMS.TAB]: 't',
   [RUN_QUERY_PARAMS.FROM]: 'f',
@@ -22,6 +23,7 @@ const keyMap: Record<string, string> = {
   [RUN_QUERY_PARAMS.TAGS]: 'tgs',
   [RUN_QUERY_PARAMS.VISIBLE_COLUMNS]: 'vc',
   [RUN_QUERY_PARAMS.COLUMNS_ORDER]: 'co',
+  [RUN_QUERY_PARAMS.SORT_ORDER]: 'so',
 };
 
 const valueMap: Record<string, string> = {
@@ -43,6 +45,8 @@ const valueMap: Record<string, string> = {
   [TEST_RUNS_STATUS.RUNDONE]: 'RD',
   [TEST_RUNS_STATUS.ENDING]: 'E',
   [TEST_RUNS_STATUS.FINISHED]: 'F',
+  // Sort orders
+  'asc':'a', 'desc': 'd', 'undefined': 'u', '': 'e',
 };
 
 // Reverse maps
@@ -53,21 +57,43 @@ const reverseValueMap: Record<string, string> = Object.fromEntries(Object.entrie
 const minifyListValue = (list: string) => list.split(',').map(item => valueMap[item] || item).join(',');
 const expandListValue = (minifiedList: string) => minifiedList.split(',').map(item => reverseValueMap[item] || item).join(',');
 
+const minifySortOrder = (sortString: string) => {
+  return sortString.split(',')
+    .map(pair => {
+      const [id, order] = pair.split(':');
+      const minId = valueMap[id] || id;
+      const minOrder = valueMap[order] || order;
+      return `${minId}:${minOrder}`;
+    })
+    .join(',');
+};
+const expandSortOrder = (minifiedSortString: string) => {
+  return minifiedSortString.split(',')
+    .map(pair => {
+      const [minId, minOrder] = pair.split(':');
+      const id = reverseValueMap[minId] || minId;
+      const order = reverseValueMap[minOrder] || minOrder;
+      return `${id}:${order}`;
+    })
+    .join(',');
+};
 
 // Transforms values based on their key
 const minifyValue = (key: string, value: string): string | number => {
   switch (key) {
-  case 'from':
-  case 'to':
+  case  RUN_QUERY_PARAMS.FROM:
+  case RUN_QUERY_PARAMS.TO:
     // Convert ISO date to a much shorter base-36 timestamp
     return new Date(value).getTime().toString(36);
-  case 'visibleColumns':
-  case 'columnsOrder':
-  case 'status':
-  case 'result':
+  case RUN_QUERY_PARAMS.VISIBLE_COLUMNS:
+  case RUN_QUERY_PARAMS.COLUMNS_ORDER:
+  case RUN_QUERY_PARAMS.STATUS:
+  case RUN_QUERY_PARAMS.RESULT:
     return minifyListValue(value);
-  case 'tab':
+  case RUN_QUERY_PARAMS.TAB:
     return valueMap[value] || value;
+  case RUN_QUERY_PARAMS.SORT_ORDER:
+    return minifySortOrder(value);
   default:
     return value;
   }
@@ -76,17 +102,19 @@ const minifyValue = (key: string, value: string): string | number => {
 // Retrieve values based on their key
 const expandValue = (key: string, value: string | number): string => {
   switch (key) {
-  case 'from':
-  case 'to':
+  case RUN_QUERY_PARAMS.FROM:
+  case RUN_QUERY_PARAMS.TO:
     // Convert base-36 timestamp back to ISO string
     return new Date(parseInt(value.toString(), 36)).toISOString();
-  case 'visibleColumns':
-  case 'columnsOrder':
-  case 'status':
-  case 'result':
+  case RUN_QUERY_PARAMS.VISIBLE_COLUMNS:
+  case RUN_QUERY_PARAMS.COLUMNS_ORDER:
+  case RUN_QUERY_PARAMS.STATUS:
+  case RUN_QUERY_PARAMS.RESULT:
     return expandListValue(value.toString());
-  case 'tab':
+  case RUN_QUERY_PARAMS.TAB:
     return reverseValueMap[value.toString()] || value.toString();
+  case RUN_QUERY_PARAMS.SORT_ORDER:
+    return expandSortOrder(value.toString());
   default:
     return value.toString();
   }

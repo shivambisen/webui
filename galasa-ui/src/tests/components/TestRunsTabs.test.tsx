@@ -12,7 +12,18 @@ import { decodeStateFromUrlParam } from '@/utils/urlEncoder';
 import { DAY_MS } from '@/utils/constants/common';
 
 // Mock Child Components
-const TestRunsTableMock = jest.fn((props) => <div data-testid="test-runs-table">Mocked Test Runs Table</div>);
+const TestRunsTableMock = jest.fn((props) =>
+  <div>
+    <div data-testid="test-runs-table">
+    Mocked Test Runs Table
+    </div>
+    {
+      props.runsList.forEach((run: any) => {
+        const runId = run.id;
+        return <div key={runId}>{run.runName || runId}</div>;
+      })
+    }
+  </div>);
 jest.mock('@/components/test-runs/TestRunsTable', () => ({
   __esModule: true,
   default: (props: any) => TestRunsTableMock(props),
@@ -41,12 +52,14 @@ jest.mock('@/components/test-runs/SearchCriteriaContent', () => ({
 
 let capturedSetSelectedVisibleColumns: (columns: string[]) => void;
 let capturedSetColumnsOrder: (order: { id: string; columnName: string }[]) => void;
+let capturedSetSortOrder: (sortOrder: { id: string; order: 'asc' | 'desc' | 'none' }[]) => void;
 
 jest.mock('@/components/test-runs/TableDesignContent', () => ({
   __esModule: true,
   default: (props: any) => {
     capturedSetSelectedVisibleColumns = props.setSelectedRowIds;
     capturedSetColumnsOrder = props.setTableRows;
+    capturedSetSortOrder = props.setSortOrder;
     return <div>Mocked Table Design Content</div>;
   },
 }));
@@ -78,19 +91,21 @@ jest.mock('next/navigation', () => ({
 jest.mock('@/utils/constants/common', () => ({
   RESULTS_TABLE_COLUMNS:  [
     { id: 'submittedAt', columnName: 'Submitted' },
-    { id: 'testRunName', columnName: 'Test Run Name' },
+    { id: 'runName', columnName: 'Test Run Name' },
     { id: 'requestor', columnName: 'Requestor' },
     { id: 'testName', columnName: 'Test Name' },
     { id: 'status', columnName: 'Status' },
     { id: 'result', columnName: 'Result' },
+    { id: 'tags', columnName: 'Tags' }
   ],
   COLUMNS_IDS: {
     SUBMITTED_AT: 'submittedAt',
-    TEST_RUN_NAME: 'testRunName',
+    TEST_RUN_NAME: 'runName',
     REQUESTOR: 'requestor',
     TEST_NAME: 'testName',
     STATUS: 'status',
     RESULT: 'result',
+    TAGS: 'tags',
   },  RUN_QUERY_PARAMS: {
     FROM: 'from',
     TO: 'to',
@@ -105,10 +120,28 @@ jest.mock('@/utils/constants/common', () => ({
     TAGS: 'tags',
     VISIBLE_COLUMNS: 'visibleColumns',
     COLUMNS_ORDER: 'columnsOrder',
-    TAB: 'tab'
+    TAB: 'tab',
+    SORT_ORDER: 'sortOrder'
   },
   DAY_MS: 86400000,
+  TABS_IDS: ['timeframe', 'table-design', 'search-criteria', 'results'],
+  SEARCH_CRITERIA_KEYS: [
+    'runName', 'requestor', 'group', 'submissionId', 'bundle', 'testName', 
+    'result', 'status', 'tags'
+  ],
+  TEST_RUNS_STATUS: {
+    QUEUED: 'Queued',
+    STARTED: 'Started',
+    GENERATING: 'Generating',
+    BUILDING: 'Building',
+    PROVSTART: 'Provstart',
+    RUNNING: 'Running',
+    RUNDONE: 'Rundone',
+    ENDING: 'Ending',
+    FINISHED: 'Finished'
+  }
 }));
+
 
 
 // Mock window.matchMedia
@@ -146,6 +179,7 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 );
 
 describe('TestRunsTabs Component', () => {
+
   const STABLE_DATE = new Date('2024-07-15T10:00:00.000Z');
   const originalDate = global.Date;
 
@@ -266,7 +300,7 @@ describe('TestRunsTabs Component', () => {
 
       const urlCall = mockReplace.mock.calls[0][0];
       const encodedQuery = new URLSearchParams(urlCall.split('?')[1]).get('q');
-        
+
       const decoded = decodeStateFromUrlParam(encodedQuery!);
       const decodedParams = new URLSearchParams(decoded!);
       
@@ -274,8 +308,8 @@ describe('TestRunsTabs Component', () => {
       const expectedFromDate = new Date(STABLE_DATE.getTime() - DAY_MS); 
 
       expect(decodedParams.get('tab')).toBe('timeframe');
-      expect(decodedParams.get('visibleColumns')).toBe("submittedAt,testRunName,requestor,testName,status,result");
-      expect(decodedParams.get('columnsOrder')).toBe("submittedAt,testRunName,requestor,testName,status,result");
+      expect(decodedParams.get('visibleColumns')).toBe("submittedAt,runName,requestor,testName,status,result");
+      expect(decodedParams.get('columnsOrder')).toBe("submittedAt,runName,requestor,testName,status,result,tags");
       expect(decodedParams.get('from')).toBe(expectedFromDate.toISOString());
       expect(decodedParams.get('to')).toBe(expectedToDate.toISOString());
     });
@@ -311,8 +345,8 @@ describe('TestRunsTabs Component', () => {
       // The only thing that should change is the tab
       expect(decodedParams.get('tab')).toBe('table-design');
       // All other params should remain at their default values
-      expect(decodedParams.get('visibleColumns')).toBe('submittedAt,testRunName,requestor,testName,status,result');
-      expect(decodedParams.get('columnsOrder')).toBe('submittedAt,testRunName,requestor,testName,status,result');
+      expect(decodedParams.get('visibleColumns')).toBe('submittedAt,runName,requestor,testName,status,result');
+      expect(decodedParams.get('columnsOrder')).toBe('submittedAt,runName,requestor,testName,status,result,tags');
     });
 
     test('updates URL when column order is changed', async () => {
@@ -346,7 +380,7 @@ describe('TestRunsTabs Component', () => {
 
       expect(decodedParams.get('columnsOrder')).toBe('result,status');
       // The visible columns should remain unchanged at their default
-      expect(decodedParams.get('visibleColumns')).toBe('submittedAt,testRunName,requestor,testName,status,result');
+      expect(decodedParams.get('visibleColumns')).toBe('submittedAt,runName,requestor,testName,status,result');
     });
 
     test('clear visible columns in URL when none are selected', async () => {
@@ -373,6 +407,93 @@ describe('TestRunsTabs Component', () => {
       const urlCall = mockReplace.mock.calls[0][0];
       const params = new URLSearchParams(urlCall.split('?')[1]);
       expect(params.get('visibleColumns')).toBeNull();
+    });
+
+    test('updates URL when sort order is changed', async () => {
+      // Arrange
+      render(
+        <TestRunsTabs
+          requestorNamesPromise={mockRequestorNamesPromise}
+          resultsNamesPromise={mockResultsNamesPromise}
+        /> , { wrapper }
+      );
+
+      // Wait for the initial save
+      await waitFor(() => expect(mockReplace).toHaveBeenCalledTimes(1)); 
+      mockReplace.mockClear();
+  
+      // Act: Simulate a child component updating the sort order
+      act(() => {
+        capturedSetSortOrder([{ id: 'status', order: 'asc' }, { id: 'result', order: 'desc' }]);
+      });
+  
+      // Assert: The save-to-URL effect runs again with the new state
+      await waitFor(() => expect(mockReplace).toHaveBeenCalledTimes(1));
+  
+      const urlCall = mockReplace.mock.calls[0][0];
+      const encodedQuery = new URLSearchParams(urlCall.split('?')[1]).get('q');
+      const decoded = decodeStateFromUrlParam(encodedQuery!);
+      const decodedParams = new URLSearchParams(decoded!);
+
+      expect(decodedParams.get('sortOrder')).toBe('status:asc,result:desc');
+    });
+
+    test('clear sortOrder in URL when no certain order is specified', async () => {
+      // Arrange
+      render(
+        <TestRunsTabs
+          requestorNamesPromise={mockRequestorNamesPromise}
+          resultsNamesPromise={mockResultsNamesPromise}
+        /> , { wrapper }
+      );
+
+      // Wait for the initial save
+      await waitFor(() => expect(mockReplace).toHaveBeenCalledTimes(1)); 
+      mockReplace.mockClear();
+  
+      // Act: Simulate a child component clearing the visible columns
+      act(() => {
+        capturedSetSortOrder([]);
+      });
+  
+      await waitFor(() => {
+        expect(mockReplace).toHaveBeenCalled();
+        const urlCall = mockReplace.mock.calls[0][0];
+
+        const encodedQuery = new URLSearchParams(urlCall.split('?')[1]).get('q');
+        const decoded = decodeStateFromUrlParam(encodedQuery!);
+        const newParams = new URLSearchParams(decoded!);
+
+        expect(newParams.get('sortOrder')).toBeNull();
+      });
+    });
+
+    test('initialize sortOrder state from URL parameter', async() => {
+      // Arrange: Provide specific URL parameters for this test
+      const params = new URLSearchParams();
+      params.set('sortOrder', 'status:asc,result:desc');
+      mockUseSearchParams.mockReturnValue(params);
+  
+      // Act
+      render(
+        <TestRunsTabs
+          requestorNamesPromise={mockRequestorNamesPromise}
+          resultsNamesPromise={mockResultsNamesPromise}
+        />, { wrapper }
+      );
+  
+      // Assert: Wait for the component to process the params and pass them as props
+      await waitFor(() => {
+        expect(mockReplace).toHaveBeenCalled();
+        const urlCall = mockReplace.mock.calls[0][0];
+
+        // Decode the URL parameters to check the sortOrder
+        const encodedQuery = new URLSearchParams(urlCall.split('?')[1]).get('q');
+        const decoded = decodeStateFromUrlParam(encodedQuery!);
+        const newParams = new URLSearchParams(decoded!);
+
+        expect(newParams.get('sortOrder')).toBe('status:asc,result:desc');
+      });
     });
   });
 
@@ -510,4 +631,198 @@ describe('TestRunsTabs Component', () => {
     // Ensure a new fetch is triggered
     await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(3));
   });
-});
+
+  describe('Sorting Logic', () => {
+
+    const unsortedRuns = [
+      { runId: '1', testStructure: { runName: 'C Run', status: 'Passed', requestor: 'A User', tags: ['A tag'] } },
+      { runId: '2', testStructure: { runName: 'A Run', status: 'Failed', requestor: 'B User', tags: ['B tag'] } },
+      { runId: '3', testStructure: { runName: 'B Run', status: 'Passed', requestor: 'C User', tags: ['A tag', 'C tag']}},
+      { runId: '0', testStructure: { runName: 'D Run', status:'Passed', requestor: 'A User', tags: ['D tag', 'A tag']}}
+    ];
+
+    const defaultTransformedRun = {
+      bundle: "N/A", group: "N/A", package: "N/A", result: "N/A", submissionId: "N/A",
+      submittedAt: "N/A", testName: "N/A", runName: "N/A"
+    };
+
+    beforeEach(() => {
+      (global.fetch as jest.Mock).mockImplementation(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ runs: unsortedRuns, limitExceeded: false }),
+        })
+      );
+    });
+
+    test('sorts data by a single column in ascending order', async () => {
+      const params = new URLSearchParams();
+      params.set('sortOrder', 'runName:asc');
+      mockUseSearchParams.mockReturnValue(params);
+
+      render(
+        <TestRunsTabs requestorNamesPromise={Promise.resolve([])} resultsNamesPromise={Promise.resolve([])} />, 
+        { wrapper }
+      );
+      fireEvent.click(screen.getByRole('tab', { name: 'Results' }));
+
+      await waitFor(() => {
+        const lastCallArgs = TestRunsTableMock.mock.calls.slice(-1)[0][0];
+        expect(lastCallArgs.runsList).toEqual([
+          { ...defaultTransformedRun, id: '2', runName: 'A Run', status: 'Failed', requestor: 'B User', tags: 'B tag' },
+          { ...defaultTransformedRun, id: '3', runName: 'B Run', status: 'Passed', requestor: 'C User', tags: 'A tag, C tag' },
+          { ...defaultTransformedRun, id: '1', runName: 'C Run', status: 'Passed', requestor: 'A User', tags: 'A tag' },
+          { ...defaultTransformedRun, id: '0', runName: 'D Run', status:'Passed', requestor: 'A User', tags: 'D tag, A tag'}
+        ]);
+      });
+    });
+
+    test('sorts data by a single column in descending order', async () => {
+      const params = new URLSearchParams();
+      params.set('sortOrder', 'runName:desc');
+      mockUseSearchParams.mockReturnValue(params);
+
+      render(
+        <TestRunsTabs requestorNamesPromise={Promise.resolve([])} resultsNamesPromise={Promise.resolve([])} />, 
+        { wrapper }
+      );
+      fireEvent.click(screen.getByRole('tab', { name: 'Results' }));
+
+      await waitFor(() => {
+        const lastCallArgs = TestRunsTableMock.mock.calls.slice(-1)[0][0];
+        expect(lastCallArgs.runsList).toEqual([
+          { ...defaultTransformedRun, id: '0', runName: 'D Run', status:'Passed', requestor: 'A User', tags: 'D tag, A tag'},
+          { ...defaultTransformedRun, id: '1', runName: 'C Run', status: 'Passed', requestor: 'A User', tags: 'A tag' },
+          { ...defaultTransformedRun, id: '3', runName: 'B Run', status: 'Passed', requestor: 'C User', tags: 'A tag, C tag' },
+          { ...defaultTransformedRun, id: '2', runName: 'A Run', status: 'Failed', requestor: 'B User', tags: 'B tag' },
+        ]);
+      });
+    });
+
+    test('sorts by tags in ascending order', async () => {
+      const params = new URLSearchParams();
+      params.set('sortOrder', 'tags:asc');
+      mockUseSearchParams.mockReturnValue(params);
+
+      render(
+        <TestRunsTabs requestorNamesPromise={Promise.resolve([])} resultsNamesPromise={Promise.resolve([])} />, 
+        { wrapper }
+      );
+      fireEvent.click(screen.getByRole('tab', { name: 'Results' }));
+
+      await waitFor(() => {
+        const lastCallArgs = TestRunsTableMock.mock.calls.slice(-1)[0][0];
+        expect(lastCallArgs.runsList).toEqual([
+          { ...defaultTransformedRun, id: '1', runName: 'C Run', status: 'Passed', requestor: 'A User', tags: 'A tag' },
+          { ...defaultTransformedRun, id: '3', runName: 'B Run', status: 'Passed', requestor: 'C User', tags: 'A tag, C tag' },
+          { ...defaultTransformedRun, id: '2', runName: 'A Run', status: 'Failed', requestor: 'B User', tags: 'B tag' },
+          { ...defaultTransformedRun, id: '0', runName: 'D Run', status:'Passed', requestor: 'A User', tags: 'D tag, A tag'}
+        ]);
+      });
+    });
+
+
+    test('sorts correctly with two keys where primary key has higher column order', async () => {
+      const params = new URLSearchParams();
+      params.set('columnsOrder', 'requestor,testName,runName,result,tags');
+      params.set('sortOrder', 'runName:desc,requestor:asc');
+      mockUseSearchParams.mockReturnValue(params);
+
+      render(
+        <TestRunsTabs requestorNamesPromise={Promise.resolve([])} resultsNamesPromise={Promise.resolve([])} />, 
+        { wrapper }
+      );
+      fireEvent.click(screen.getByRole('tab', { name: 'Results' }));
+
+      await waitFor(() => {
+        const lastCallArgs = TestRunsTableMock.mock.calls.slice(-1)[0][0];
+        expect(lastCallArgs.runsList).toEqual([
+          { ...defaultTransformedRun, id: '0', runName: 'D Run', status:'Passed', requestor: 'A User', tags: 'D tag, A tag'},
+          { ...defaultTransformedRun, id: '1', runName: 'C Run', status: 'Passed', requestor: 'A User', tags: 'A tag' },
+          { ...defaultTransformedRun, id: '2', runName: 'A Run', status: 'Failed', requestor: 'B User', tags: 'B tag' },
+          { ...defaultTransformedRun, id: '3', runName: 'B Run', status: 'Passed', requestor: 'C User', tags: 'A tag, C tag' },
+        ]);
+      });
+    });
+
+    test('sorts by date in ascending order', async () => {
+      const mockedRuns = [
+        { runId: '1', testStructure: { queued: '2023-10-11T12:00:00Z', runName: 'Run A', status: 'Passed', requestor: 'A User', tags: ['A tag'] }},
+        { runId: '2', testStructure: { queued: '2023-10-02T12:00:00Z', runName: 'Run B', status: 'Failed', requestor: 'B User', tags: ['B tag'] }},
+        { runId: '3', testStructure: { queued: '2023-10-03T12:00:00Z', runName: 'Run C', status: 'Passed', requestor: 'C User', tags: ['C tag'] }},
+      ];
+
+      (global.fetch as jest.Mock).mockImplementation(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ runs: mockedRuns, limitExceeded: false }),
+        })
+      );
+
+      const params = new URLSearchParams();
+      params.set('sortOrder', 'submittedAt:asc');
+      mockUseSearchParams.mockReturnValue(params);
+
+      render(
+        <TestRunsTabs requestorNamesPromise={Promise.resolve([])} resultsNamesPromise={Promise.resolve([])} />, 
+        { wrapper }
+      );
+      fireEvent.click(screen.getByRole('tab', { name: 'Results' }));
+
+      await waitFor(() => {
+        const lastCallArgs = TestRunsTableMock.mock.calls.slice(-1)[0][0];
+
+        const expectedDateRun2 = new Date('2023-10-02T12:00:00Z').toLocaleString().replace(',', '');
+        const expectedDateRun3 = new Date('2023-10-03T12:00:00Z').toLocaleString().replace(',', '');
+        const expectedDateRun1 = new Date('2023-10-11T12:00:00Z').toLocaleString().replace(',', '');
+
+        expect(lastCallArgs.runsList).toEqual([
+          { ...defaultTransformedRun, id: '2', submittedAt: expectedDateRun2, runName: 'Run B', status: 'Failed', requestor: 'B User', tags: 'B tag' },
+          { ...defaultTransformedRun, id: '3', submittedAt: expectedDateRun3, runName: 'Run C', status: 'Passed', requestor: 'C User', tags: 'C tag' },
+          { ...defaultTransformedRun, id: '1', submittedAt: expectedDateRun1, runName: 'Run A', status: 'Passed', requestor: 'A User', tags: 'A tag' }
+        ]);
+      });
+    });
+
+    test('sorts correctly with three keys and handles ties at each level', async () => {
+      const mockedRuns = [
+        {runId: '1', testStructure: {requestor: 'A User', status: 'Passed', tags: ['B tag'] }},
+        {runId: '2', testStructure: {requestor: 'L User', status: 'Passed', tags: ['C tag']}},
+        {runId: '3', testStructure: {requestor: 'B User', status: 'Passed', tags: ['A tag']}},
+        {runId: '4', testStructure: {requestor: 'L User', status: 'Failed', tags: ['F tag']}},
+        {runId: '5', testStructure: {requestor: 'A User', status: 'Passed', tags: ['A tag, L tag']}},
+        {runId: '6', testStructure: {requestor: 'A User', status: 'Failed', tags: ['A tag, B tag']}}
+      ];
+
+      (global.fetch as jest.Mock).mockImplementation(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ runs: mockedRuns, limitExceeded: false }),
+        })
+      );
+
+      const params = new URLSearchParams();
+      params.set('columnsOrder', 'requestor,status,runName,result,tags');
+      params.set('sortOrder', 'requestor:desc,tags:asc,status:asc');
+      mockUseSearchParams.mockReturnValue(params);
+
+      render(
+        <TestRunsTabs requestorNamesPromise={Promise.resolve([])} resultsNamesPromise={Promise.resolve([])} />, 
+        { wrapper }
+      );
+      fireEvent.click(screen.getByRole('tab', { name: 'Results' }));
+
+      await waitFor(() => {
+        const lastCallArgs = TestRunsTableMock.mock.calls.slice(-1)[0][0];
+        expect(lastCallArgs.runsList).toEqual([
+          {...defaultTransformedRun, id: '4', requestor: 'L User', status: 'Failed', tags: 'F tag'},
+          {...defaultTransformedRun, id: '2', requestor: 'L User', status: 'Passed', tags: 'C tag'},
+          {...defaultTransformedRun, id: '3', requestor: 'B User', status: 'Passed', tags: 'A tag'},
+          {...defaultTransformedRun, id: '6', requestor: 'A User', status: 'Failed', tags: 'A tag, B tag'},
+          {...defaultTransformedRun, id: '5', requestor: 'A User', status: 'Passed', tags: 'A tag, L tag'},
+          {...defaultTransformedRun, id: '1', requestor: 'A User', status: 'Passed', tags: 'B tag' },
+        ]);
+      });
+    });
+  });
+}); 

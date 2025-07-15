@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
+import { TestStructure } from "@/generated/galasaapi";
+import { ColumnDefinition } from "../interfaces";
+
 const CLIENT_API_VERSION = "0.43.0";
 
 const COLORS = {
@@ -50,9 +53,9 @@ const COLUMNS_IDS = {
   RESULT: "result"
 } as const;
 
-const RESULTS_TABLE_COLUMNS = [
-  {id: "submittedAt", columnName: "Submitted at"},
-  { id: "testRunName", columnName: "Test Run name" },
+const RESULTS_TABLE_COLUMNS: ColumnDefinition[] = [
+  { id: "submittedAt", columnName: "Submitted at" },
+  { id: "runName", columnName: "Test Run name" },
   { id: "requestor", columnName: "Requestor" },
   { id: "submissionId", columnName: "Submission ID" },
   { id: "group", columnName: "Group" },
@@ -80,6 +83,7 @@ const RUN_QUERY_PARAMS = {
   VISIBLE_COLUMNS: "visibleColumns",
   COLUMNS_ORDER: "columnsOrder",
   TAB: "tab",
+  SORT_ORDER: "sortOrder",
 };
 
 const TABS_IDS = ['timeframe', 'table-design', 'search-criteria', 'results'];

@@ -42,8 +42,6 @@ export function encodeStateToUrlParam(queryString: string): string {
     
     // T minify the object before doing anything else
     const minifiedObject = minifyState(paramObject);
-    console.log("Minified Object:", minifiedObject);
-
     if (Object.keys(minifiedObject).length === 0) {
       return '';
     }
