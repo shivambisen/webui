@@ -32,7 +32,7 @@ const valueMap: Record<string, string> = {
   status: 'st', result: 'rs', submissionId: 'sid', group: 'g', bundle: 'b',
   package: 'p', tags: 'tgs',
   // Results
-  'Passed': 'P', 'Failed': 'F', 'Requeued': 'R', 'Ignored': 'I', 'Hung': 'H', 'EnvFail':'E', 'Cancelled': 'C',
+  'Passed': 'Pa', 'Failed': 'Fa', 'Requeued': 'Re', 'Ignored': 'Ig', 'Hung': 'Hu', 'EnvFail':'En', 'Cancelled': 'Ca',
   // Statuses
   [TEST_RUNS_STATUS.QUEUED]: 'Q',
   [TEST_RUNS_STATUS.STARTED]: 'S',
