@@ -272,7 +272,7 @@ export default function SearchCriteriaContent({
   return (
     <div>
       <p>{translations('description')}</p>
-      <div className={styles.resetToDefaultsButtonContainer}>
+      <div className={styles.resetToDefaultsButtonContainerSearchCriteria}>
         <Button 
           type="button"
           kind="secondary"
