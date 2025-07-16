@@ -8,6 +8,7 @@ import '@testing-library/jest-dom';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import TestRunsTabs from '@/components/test-runs/TestRunsTabs';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
+import { FeatureFlagProvider } from '@/contexts/FeatureFlagContext';
 
 // Mock Child Components
 const TestRunsTableMock = jest.fn((props) =>
@@ -36,6 +37,12 @@ jest.mock('@/components/test-runs/SearchCriteriaContent', () => ({
   __esModule: true,
   default: () => <div>Mocked Search Criteria Content</div>,
 }));
+
+jest.mock('@/components/test-runs/TestRunGraph', () => ({
+  __esModule: true,
+  default: jest.fn(() => <div>TestRunsGraphMock</div>)
+}));
+
 
 let capturedSetSelectedVisibleColumns: (columns: string[]) => void;
 let capturedSetColumnsOrder: (order: { id: string; columnName: string }[]) => void;
@@ -161,10 +168,12 @@ describe('TestRunsTabs Component', () => {
 
   test('renders all tabs correctly', () => {
     render(
-      <TestRunsTabs
-        requestorNamesPromise={mockRequestorNamesPromise}
-        resultsNamesPromise={mockResultsNamesPromise}
-      />
+      <FeatureFlagProvider>
+        <TestRunsTabs
+          requestorNamesPromise={mockRequestorNamesPromise}
+          resultsNamesPromise={mockResultsNamesPromise}
+        />
+      </FeatureFlagProvider>
       , { wrapper }
     );
     const tabLabels = ['Timeframe', 'Table Design', 'Search Criteria', 'Results'];
@@ -175,10 +184,12 @@ describe('TestRunsTabs Component', () => {
 
   test('displays the content of the Timeframe tab', () => {
     render(
-      <TestRunsTabs
-        requestorNamesPromise={mockRequestorNamesPromise}
-        resultsNamesPromise={mockResultsNamesPromise}
-      />, {wrapper}
+      <FeatureFlagProvider>
+        <TestRunsTabs
+          requestorNamesPromise={mockRequestorNamesPromise}
+          resultsNamesPromise={mockResultsNamesPromise}
+        />
+      </FeatureFlagProvider>, {wrapper}
     );
     const timeframeTab = screen.getByRole('tab', { name: 'Timeframe' });
     fireEvent.click(timeframeTab);
@@ -189,10 +200,12 @@ describe('TestRunsTabs Component', () => {
 
   test('switches to the "Results" tab and displays its content on click', async () => {
     render(
-      <TestRunsTabs
-        requestorNamesPromise={mockRequestorNamesPromise}
-        resultsNamesPromise={mockResultsNamesPromise}
-      />, {wrapper}
+      <FeatureFlagProvider>
+        <TestRunsTabs
+          requestorNamesPromise={mockRequestorNamesPromise}
+          resultsNamesPromise={mockResultsNamesPromise}
+        />
+      </FeatureFlagProvider>, {wrapper}
     );
     const resultsTab = screen.getByRole('tab', { name: 'Results' });
     fireEvent.click(resultsTab);
@@ -211,10 +224,12 @@ describe('TestRunsTabs Component', () => {
   
       // Act
       render(
-        <TestRunsTabs
-          requestorNamesPromise={mockRequestorNamesPromise}
-          resultsNamesPromise={mockResultsNamesPromise}
-        />, { wrapper }
+        <FeatureFlagProvider>
+          <TestRunsTabs
+            requestorNamesPromise={mockRequestorNamesPromise}
+            resultsNamesPromise={mockResultsNamesPromise}
+          />
+        </FeatureFlagProvider>, { wrapper }
       );
   
       // Assert: Wait for the component to process the params and pass them as props
@@ -233,10 +248,11 @@ describe('TestRunsTabs Component', () => {
     test('saves default state to URL when no parameters are present', async () => {
       // Act
       render(
-        <TestRunsTabs
-          requestorNamesPromise={mockRequestorNamesPromise}
-          resultsNamesPromise={mockResultsNamesPromise}
-        /> , { wrapper }
+        <FeatureFlagProvider>
+          <TestRunsTabs
+            requestorNamesPromise={mockRequestorNamesPromise}
+            resultsNamesPromise={mockResultsNamesPromise}
+          /></FeatureFlagProvider> , { wrapper }
       );
   
       // Assert: Wait for the initialization and save effect to run
@@ -257,10 +273,12 @@ describe('TestRunsTabs Component', () => {
     test('updates URL when selected visible columns are changed', async () => {
       // Arrange
       render(
-        <TestRunsTabs
-          requestorNamesPromise={mockRequestorNamesPromise}
-          resultsNamesPromise={mockResultsNamesPromise}
-        /> , { wrapper }
+        <FeatureFlagProvider>
+          <TestRunsTabs
+            requestorNamesPromise={mockRequestorNamesPromise}
+            resultsNamesPromise={mockResultsNamesPromise}
+          />
+        </FeatureFlagProvider> , { wrapper }
       );
 
       // Wait for the initial save
@@ -284,10 +302,12 @@ describe('TestRunsTabs Component', () => {
     test('updates URL when column order is changed', async () => {
       // Arrange
       render(
-        <TestRunsTabs
-          requestorNamesPromise={mockRequestorNamesPromise}
-          resultsNamesPromise={mockResultsNamesPromise}
-        /> , { wrapper }
+        <FeatureFlagProvider>
+          <TestRunsTabs
+            requestorNamesPromise={mockRequestorNamesPromise}
+            resultsNamesPromise={mockResultsNamesPromise}
+          />
+        </FeatureFlagProvider> , { wrapper }
       );
 
       // Wait for the initial save
@@ -312,10 +332,12 @@ describe('TestRunsTabs Component', () => {
     test('clear visible columns in URL when none are selected', async () => {
       // Arrange
       render(
-        <TestRunsTabs
-          requestorNamesPromise={mockRequestorNamesPromise}
-          resultsNamesPromise={mockResultsNamesPromise}
-        /> , { wrapper }
+        <FeatureFlagProvider>
+          <TestRunsTabs
+            requestorNamesPromise={mockRequestorNamesPromise}
+            resultsNamesPromise={mockResultsNamesPromise}
+          /> 
+        </FeatureFlagProvider>, { wrapper }
       );
 
       // Wait for the initial save
@@ -338,10 +360,12 @@ describe('TestRunsTabs Component', () => {
     test('updates URL when sort order is changed', async () => {
       // Arrange
       render(
-        <TestRunsTabs
-          requestorNamesPromise={mockRequestorNamesPromise}
-          resultsNamesPromise={mockResultsNamesPromise}
-        /> , { wrapper }
+        <FeatureFlagProvider>
+          <TestRunsTabs
+            requestorNamesPromise={mockRequestorNamesPromise}
+            resultsNamesPromise={mockResultsNamesPromise}
+          />
+        </FeatureFlagProvider> , { wrapper }
       );
 
       // Wait for the initial save
@@ -364,10 +388,12 @@ describe('TestRunsTabs Component', () => {
     test('clear sortOrder in URL when no certain order is specified', async () => {
       // Arrange
       render(
-        <TestRunsTabs
-          requestorNamesPromise={mockRequestorNamesPromise}
-          resultsNamesPromise={mockResultsNamesPromise}
-        /> , { wrapper }
+        <FeatureFlagProvider>
+          <TestRunsTabs
+            requestorNamesPromise={mockRequestorNamesPromise}
+            resultsNamesPromise={mockResultsNamesPromise}
+          /> 
+        </FeatureFlagProvider>, { wrapper }
       );
 
       // Wait for the initial save
@@ -395,10 +421,11 @@ describe('TestRunsTabs Component', () => {
   
       // Act
       render(
-        <TestRunsTabs
-          requestorNamesPromise={mockRequestorNamesPromise}
-          resultsNamesPromise={mockResultsNamesPromise}
-        />, { wrapper }
+        <FeatureFlagProvider>
+          <TestRunsTabs
+            requestorNamesPromise={mockRequestorNamesPromise}
+            resultsNamesPromise={mockResultsNamesPromise}
+          /></FeatureFlagProvider>, { wrapper }
       );
   
       // Assert: Wait for the component to process the params and pass them as props
@@ -421,10 +448,11 @@ describe('TestRunsTabs Component', () => {
     test('does not fetch data on initial render if "Results" tab is not active', () => {
       mockUseSearchParams.mockReturnValue(new URLSearchParams());
       render(
-        <TestRunsTabs
-          requestorNamesPromise={mockRequestorNamesPromise}
-          resultsNamesPromise={mockResultsNamesPromise}
-        />, { wrapper }
+        <FeatureFlagProvider>
+          <TestRunsTabs
+            requestorNamesPromise={mockRequestorNamesPromise}
+            resultsNamesPromise={mockResultsNamesPromise}
+          /></FeatureFlagProvider>, { wrapper }
       );
 
       expect(global.fetch).not.toHaveBeenCalled();
@@ -433,10 +461,12 @@ describe('TestRunsTabs Component', () => {
     test('fetches data when "Results" tab is selected', async () => {
       mockUseSearchParams.mockReturnValue(new URLSearchParams());
       render(
-        <TestRunsTabs
-          requestorNamesPromise={mockRequestorNamesPromise}
-          resultsNamesPromise={mockResultsNamesPromise}
-        />, { wrapper }
+        <FeatureFlagProvider>
+          <TestRunsTabs
+            requestorNamesPromise={mockRequestorNamesPromise}
+            resultsNamesPromise={mockResultsNamesPromise}
+          />
+        </FeatureFlagProvider>, { wrapper }
       );
 
       expect(global.fetch).not.toHaveBeenCalled();
@@ -449,10 +479,11 @@ describe('TestRunsTabs Component', () => {
     test('serves data from cache and does not refetch when switching tabs with same query', async () => {
       mockUseSearchParams.mockReturnValue((new URLSearchParams("requestor=user1&result=passed")));
       render(
-        <TestRunsTabs
-          requestorNamesPromise={mockRequestorNamesPromise}
-          resultsNamesPromise={mockResultsNamesPromise}
-        />, { wrapper }
+        <FeatureFlagProvider>
+          <TestRunsTabs
+            requestorNamesPromise={mockRequestorNamesPromise}
+            resultsNamesPromise={mockResultsNamesPromise}
+          /></FeatureFlagProvider>, { wrapper }
       );
 
       // Initial fetch 
@@ -474,10 +505,11 @@ describe('TestRunsTabs Component', () => {
     test('does NOT trigger a new fetch when a UI-only param changes', async () => {
       mockUseSearchParams.mockReturnValue(new URLSearchParams("requestor=user1&result=passed"));
       const {rerender} = render(
-        <TestRunsTabs
-          requestorNamesPromise={mockRequestorNamesPromise}
-          resultsNamesPromise={mockResultsNamesPromise}
-        />, { wrapper }
+        <FeatureFlagProvider>
+          <TestRunsTabs
+            requestorNamesPromise={mockRequestorNamesPromise}
+            resultsNamesPromise={mockResultsNamesPromise}
+          /></FeatureFlagProvider>, { wrapper }
       );
 
       // Initial fetch 
@@ -487,10 +519,12 @@ describe('TestRunsTabs Component', () => {
       // Change a UI-only param (e.g., visibleColumns)
       mockUseSearchParams.mockReturnValue(new URLSearchParams("requestor=user1&result=passed&visibleColumns=status,result"));
       rerender(
-        <TestRunsTabs
-          requestorNamesPromise={mockRequestorNamesPromise}
-          resultsNamesPromise={mockResultsNamesPromise}
-        />
+        <FeatureFlagProvider>
+          <TestRunsTabs
+            requestorNamesPromise={mockRequestorNamesPromise}
+            resultsNamesPromise={mockResultsNamesPromise}
+          />
+        </FeatureFlagProvider>
       );
 
       // Ensure no new fetch is triggered
@@ -501,10 +535,12 @@ describe('TestRunsTabs Component', () => {
   test('check that we are sending an API request when we expect to', async() => {
     mockUseSearchParams.mockReturnValue(new URLSearchParams("requestor=user1&result=passed"));
     const {rerender} = render(
-      <TestRunsTabs
-        requestorNamesPromise={mockRequestorNamesPromise}
-        resultsNamesPromise={mockResultsNamesPromise}
-      />, { wrapper }
+      <FeatureFlagProvider>
+        <TestRunsTabs
+          requestorNamesPromise={mockRequestorNamesPromise}
+          resultsNamesPromise={mockResultsNamesPromise}
+        />
+      </FeatureFlagProvider>, { wrapper }
     );
 
     // Initial fetch 
@@ -514,10 +550,12 @@ describe('TestRunsTabs Component', () => {
     // Change tags param
     mockUseSearchParams.mockReturnValue(new URLSearchParams("requestor=user1&result=passed&tags=tag1,tag2"));
     rerender(
-      <TestRunsTabs
-        requestorNamesPromise={mockRequestorNamesPromise}
-        resultsNamesPromise={mockResultsNamesPromise}
-      />
+      <FeatureFlagProvider>
+        <TestRunsTabs
+          requestorNamesPromise={mockRequestorNamesPromise}
+          resultsNamesPromise={mockResultsNamesPromise}
+        />
+      </FeatureFlagProvider>
     );
     // Ensure a new fetch is triggered
     await waitFor(() => expect(global.fetch).toHaveBeenCalledTimes(2));
@@ -525,10 +563,12 @@ describe('TestRunsTabs Component', () => {
     // Change the tags order without changing the tags themselves
     mockUseSearchParams.mockReturnValue(new URLSearchParams("requestor=user1&result=passed&tags=tag2,tag1"));
     rerender(
-      <TestRunsTabs
-        requestorNamesPromise={mockRequestorNamesPromise}
-        resultsNamesPromise={mockResultsNamesPromise}
-      />
+      <FeatureFlagProvider>
+        <TestRunsTabs
+          requestorNamesPromise={mockRequestorNamesPromise}
+          resultsNamesPromise={mockResultsNamesPromise}
+        />
+      </FeatureFlagProvider>
     );
     // Ensure no fetch is triggered
     await waitFor(() => expect(global.fetch).not.toHaveBeenCalledTimes(3));
@@ -536,10 +576,12 @@ describe('TestRunsTabs Component', () => {
     // Delete a tag
     mockUseSearchParams.mockReturnValue(new URLSearchParams("requestor=user1&result=passed&tags=tag2"));
     rerender(
-      <TestRunsTabs
-        requestorNamesPromise={mockRequestorNamesPromise}
-        resultsNamesPromise={mockResultsNamesPromise}
-      />
+      <FeatureFlagProvider>
+        <TestRunsTabs
+          requestorNamesPromise={mockRequestorNamesPromise}
+          resultsNamesPromise={mockResultsNamesPromise}
+        />
+      </FeatureFlagProvider>
     );
 
     // Ensure a new fetch is triggered
@@ -575,7 +617,9 @@ describe('TestRunsTabs Component', () => {
       mockUseSearchParams.mockReturnValue(params);
 
       render(
-        <TestRunsTabs requestorNamesPromise={Promise.resolve([])} resultsNamesPromise={Promise.resolve([])} />, 
+        <FeatureFlagProvider>
+          <TestRunsTabs requestorNamesPromise={Promise.resolve([])} resultsNamesPromise={Promise.resolve([])} />
+        </FeatureFlagProvider>, 
         { wrapper }
       );
       fireEvent.click(screen.getByRole('tab', { name: 'Results' }));
@@ -597,7 +641,9 @@ describe('TestRunsTabs Component', () => {
       mockUseSearchParams.mockReturnValue(params);
 
       render(
-        <TestRunsTabs requestorNamesPromise={Promise.resolve([])} resultsNamesPromise={Promise.resolve([])} />, 
+        <FeatureFlagProvider>
+          <TestRunsTabs requestorNamesPromise={Promise.resolve([])} resultsNamesPromise={Promise.resolve([])} />
+        </FeatureFlagProvider>, 
         { wrapper }
       );
       fireEvent.click(screen.getByRole('tab', { name: 'Results' }));
@@ -619,7 +665,9 @@ describe('TestRunsTabs Component', () => {
       mockUseSearchParams.mockReturnValue(params);
 
       render(
-        <TestRunsTabs requestorNamesPromise={Promise.resolve([])} resultsNamesPromise={Promise.resolve([])} />, 
+        <FeatureFlagProvider>
+          <TestRunsTabs requestorNamesPromise={Promise.resolve([])} resultsNamesPromise={Promise.resolve([])} />
+        </FeatureFlagProvider>, 
         { wrapper }
       );
       fireEvent.click(screen.getByRole('tab', { name: 'Results' }));
@@ -643,7 +691,9 @@ describe('TestRunsTabs Component', () => {
       mockUseSearchParams.mockReturnValue(params);
 
       render(
-        <TestRunsTabs requestorNamesPromise={Promise.resolve([])} resultsNamesPromise={Promise.resolve([])} />, 
+        <FeatureFlagProvider>
+          <TestRunsTabs requestorNamesPromise={Promise.resolve([])} resultsNamesPromise={Promise.resolve([])} />
+        </FeatureFlagProvider>, 
         { wrapper }
       );
       fireEvent.click(screen.getByRole('tab', { name: 'Results' }));
@@ -678,7 +728,9 @@ describe('TestRunsTabs Component', () => {
       mockUseSearchParams.mockReturnValue(params);
 
       render(
-        <TestRunsTabs requestorNamesPromise={Promise.resolve([])} resultsNamesPromise={Promise.resolve([])} />, 
+        <FeatureFlagProvider>
+          <TestRunsTabs requestorNamesPromise={Promise.resolve([])} resultsNamesPromise={Promise.resolve([])} />
+        </FeatureFlagProvider>, 
         { wrapper }
       );
       fireEvent.click(screen.getByRole('tab', { name: 'Results' }));
@@ -721,7 +773,9 @@ describe('TestRunsTabs Component', () => {
       mockUseSearchParams.mockReturnValue(params);
 
       render(
-        <TestRunsTabs requestorNamesPromise={Promise.resolve([])} resultsNamesPromise={Promise.resolve([])} />, 
+        <FeatureFlagProvider>
+          <TestRunsTabs requestorNamesPromise={Promise.resolve([])} resultsNamesPromise={Promise.resolve([])} />
+        </FeatureFlagProvider>, 
         { wrapper }
       );
       fireEvent.click(screen.getByRole('tab', { name: 'Results' }));
