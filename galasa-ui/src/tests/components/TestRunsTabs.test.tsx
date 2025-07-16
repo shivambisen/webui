@@ -9,7 +9,7 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import TestRunsTabs from '@/components/test-runs/TestRunsTabs';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { decodeStateFromUrlParam } from '@/utils/urlEncoder';
-import { DAY_MS } from '@/utils/constants/common';
+import { DAY_MS, DEFAULT_VISIBLE_COLUMNS } from '@/utils/constants/common';
 
 // Mock Child Components
 const TestRunsTableMock = jest.fn((props) =>
@@ -139,7 +139,15 @@ jest.mock('@/utils/constants/common', () => ({
     RUNDONE: 'Rundone',
     ENDING: 'Ending',
     FINISHED: 'Finished'
-  }
+  },
+  DEFAULT_VISIBLE_COLUMNS: [
+    "submittedAt",
+    "runName",
+    "requestor",
+    "testName",
+    "status",
+    "result",
+  ]
 }));
 
 
