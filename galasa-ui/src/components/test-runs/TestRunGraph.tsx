@@ -8,7 +8,8 @@
 import "@carbon/charts/styles.css";
 import { ScatterChart } from "@carbon/charts-react";
 import { ScaleTypes } from "@carbon/charts";
-import { Loading, InlineNotification } from "@carbon/react";
+import { InlineNotification } from "@carbon/react";
+import { SkeletonText } from "@carbon/react";
 import {useMemo,useRef, useEffect,} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -18,6 +19,8 @@ import { MAX_RECORDS } from "@/utils/constants/common";
 import { TEST_RUNS } from "@/utils/constants/breadcrumb";
 import useHistoryBreadCrumbs from "@/hooks/useHistoryBreadCrumbs";
 import { useTheme } from "@/contexts/ThemeContext";
+import { getEarliestAndLatestDates } from "@/utils/timeOperations";
+import { getTooltipHTML } from "./TooltipTestRunGraph";
 
 interface TestRunGraphProps {
   runsList: runStructure[];
@@ -27,6 +30,15 @@ interface TestRunGraphProps {
   isLoading?: boolean;
   isError?: boolean;
 }
+const resultColorMap: Record<string, string> = {
+  passed:    "#2ecc40", // bright green
+  failed:    "#ff4136", // vivid red
+  envfail:   "#ffb700", // gold/yellow
+  cancelled: "#ab47bc", // medium purple
+  requeued:  "#00bcd4", // cyan
+  "n/a":     "#bdbdbd", // light gray
+  other:     "#607d8b", // blue-gray
+};
 
 export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[], orderedHeaders =[], isLoading, isError,}: TestRunGraphProps) {
   const translations = useTranslations("TestRunGraph");
@@ -40,21 +52,17 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
   const headerDefinitions = useMemo(() => {
-    if (orderedHeaders.length && visibleColumns.length) {
-      return orderedHeaders
-        .filter(({ id }) => visibleColumns.includes(id))
-        .map(({ id }) => ({ key: id, header: translations(id) }));
-    }
-    return visibleColumns.map((columnId) => ({
-      key: columnId,
-      header: translations(columnId),
-    }));
-  }, [orderedHeaders, visibleColumns, translations]);
+    if (!runsList.length) return [];
+    const firstRun = runsList[0];
+    return Object.keys(firstRun)
+      .filter((key) => key !== "submittedAt" && key !== "id") // exclude keys you don't want in tooltip
+      .map((key) => ({
+        key,
+        header: translations(key), // or just `key` if translation not available
+      }));
+  }, [runsList, translations]);
 
-  const resultColorMap: Record<string, string> = {
-    passed: "#24a148",
-    failed: "#e53935",
-  };
+
 
   const chartData = useMemo(() => {
     const dateMap: Record<string, number> = {};
@@ -66,12 +74,17 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
 
       return {
         group: (run.result || "other").toLowerCase(),
-        date: date,
+        date,
         value: count,
         custom: run,
       };
     });
   }, [runsList]);
+
+  const xTickValues = Array.from(
+    new Set(runsList.map(run => new Date(run.submittedAt).toISOString().split("T")[0]))
+  ).map(dateStr => new Date(dateStr));
+  
 
   const chartOptions = useMemo(() => ({
     theme: isLightTheme ? "white" : "g100",
@@ -80,7 +93,21 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
         title: translations("submittedAt"),
         mapsTo: "date",
         scaleType: ScaleTypes.TIME,
-      },
+        ticks: {
+          values: xTickValues,
+          formatter: (tick: number | Date, i?: number) => {
+            const date = tick instanceof Date ? tick : new Date(tick);
+            const day = date.getDate();
+            const month = date.toLocaleString("default", { month: "short" });
+            if (day === 30) {
+              return `${month} ${day}`;
+            }
+            return `${day}`;
+          },
+          rotateIfSmallerThan: 60,
+        
+        }},
+        
       left: {
         title: "",
         mapsTo: "value",
@@ -89,26 +116,28 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
       },
     },
     height: "400px",
-    points: { radius: 5, fillOpacity: 1 },
+    points: { radius: 4, fillOpacity: 1 },
     color: { scale: resultColorMap },
+    zoomBar: {
+      top: {
+        enabled: true
+      },
+    },
+    animations: false,
     tooltip: {
       enabled: true,
-      customHTML: (points: any[]) => {
-        const run = points[0]?.custom || {};
-        return `
-            <div style="padding:6px; font-size:0.9rem;">
-              ${headerDefinitions.map(({ key, header }) =>
-      `<strong>${header}:</strong> ${run[key] ?? "Unknown"}`
-    ).join("<br/>")}
-            </div>`;
-      },
+      customHTML: (points: any[]) => getTooltipHTML(points, headerDefinitions, styles),
     },
     legend: { alignment: "center" },
     data: { loading: isLoading },
     toolbar: { enabled: false },
     experimental: true,
-  }),[headerDefinitions, isLoading, isLightTheme]);
+  }),[headerDefinitions, isLoading, isLightTheme,translations]);
 
+  // Carbon Charts does not expose a direct onClick handler for data points.
+  // Therefore, we manually attach a click event listener to the chart container.
+  // The handler traverses the DOM from the event target upwards to find an element with a __data__ property,
+  // which contains the chart's data point object. This allows us to extract the clicked run and perform navigation.
   useEffect(() => {
     const container = chartContainerRef.current;
     if (!container) return;
@@ -139,18 +168,15 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
   if (isLoading)
     return (
       <div className={styles.spinnerWrapper}>
-        <Loading withOverlay={false} description={translations("loadingGraph")} />
+        <SkeletonText width="100%" style={{ height: 400 }} />
       </div>
     );
   if (!runsList.length) return <p>{translations("noTestRunsFound")}</p>;
+  const dates = runsList.map((run) =>
+    new Date(run.submittedAt || 0).getTime(),
+  );
 
-  // Compute timeframe text
-  const earliestDate = new Date(
-    Math.min(...runsList.map((r) => new Date(r.submittedAt).getTime()))
-  );
-  const latestDate = new Date(
-    Math.max(...runsList.map((r) => new Date(r.submittedAt).getTime()))
-  );
+  const { earliest, latest } = getEarliestAndLatestDates(dates);
 
   return (
     <div className={styles.resultsPageContainer}>
@@ -164,8 +190,8 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
       )}
       <p className={styles.timeFrameText}>
         {translations("timeFrameText.range", {
-          from: earliestDate.toLocaleString().replace(",", ""),
-          to: latestDate.toLocaleString().replace(",", ""),
+          from: earliest ? earliest.toLocaleString().replace(",", "") : "",
+          to: latest ? latest.toLocaleString().replace(",", "") : "",
         })}
       </p>
       <div ref={chartContainerRef}>

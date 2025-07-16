@@ -273,3 +273,19 @@ export const parseAndValidateTime = (timeString: string) => {
   return parsedTime;
 };
 
+
+export function getEarliestAndLatestDates(dates: (string | number | Date | undefined)[]): { earliest: Date | null, latest: Date | null } {
+  if (!dates || dates.length === 0) {
+    return { earliest: null, latest: null };
+  }
+  const timestamps = dates
+    .map((d) => d ? new Date(d).getTime() : NaN)
+    .filter((t) => !isNaN(t));
+  if (timestamps.length === 0) {
+    return { earliest: null, latest: null };
+  }
+  return {
+    earliest: new Date(Math.min(...timestamps)),
+    latest: new Date(Math.max(...timestamps)),
+  };
+}
