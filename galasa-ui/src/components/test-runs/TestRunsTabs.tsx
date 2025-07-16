@@ -154,7 +154,7 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
       const structure = run.testStructure || {};
   
       return {
-        id: run.runId,
+        id: run.runId || 'N/A',
         submittedAt: structure.queued ? new Date(structure.queued).toLocaleString().replace(',', '') : 'N/A',
         runName: structure.runName || 'N/A',
         requestor: structure.requestor || 'N/A',
