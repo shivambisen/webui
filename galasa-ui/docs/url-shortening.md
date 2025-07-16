@@ -103,5 +103,5 @@ from=2025-06-01T10:45:00.000Z
 - The **key and value mappings** used for minification in `urlStateMappers.ts` are **hardcoded**.
 - These mappings are used both for **encoding** and **decoding**, and they must stay **in sync**.
 - If a new filter or query parameter is added to the system (e.g., a new column, status, or query key), make sure to:
-1. Add a new entry in `keyMap` and `valueMap`.
-2. Update the `minifyValue` and `expandValue` logic if the new param needs special handling (e.g., date, list, sort order).
+  1. Add a new entry in `keyMap` and `valueMap`.
+  2. Update the `minifyValue` and `expandValue` logic if the new param needs special handling (e.g., date, list, sort order).
