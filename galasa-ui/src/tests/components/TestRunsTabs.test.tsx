@@ -154,6 +154,19 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 );
 
 describe('TestRunsTabs Component', () => {
+
+  const STABLE_DATE = new Date('2024-07-15T10:00:00.000Z');
+  const originalDate = global.Date;
+
+
+  beforeAll(() => {
+    jest.useFakeTimers().setSystemTime(STABLE_DATE);
+  });
+  
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
   const mockRequestorNamesPromise = Promise.resolve([]);
   const mockResultsNamesPromise = Promise.resolve([]);
 

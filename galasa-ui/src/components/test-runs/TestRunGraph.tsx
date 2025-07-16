@@ -7,17 +7,22 @@
 
 import "@carbon/charts/styles.css";
 import { ScatterChart } from "@carbon/charts-react";
-import { Loading, InlineNotification } from "@carbon/react";
-import { ScaleTypes } from "@carbon/charts";
-import { useMemo } from "react";
-
-import styles from "@/styles/TestRunsGraph.module.css";
-import { runStructure, ColumnDefinition } from "@/utils/interfaces";
+import { ScaleTypes, TimeIntervalNames } from "@carbon/charts";
+import { InlineNotification } from "@carbon/react";
+import { SkeletonText } from "@carbon/react";
+import {useMemo,useRef, useEffect, useState,} from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { MAX_RECORDS } from "@/utils/constants/common";
+import styles from "@/styles/TestRunsGraph.module.css";
+import { runStructure, ColumnDefinition, DataPoint } from "@/utils/interfaces";
+import { COLORS, MAX_RECORDS } from "@/utils/constants/common";
+import { TEST_RUNS } from "@/utils/constants/breadcrumb";
+import useHistoryBreadCrumbs from "@/hooks/useHistoryBreadCrumbs";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useDateTimeFormat } from "@/contexts/DateTimeFormatContext";
+import { getTooltipHTML } from "../../utils/generateTooltipHTML";
 
-interface GraphsProps {
+interface TestRunGraphProps {
   runsList: runStructure[];
   limitExceeded: boolean;
   visibleColumns?: string[];
@@ -25,142 +30,231 @@ interface GraphsProps {
   isLoading?: boolean;
   isError?: boolean;
 }
+const resultColorMap: Record<string, string> = {
+  passed:    COLORS.GREEN, 
+  failed:    COLORS.RED,
+  envfail:   COLORS.YELLOW,
+  cancelled: COLORS.PURPLE,
+  requeued:  COLORS.CYAN,
+  "n/a":     COLORS.GRAY,
+  other:     COLORS.BLUE_GRAY,
+};
 
-export default function TestRunGraph({
-  runsList,
-  limitExceeded,
-  visibleColumns = [],
-  orderedHeaders = [],
-  isLoading,
-  isError,
-}: GraphsProps) {
+export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[], orderedHeaders =[], isLoading, isError,}: TestRunGraphProps) {
   const translations = useTranslations("TestRunGraph");
-  const theme=useTheme();
-  const isLight = theme?.theme === "light"; 
+  const themeContext = useTheme();
+  const isLightTheme = themeContext?.theme === "light";
+  const { formatDate } = useDateTimeFormat();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { pushBreadCrumb } = useHistoryBreadCrumbs();
+  const chartContainerRef = useRef<HTMLDivElement>(null);
 
-  const headers = useMemo(() => {
-    return orderedHeaders
-      ?.filter((col) => visibleColumns.includes(col.id))
-      .map((col) => ({
-        key: col.id,
-        header: translations(col.id),
-      })) || [];
-  }, [orderedHeaders, visibleColumns]);
+  const headerDefinitions = useMemo(() => {
+    if (!runsList.length) return [];
+    const firstRun = runsList[0];
+    return Object.keys(firstRun)
+      .filter((key) => key !== "id") 
+      .map((key) => ({
+        key,
+        header: translations(key),
+        isDate: key === "submittedAt",
+      }));
+  }, [runsList, translations]);
 
-  const colorMap: Record<string, string> = {
-    passed: "#24a148",
-    failed: "#da1e28",
-    other: "#f1c21b",
+  const createChartDataPoint = (run: runStructure, dateMap: Record<string, number>) => {
+    const date = new Date(run.submittedAt);
+    const dateKey = date.toISOString().split("T")[0];
+    const count = (dateMap[dateKey] || 0) + 1;
+    dateMap[dateKey] = count;
+  
+    return {
+      group: (run.result || "other").toLowerCase(),
+      date,
+      value: count,
+      custom: run,
+    };
   };
 
   const chartData = useMemo(() => {
     const dateMap: Record<string, number> = {};
-    return runsList.map((run) => {
-      const date = new Date(run.submittedAt);
-      const dateKey = date.toISOString().split("T")[0];
-      const count = (dateMap[dateKey] || 0) + 1;
-      dateMap[dateKey] = count;
-
-      return {
-        group: run.result?.toLowerCase() || "other",
-        date,
-        value: count,
-        custom: run,
-      };
-    });
+    return runsList.map((run) => createChartDataPoint(run, dateMap));
   }, [runsList]);
 
-  const options = useMemo(() => ({
-    theme: isLight ? "white" : "g100",
-    axes: {
-      bottom: {
-        title: translations("submittedAt"),
-        mapsTo: "date",
-        scaleType: ScaleTypes.TIME,
-      },
-      left: {
-        title: "",
-        mapsTo: "value",
-        scaleType: ScaleTypes.LINEAR,
-        ticks: { values: [1] },
-        visible: false,
-      },
-    },
-    height: "400px",
-    points: {
-      radius: 5,
-      fillOpacity: 1,
-    },
+  const xTickValues = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          runsList.map((run) =>
+            new Date(run.submittedAt).toISOString().split("T")[0]
+          )
+        )
+      ).map((d) => new Date(d)),
+    [runsList]
+  );
+
+  let domain: [Date, Date] | undefined;
+  const totalDates = xTickValues.length;
   
-    color: {
-      scale: colorMap,
-    },
-    tooltip: {
-      enabled: true,
-      customHTML: (dataPoint: any) => {
-        const run = dataPoint[0]?.custom || {};
-    
-        const headersToUse = orderedHeaders?.length
-          ? orderedHeaders.filter((col) => visibleColumns.includes(col.id)).map((col) => ({
-            key: col.id,
-            header: translations(col.id),
-          }))
-          : visibleColumns.map((key) => ({
-            key,
-            header: translations(key),
-          }));
-    
-        return `
-          <div style="padding: 6px 8px; font-size: 0.9rem;">
-            ${headersToUse
-      .map(({ key, header }) => `<strong>${header}:</strong> ${run[key] ?? "Unknown"}`)
-      .join("<br/>")}
-          </div>
-        `;
-      },
-    },     
-    legend: {
-      alignment: "center",
-    },
-    data: {
-      loading: isLoading,
-    },
-    experimental: true,
-    toolbar: {
-      enabled: false,
-    },
-  }), [headers, isLoading,isLight]);
-
-  if (isError) return <p>{translations("errorLoadingGraph")}</p>;
-  if (isLoading) {
-    return (
-      <div className={styles.spinnerWrapper}>
-        <Loading withOverlay={false} description="Loading graph..." />
-      </div>
-    );
+  if (totalDates === 1) {
+    const timestamp = xTickValues[0].getTime();
+    const offset = 12 * 60 * 60 * 1000; 
+    domain = [new Date(timestamp - offset), new Date(timestamp + offset)];
+  } else {
+    domain = undefined; 
   }
-  if (!runsList.length) return <p>{translations("noTestRunsFound")}</p>;
+  
 
-  const earliest = new Date(Math.min(...runsList.map((r) => new Date(r.submittedAt).getTime())));
-  const latest = new Date(Math.max(...runsList.map((r) => new Date(r.submittedAt).getTime())));
+  let pointRadius: number;
+  const totalRuns = runsList.length;
+  const maxRadius = 5;
+  const minRadius = 1;
+  const softLimit = 1000;
+
+  if (totalRuns <= softLimit) {
+    pointRadius =maxRadius - ((maxRadius - minRadius) * totalRuns) / softLimit;
+  } else {
+    pointRadius = minRadius;
+  }
+        
+  const chartOptions = useMemo(() => {
+    
+    return {
+      theme: isLightTheme ? "white" : "g100",
+      axes: {
+        bottom: {
+          title: translations("submittedAt"),
+          mapsTo: "date",
+          scaleType: ScaleTypes.TIME,
+          ticks: {
+            values: xTickValues,
+            formatter: (tick: number | Date, i?: number) => {
+              const date = tick instanceof Date ? tick : new Date(tick);
+              const day = date.getDate();
+              const month = date.toLocaleString("default", { month: "short" });
+            
+              let formattedDate;
+              if (day === 1) {
+                formattedDate = `${month} ${day}`;
+              } else {
+                formattedDate = `${day}`;
+              }
+
+              return formattedDate;
+            }
+            
+          },
+          domain: domain
+        },
+        left: {
+          title: "",
+          mapsTo: "value",
+          scaleType: ScaleTypes.LINEAR,
+          visible: false,
+        },
+      },
+      timeScale: {
+        showDayName: false,
+        timeInterval: TimeIntervalNames.monthly, 
+        timeIntervalFormats: {
+          monthly: {
+            primary: 'MMM',  
+            secondary: 'd' 
+          }
+        }
+      },
+      height: "400px",
+      points: { radius: pointRadius, fillOpacity: 1 },
+      color: { scale: resultColorMap },
+      zoomBar: {
+        top: {
+          enabled: true
+        },
+      },
+      animations: false,
+      tooltip: {
+        enabled: true,
+        customHTML: (points:DataPoint[]) => getTooltipHTML(points, headerDefinitions, formatDate),
+      },
+      legend: { alignment: "center" },
+      data: { loading: isLoading },
+      toolbar: { enabled: false },
+      experimental: true,
+    };
+  }, [headerDefinitions, isLoading, isLightTheme,translations, xTickValues]);
+
+  type DataBoundElement = HTMLElement & { __data__?: DataPoint };
+
+  // Carbon Charts does not expose a direct onClick handler for data points.
+  // Therefore, we manually attach a click event listener to the chart container.
+  // The handler traverses the DOM from the event target upwards to find an element with a __data__ property,
+  // which contains the chart's data point object. This allows us to extract the clicked run and perform navigation.
+  useEffect(() => {
+    const container = chartContainerRef.current;
+    if (!container){
+      return; 
+    } 
+
+    const handleClick = (event: MouseEvent) => {
+      let element = event.target as HTMLElement | null;
+
+      while (element && !(element as DataBoundElement).__data__) {
+        element = element.parentElement;
+      }
+      const dataPoint = element && (element as DataBoundElement)?.__data__;
+      let selectedRun: runStructure | undefined;
+      if (dataPoint?.custom) {
+        selectedRun = dataPoint.custom as runStructure;
+      }
+      if(selectedRun?.id){
+        pushBreadCrumb({
+          ...TEST_RUNS,
+          route: `/test-runs?${searchParams.toString()}`,
+        });
+        router.push(`/test-runs/${selectedRun.id}`); 
+      }
+    };
+
+    container.addEventListener("click", handleClick);
+    return () => container.removeEventListener("click", handleClick);
+  }, [chartData, pushBreadCrumb, router, searchParams]);
+
+  if (isError){
+    return <p>{translations("errorLoadingGraph")}</p>;
+  };
+  if (isLoading){
+    return (
+      <SkeletonText className={styles.spinnerWrapper} />
+    );};
+  if (!runsList.length){
+    return <p>{translations("noTestRunsFound")}</p>;
+  };
+  const dates = runsList.map((run) =>
+    new Date(run.submittedAt || 0).getTime(),
+  );
+
+  const earliestDate = new Date(Math.min(...dates));
+  const latestDate = new Date(Math.max(...dates));
 
   return (
     <div className={styles.resultsPageContainer}>
       {limitExceeded && (
         <InlineNotification
-          className={styles.notification}
           kind="warning"
           title={translations("limitExceeded.title")}
           subtitle={translations("limitExceeded.subtitle", { MAX_RECORDS })}
+          className={styles.notification}
         />
       )}
       <p className={styles.timeFrameText}>
         {translations("timeFrameText.range", {
-          from: earliest.toLocaleString().replace(",", ""),
-          to: latest.toLocaleString().replace(",", ""),
+          from: formatDate(earliestDate),
+          to: formatDate(latestDate)
         })}
       </p>
-      <ScatterChart data={chartData} options={options} />
+      <div ref={chartContainerRef}>
+        <ScatterChart data={chartData} options={chartOptions} />
+      </div>
     </div>
   );
 }

@@ -95,19 +95,27 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
   const [isInitialized, setIsInitialized] = useState(false);
   useEffect(() => {setIsInitialized(true);}, []);
 
-  // Define the tabs with their corresponding labels
-  const TABS_CONFIG: TabConfig[] = [
-    { id: TABS_IDS[0], label: translations('tabs.timeframe') },
-    { id: TABS_IDS[1], label: translations('tabs.tableDesign') },
-    { id: TABS_IDS[2], label: translations('tabs.searchCriteria') },
-    { id: TABS_IDS[3], label: translations('tabs.results') },
-    isGraphEnabled && {
-      id: TABS_IDS[4],
-      label: translations('tabs.graphs'),
-    },
-  ].filter(Boolean) as TabConfig[];
-  
-  // Save to URL parameters (only after initialization)
+  // Define the tabs with their corresponding labels, memoized to avoid unnecessary re-renders
+  const TABS_CONFIG = useMemo<TabConfig[]>(() => {
+    const tabs: TabConfig[] = [
+      { id: TABS_IDS[0], label: translations("tabs.timeframe") },
+      { id: TABS_IDS[1], label: translations("tabs.tableDesign") },
+      { id: TABS_IDS[2], label: translations("tabs.searchCriteria") },
+      { id: TABS_IDS[3], label: translations("tabs.results") },
+    ];
+
+    if (isGraphEnabled) {
+      tabs.push({
+        id: TABS_IDS[4],
+        label: translations("tabs.graph"),
+      });
+    }
+
+    return tabs;
+  }, [translations, isGraphEnabled]);
+
+
+  // Save and encode current state to the URL. This is the single source of truth for URL updates.
   useEffect(() => {
     if (!isInitialized) return;
 
@@ -154,7 +162,7 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
       const structure = run.testStructure || {};
   
       return {
-        id: run.runId,
+        id: run.runId || 'N/A',
         submittedAt: structure.queued ? new Date(structure.queued).toLocaleString().replace(',', '') : 'N/A',
         runName: structure.runName || 'N/A',
         requestor: structure.requestor || 'N/A',
