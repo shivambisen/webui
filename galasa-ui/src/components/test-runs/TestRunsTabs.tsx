@@ -18,6 +18,9 @@ import { RESULTS_TABLE_COLUMNS, COLUMNS_IDS, RUN_QUERY_PARAMS} from '@/utils/con
 import { useQuery } from '@tanstack/react-query';
 import { ColumnDefinition, runStructure, sortOrderType } from '@/utils/interfaces';
 import { Run } from '@/generated/galasaapi';
+import { useFeatureFlags } from '@/contexts/FeatureFlagContext';
+import { FEATURE_FLAGS } from '@/utils/featureFlags';
+import TestRunGraph from './TestRunGraph';
 
 
 interface TabConfig {
@@ -36,7 +39,9 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-  const TABS_IDS = ['timeframe', 'table-design', 'search-criteria', 'results'];
+  const TABS_IDS = ['timeframe', 'table-design', 'search-criteria', 'results','graphs'];
+  const { isFeatureEnabled } = useFeatureFlags();
+  const isGraphEnabled = isFeatureEnabled(FEATURE_FLAGS.GRAPH);
 
   // Initialize selectedIndex based on URL parameters or default to first tab
   const [selectedIndex, setSelectedIndex] = useState(() => {
@@ -96,8 +101,12 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
     { id: TABS_IDS[1], label: translations('tabs.tableDesign') },
     { id: TABS_IDS[2], label: translations('tabs.searchCriteria') },
     { id: TABS_IDS[3], label: translations('tabs.results') },
-  ];
-
+    isGraphEnabled && {
+      id: TABS_IDS[4],
+      label: translations('tabs.graphs'),
+    },
+  ].filter(Boolean) as TabConfig[];
+  
   // Save to URL parameters (only after initialization)
   useEffect(() => {
     if (!isInitialized) return;
@@ -209,7 +218,7 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
       return response.json() as Promise<TestRunsData>;
     },
     // Only run the query when the results tab is selected
-    enabled: selectedIndex === TABS_IDS.indexOf('results'), 
+    enabled: ['results', 'graphs'].includes(TABS_IDS[selectedIndex]),
     // Only refetch when the canonical query key changes
     staleTime: Infinity,
   });
@@ -299,6 +308,20 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
             />
           </div>
         </TabPanel>
+        { isGraphEnabled &&
+          <TabPanel>
+            <div className={styles.tabContent}>
+              <TestRunGraph
+                runsList={sortedRuns ?? []}
+                limitExceeded={runsData?.limitExceeded ?? false}
+                visibleColumns={selectedVisibleColumns}
+                isLoading={isLoading}
+                isError={isError}
+              />
+            </div>
+          </TabPanel>
+        }
+        
       </TabPanels>
     </Tabs>
   );

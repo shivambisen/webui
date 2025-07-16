@@ -258,12 +258,39 @@
       "page":"page"
     }
   },
+"TestRunGraph": {
+    "submittedAt": "Submitted At",
+    "runName": "Run Name",
+    "requestor": "Requestor",
+    "submissionId": "Submission ID",
+    "group": "Group",
+    "bundle": "Bundle",
+    "package": "Package",
+    "testName": "Test Name",
+    "status": "Status",
+    "tags": "Tags",
+    "result": "Result",
+
+    "isloading": "Loading graph...",
+    "errorLoadingGraph": "Something went wrong loading the graph.",
+    "noTestRunsFound": "No test runs found.",
+
+    "limitExceeded": {
+      "title": "Limit Exceeded",
+      "subtitle": "Your query returned more than {MAX_RECORDS} results. Showing the first {MAX_RECORDS} records."
+    },
+
+    "timeFrameText": {
+      "range": "Showing test runs submitted between {from} and {to}"
+    }
+  },
   "TestRunsTabs": {
     "tabs": {
       "timeframe": "Timeframe",
       "tableDesign": "Table Design",
       "searchCriteria": "Search Criteria",
-      "results": "Results"
+      "results": "Results",
+      "graphs": "Graphs"
     },
     "content": {
       "timeframe": "This page is under construction. Currently, all results for the last 24 hours are shown in the Results tab.",
