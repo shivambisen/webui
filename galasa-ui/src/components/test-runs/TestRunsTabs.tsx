@@ -14,7 +14,7 @@ import { usePathname, useSearchParams, useRouter } from "next/navigation";
 import { TestRunsData } from "@/utils/testRuns";
 import { useTranslations } from "next-intl";
 import { useEffect, useMemo, useState } from 'react';
-import { RESULTS_TABLE_COLUMNS, COLUMNS_IDS, RUN_QUERY_PARAMS, DAY_MS, TABS_IDS, SEARCH_CRITERIA_KEYS} from '@/utils/constants/common';
+import { RESULTS_TABLE_COLUMNS, COLUMNS_IDS, RUN_QUERY_PARAMS, DAY_MS, TABS_IDS, SEARCH_CRITERIA_KEYS, DEFAULT_VISIBLE_COLUMNS} from '@/utils/constants/common';
 import { useQuery } from '@tanstack/react-query';
 import { ColumnDefinition, runStructure, sortOrderType } from '@/utils/interfaces';
 import { Run } from '@/generated/galasaapi';
@@ -52,14 +52,7 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
 
   // Initialize selectedVisibleColumns  based on URL parameters or default values
   const [selectedVisibleColumns, setSelectedVisibleColumns] = useState<string[]>(
-    () => searchParams.get(RUN_QUERY_PARAMS.VISIBLE_COLUMNS)?.split(',') || [
-      COLUMNS_IDS.SUBMITTED_AT,
-      COLUMNS_IDS.TEST_RUN_NAME,
-      COLUMNS_IDS.REQUESTOR,
-      COLUMNS_IDS.TEST_NAME,
-      COLUMNS_IDS.STATUS,
-      COLUMNS_IDS.RESULT,
-    ]
+    () => searchParams.get(RUN_QUERY_PARAMS.VISIBLE_COLUMNS)?.split(',') || DEFAULT_VISIBLE_COLUMNS
   );
 
   // Initialize columnsOrder based on URL parameters or default to RESULTS_TABLE_COLUMNS
@@ -290,9 +283,13 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
               selectedRowIds={selectedVisibleColumns}
               setSelectedRowIds={setSelectedVisibleColumns}
               tableRows={columnsOrder}
+              visibleColumns={selectedVisibleColumns}
+              columnsOrder={columnsOrder}
               setTableRows={setColumnsOrder}
               sortOrder={sortOrder}
               setSortOrder={setSortOrder}
+              setVisibleColumns={setSelectedVisibleColumns}
+              setColumnsOrder={setColumnsOrder}
             />
           </div>
         </TabPanel>
