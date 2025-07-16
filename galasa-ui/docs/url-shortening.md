@@ -32,11 +32,11 @@ It mainly has 2 functions to compress/decompress the full URL state object.
 ### 3. `urlStateMappers` 
 Contains the logic for replacing verbose keys/values with compact alternatives:/
 
-| Type      | Example                    | Minified                   |     |
-| --------- | -------------------------- | -------------------------- | --- |
-| Key       | `runName`                  | `rn`                       |     |
-| Value     | `Passed`                   | `Pa`                       |     |
-| Timestamp | `2025-06-01T10:45:00.000Z` | `ltfsj5s` (base-36 millis) |     |
+| Type      | Example                    | Minified                   | 
+| --------- | -------------------------- | -------------------------- | 
+| Key       | `runName`                  | `rn`                       |     
+| Value     | `Passed`                   | `Pa`                       |   
+| Timestamp | `2025-06-01T10:45:00.000Z` | `ltfsj5s` (base-36 millis) | 
 Also handles list minification and sort orders:
 - `visibleColumns=submittedAt,runName` → `vc=sA,rn`
 - `sortOrder=submittedAt:desc` → `so=sA:d`
