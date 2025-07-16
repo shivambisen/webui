@@ -198,25 +198,13 @@ describe('TestRunsTabs Component', () => {
   const STABLE_DATE = new Date('2024-07-15T10:00:00.000Z');
   const originalDate = global.Date;
 
-  beforeAll(() => {
-    // Mock the Date constructor to always return a predictable date
-    global.Date = class extends originalDate {
-      constructor(dateString?: string | number | Date) {
-        if (dateString) {
-          super(dateString);
-        } else {
-          return STABLE_DATE; 
-        }
-      }
-      static now() {
-        return STABLE_DATE.getTime(); 
-      }
-    } as any;
-  });
 
+  beforeAll(() => {
+    jest.useFakeTimers().setSystemTime(STABLE_DATE);
+  });
+  
   afterAll(() => {
-    // Restore the real Date object after tests in this file are done
-    global.Date = originalDate;
+    jest.useRealTimers();
   });
 
   const mockRequestorNamesPromise = Promise.resolve([]);
