@@ -122,23 +122,23 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
   useEffect(() => {setIsInitialized(true);}, []);
 
   // Define the tabs with their corresponding labels, memoized to avoid unnecessary re-renders
-const TABS_CONFIG = useMemo<TabConfig[]>(() => {
-  const tabs: TabConfig[] = [
-    { id: TABS_IDS[0], label: translations("tabs.timeframe") },
-    { id: TABS_IDS[1], label: translations("tabs.tableDesign") },
-    { id: TABS_IDS[2], label: translations("tabs.searchCriteria") },
-    { id: TABS_IDS[3], label: translations("tabs.results") },
-  ];
+  const TABS_CONFIG = useMemo<TabConfig[]>(() => {
+    const tabs: TabConfig[] = [
+      { id: TABS_IDS[0], label: translations("tabs.timeframe") },
+      { id: TABS_IDS[1], label: translations("tabs.tableDesign") },
+      { id: TABS_IDS[2], label: translations("tabs.searchCriteria") },
+      { id: TABS_IDS[3], label: translations("tabs.results") },
+    ];
 
-  if (isGraphEnabled) {
-    tabs.push({
-      id: TABS_IDS[4],
-      label: translations("tabs.graphs"),
-    });
-  }
+    if (isGraphEnabled) {
+      tabs.push({
+        id: TABS_IDS[4],
+        label: translations("tabs.graphs"),
+      });
+    }
 
-  return tabs;
-}, [translations, isGraphEnabled]);
+    return tabs;
+  }, [translations, isGraphEnabled]);
 
 
   // Save and encode current state to the URL. This is the single source of truth for URL updates.
