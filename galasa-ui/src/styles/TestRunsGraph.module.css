@@ -27,3 +27,8 @@
   align-items: center;
   height: 400px;
 }
+
+.tooltipContent {
+  padding: 6px;
+  font-size: 0.9rem;
+}
