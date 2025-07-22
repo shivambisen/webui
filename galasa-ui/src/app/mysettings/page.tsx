@@ -57,6 +57,7 @@ export default async function MySettings() {
     <main id="content">
       <BreadCrumb breadCrumbItems={[HOME]} />
       <PageTile translationKey="MySettings.title" />
+      <ProfileRole userProfilePromise={fetchUserFromApiServer("me")} />
       <AccessTokensSection accessTokensPromise={fetchAccessTokens(userLoginId)} isAddBtnVisible={true}/>
       <TokenResponseModal refreshToken={refreshToken} clientId={clientId} onLoad={deleteCookies} />
       <DateTimeFormatSection />
