@@ -271,7 +271,7 @@
   "status": "Status",
   "tags": "Tags",
   "result": "Ergebnis",
-
+  "noColumnsSelected": "Alle Spalten wurden im Tabellen-Design-Tab ausgeblendet, sodass keine Ergebniseinzelheiten sichtbar sein werden. Bitte passen Sie das Tabellen-Design an, um die gewünschten Spalten anzuzeigen.",
   "isloading": "Diagramm wird geladen...",
   "errorLoadingGraph": "Beim Laden des Diagramms ist ein Fehler aufgetreten.",
   "noTestRunsFound": "Keine Testläufe gefunden.",

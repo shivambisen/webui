@@ -8,7 +8,7 @@
 import "@carbon/charts/styles.css";
 import { ScatterChart } from "@carbon/charts-react";
 import { ScaleTypes } from "@carbon/charts";
-import { Loading, InlineNotification } from "@carbon/react";
+import { InlineNotification } from "@carbon/react";
 import { SkeletonText } from "@carbon/react";
 import {useMemo,useRef, useEffect,} from "react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -30,6 +30,15 @@ interface TestRunGraphProps {
   isLoading?: boolean;
   isError?: boolean;
 }
+const resultColorMap: Record<string, string> = {
+  passed:    "#2ecc40", // bright green
+  failed:    "#ff4136", // vivid red
+  envfail:   "#ffb700", // gold/yellow
+  cancelled: "#ab47bc", // medium purple
+  requeued:  "#00bcd4", // cyan
+  "n/a":     "#bdbdbd", // light gray
+  other:     "#607d8b", // blue-gray
+};
 
 export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[], orderedHeaders =[], isLoading, isError,}: TestRunGraphProps) {
   const translations = useTranslations("TestRunGraph");
@@ -54,15 +63,7 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
     }));
   }, [orderedHeaders, visibleColumns, translations]);
 
-  const resultColorMap: Record<string, string> = {
-    passed:    "#2ecc40", // bright green
-    failed:    "#ff4136", // vivid red
-    envfail:   "#ffb700", // gold/yellow
-    cancelled: "#ab47bc", // medium purple
-    requeued:  "#00bcd4", // cyan
-    "n/a":     "#bdbdbd", // light gray
-    other:     "#607d8b", // blue-gray
-  };
+
 
   const chartData = useMemo(() => {
     const dateMap: Record<string, number> = {};
@@ -113,7 +114,7 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
     data: { loading: isLoading },
     toolbar: { enabled: false },
     experimental: true,
-  }),[headerDefinitions, isLoading, isLightTheme,translations,resultColorMap]);
+  }),[headerDefinitions, isLoading, isLightTheme,translations]);
 
   // Carbon Charts does not expose a direct onClick handler for data points.
   // Therefore, we manually attach a click event listener to the chart container.
@@ -144,7 +145,9 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
     container.addEventListener("click", handleClick);
     return () => container.removeEventListener("click", handleClick);
   }, [chartData, pushBreadCrumb, router, searchParams]);
-
+  if (visibleColumns.length === 0) {
+    return <p>{translations('noColumnsSelected')}</p>;
+  }
   if (isError) return <p>{translations("errorLoadingGraph")}</p>;
   if (isLoading)
     return (
@@ -153,8 +156,11 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
       </div>
     );
   if (!runsList.length) return <p>{translations("noTestRunsFound")}</p>;
+  const dates = runsList.map((run) =>
+    new Date(run.submittedAt || 0).getTime(),
+  );
 
-  const { earliest, latest } = getEarliestAndLatestDates(runsList.map(run => run.submittedAt));
+  const { earliest, latest } = getEarliestAndLatestDates(dates);
 
   return (
     <div className={styles.resultsPageContainer}>

@@ -101,7 +101,7 @@ export default function TestRunsTable({runsList,limitExceeded, visibleColumns, o
     const dates = runsList.map((run) =>
       new Date(run.submittedAt || 0).getTime(),
     );
-    const { earliest, latest } = getEarliestAndLatestDates(runsList.map(r => r.submittedAt));
+    const { earliest, latest } = getEarliestAndLatestDates(dates);
 
     if (earliest && latest) {
       text = translations('timeFrameText.range', {

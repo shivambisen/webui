@@ -111,4 +111,24 @@ describe("TestRunGraph", () => {
     expect(screen.getByText(/Limit Exceeded/)).toBeInTheDocument();
   });
 
+  it("navigates to the test run details page when a data point is clicked", async () => {
+    render(<TestRunGraph {...defaultProps} />);
+  
+    const chartContainer = document.querySelector("[data-carbon-theme='white']");
+    const mockDot = document.createElement("div");
+    (mockDot as any).__data__ = {
+      custom: defaultProps.runsList[0], // The run we expect to navigate to
+    };
+    chartContainer?.appendChild(mockDot);
+    fireEvent.click(mockDot);
+  
+    await waitFor(() => {
+      expect(mockPush).toHaveBeenCalledWith(`/test-runs/${defaultProps.runsList[0].id}`);
+    });
+  
+    chartContainer?.removeChild(mockDot);
+  });
+  
+
 });
+
