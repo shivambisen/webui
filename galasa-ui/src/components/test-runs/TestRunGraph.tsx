@@ -82,6 +82,11 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
     });
   }, [runsList]);
 
+  const xTickValues = Array.from(
+    new Set(runsList.map(run => new Date(run.submittedAt).toISOString().split("T")[0]))
+  ).map(dateStr => new Date(dateStr));
+  
+
   const chartOptions = useMemo(() => ({
     theme: isLightTheme ? "white" : "g100",
     axes: {
@@ -89,7 +94,21 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
         title: translations("submittedAt"),
         mapsTo: "date",
         scaleType: ScaleTypes.TIME,
-      },
+        ticks: {
+          values: xTickValues,
+          formatter: (tick: number | Date, i?: number) => {
+            const date = tick instanceof Date ? tick : new Date(tick);
+            const day = date.getDate();
+            const month = date.toLocaleString("default", { month: "short" });
+            if (day === 30) {
+              return `${month} ${day}`;
+            }
+            return `${day}`;
+          },
+          rotateIfSmallerThan: 60,
+        
+        }},
+        
       left: {
         title: "",
         mapsTo: "value",
