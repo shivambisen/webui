@@ -22,7 +22,6 @@ import { useFeatureFlags } from '@/contexts/FeatureFlagContext';
 import { FEATURE_FLAGS } from '@/utils/featureFlags';
 import TestRunGraph from './TestRunGraph';
 
-
 interface TabConfig {
   id: string;
   label: string;
@@ -151,7 +150,6 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
   
     return runs.map((run) => {
       const structure = run.testStructure || {};
-  
       return {
         id: run.runId || 'N/A',
         submittedAt: structure.queued ? new Date(structure.queued).toLocaleString().replace(',', '') : 'N/A',
