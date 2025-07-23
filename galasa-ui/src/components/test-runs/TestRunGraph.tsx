@@ -19,8 +19,8 @@ import { MAX_RECORDS } from "@/utils/constants/common";
 import { TEST_RUNS } from "@/utils/constants/breadcrumb";
 import useHistoryBreadCrumbs from "@/hooks/useHistoryBreadCrumbs";
 import { useTheme } from "@/contexts/ThemeContext";
-import { getEarliestAndLatestDates } from "@/utils/timeOperations";
 import { getTooltipHTML } from "./TooltipTestRunGraph";
+import { useDateTimeFormat } from "@/contexts/DateTimeFormatContext";
 
 interface TestRunGraphProps {
   runsList: runStructure[];
@@ -44,6 +44,8 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
   const translations = useTranslations("TestRunGraph");
   const themeContext = useTheme();
   const isLightTheme = themeContext?.theme === "light";
+  const { formatDate } = useDateTimeFormat();
+  
 
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -176,7 +178,8 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
     new Date(run.submittedAt || 0).getTime(),
   );
 
-  const { earliest, latest } = getEarliestAndLatestDates(dates);
+  const earliestDate = new Date(Math.min(...dates));
+  const latestDate = new Date(Math.max(...dates));
 
   return (
     <div className={styles.resultsPageContainer}>
@@ -190,8 +193,8 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
       )}
       <p className={styles.timeFrameText}>
         {translations("timeFrameText.range", {
-          from: earliest ? earliest.toLocaleString().replace(",", "") : "",
-          to: latest ? latest.toLocaleString().replace(",", "") : "",
+          from: formatDate(earliestDate),
+          to: formatDate(latestDate)
         })}
       </p>
       <div ref={chartContainerRef}>

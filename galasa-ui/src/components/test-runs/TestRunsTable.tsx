@@ -36,7 +36,6 @@ import { useTranslations } from "next-intl";
 import { InlineNotification } from "@carbon/react";
 import useHistoryBreadCrumbs from "@/hooks/useHistoryBreadCrumbs";
 import { TEST_RUNS } from "@/utils/constants/breadcrumb";
-import { getEarliestAndLatestDates } from "@/utils/timeOperations";
 import { useDateTimeFormat } from "@/contexts/DateTimeFormatContext";
 
 
@@ -87,11 +86,12 @@ export default function TestRunsTable({runsList,limitExceeded, visibleColumns, o
     const dates = runsList.map((run) =>
       new Date(run.submittedAt || 0).getTime(),
     );
-    const { earliest, latest } = getEarliestAndLatestDates(dates);
 
-    if (earliest && latest) {
+    const earliestDate = new Date(Math.min(...dates));
+    const latestDate = new Date(Math.max(...dates));
+
+    if (earliestDate && latestDate) {
       text = translations('timeFrameText.range', {
-    
         from: formatDate(earliestDate),
         to: formatDate(latestDate)
       });
