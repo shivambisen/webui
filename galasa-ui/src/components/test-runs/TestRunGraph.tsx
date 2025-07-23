@@ -52,16 +52,15 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
   const headerDefinitions = useMemo(() => {
-    if (orderedHeaders.length && visibleColumns.length) {
-      return orderedHeaders
-        .filter(({ id }) => visibleColumns.includes(id))
-        .map(({ id }) => ({ key: id, header: translations(id) }));
-    }
-    return visibleColumns.map((columnId) => ({
-      key: columnId,
-      header: translations(columnId),
-    }));
-  }, [orderedHeaders, visibleColumns, translations]);
+    if (!runsList.length) return [];
+    const firstRun = runsList[0];
+    return Object.keys(firstRun)
+      .filter((key) => key !== "submittedAt" && key !== "id") // exclude keys you don't want in tooltip
+      .map((key) => ({
+        key,
+        header: translations(key), // or just `key` if translation not available
+      }));
+  }, [runsList, translations]);
 
 
 
@@ -164,9 +163,7 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
     container.addEventListener("click", handleClick);
     return () => container.removeEventListener("click", handleClick);
   }, [chartData, pushBreadCrumb, router, searchParams]);
-  if (visibleColumns.length === 0) {
-    return <p>{translations('noColumnsSelected')}</p>;
-  }
+
   if (isError) return <p>{translations("errorLoadingGraph")}</p>;
   if (isLoading)
     return (

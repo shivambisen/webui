@@ -133,7 +133,7 @@ export default function TestRunsTabs({ requestorNamesPromise, resultsNamesPromis
     if (isGraphEnabled) {
       tabs.push({
         id: TABS_IDS[4],
-        label: translations("tabs.graphs"),
+        label: translations("tabs.graph"),
       });
     }
 
