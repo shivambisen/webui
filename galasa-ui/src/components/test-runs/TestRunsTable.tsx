@@ -86,9 +86,11 @@ export default function TestRunsTable({runsList,limitExceeded, visibleColumns, o
     const dates = runsList.map((run) =>
       new Date(run.submittedAt || 0).getTime(),
     );
-    const { earliest, latest } = getEarliestAndLatestDates(dates);
 
-    if (earliest && latest) {
+    const earliestDate = new Date(Math.min(...dates));
+    const latestDate = new Date(Math.max(...dates));
+
+    if (earliestDate && latestDate) {
       text = translations('timeFrameText.range', {
         from: earliest ? earliest.toLocaleString().replace(',', '') : '',
         to: latest ? latest.toLocaleString().replace(',', '') : ''

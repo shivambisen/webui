@@ -54,6 +54,26 @@ export interface runStructure {
   submissionId: string;
 }
 
+export interface DataPoint {
+  group: string;
+  date: string; // ISO timestamp
+  value: number;
+  custom: {
+    id: string;
+    submittedAt: string;
+    runName: string;
+    requestor: string;
+    group: string;
+    bundle: string;
+    package: string;
+    testName: string;
+    tags: string;
+    status: string;
+    result: string;
+    submissionId: string;
+  };
+};
+
 
 export interface ColumnDefinition {
   id: keyof runStructure;

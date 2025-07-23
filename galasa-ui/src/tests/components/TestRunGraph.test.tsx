@@ -8,6 +8,7 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import TestRunGraph from "../../components/test-runs/TestRunGraph";
 import { useRouter, useSearchParams } from "next/navigation";
 import { RESULTS_TABLE_COLUMNS } from "@/utils/constants/common";
+import { DateTimeFormatProvider } from "@/contexts/DateTimeFormatContext";
 
 jest.mock("next/navigation");
 jest.mock("next-intl", () => ({
@@ -34,6 +35,11 @@ jest.mock("@/contexts/ThemeContext", () => ({
   useTheme: () => ({ theme: "light" })
 }));
 jest.mock("@/hooks/useHistoryBreadCrumbs", () => () => ({ pushBreadCrumb: jest.fn() }));
+jest.mock('@carbon/charts', () => ({
+  ScaleTypes: { TIME: 'time' },
+  TimeIntervalNames: { monthly: 'monthly' }
+}));
+
 
 const mockPush = jest.fn();
 (useRouter as jest.Mock).mockReturnValue({ push: mockPush });
@@ -82,7 +88,10 @@ const defaultProps = {
 
 describe("TestRunGraph", () => {
   it("renders the graph with data", () => {
-    render(<TestRunGraph {...defaultProps} />);
+    render(
+      <DateTimeFormatProvider>
+        <TestRunGraph {...defaultProps} />
+      </DateTimeFormatProvider>);
     expect(screen.getByText(/Showing test runs submitted between/)).toBeInTheDocument();
     // Check for legend items (status labels)
     expect(screen.getByText("passed")).toBeInTheDocument();
@@ -92,27 +101,45 @@ describe("TestRunGraph", () => {
   });
 
   it("shows loading state", () => {
-    render(<TestRunGraph {...defaultProps} isLoading={true} />);
+    render(
+      <DateTimeFormatProvider>
+        <TestRunGraph {...defaultProps} isLoading={true} />
+      </DateTimeFormatProvider>
+    );
     expect(document.querySelector('.cds--skeleton__text')).toBeInTheDocument();
   });
 
   it("shows error state", () => {
-    render(<TestRunGraph {...defaultProps} isError={true} />);
+    render(
+      <DateTimeFormatProvider>
+        <TestRunGraph {...defaultProps} isError={true} />
+      </DateTimeFormatProvider>
+    );
     expect(screen.getByText(/Error loading graph/)).toBeInTheDocument();
   });
 
   it("shows no data message", () => {
-    render(<TestRunGraph {...defaultProps} runsList={[]} />);
+    render(   
+      <DateTimeFormatProvider>
+        <TestRunGraph {...defaultProps} runsList={[]} />    
+      </DateTimeFormatProvider>
+    );
     expect(screen.getByText(/No test runs found/)).toBeInTheDocument();
   });
 
   it("shows limit exceeded warning", () => {
-    render(<TestRunGraph {...defaultProps} limitExceeded={true} />);
+    render(   
+      <DateTimeFormatProvider>
+        <TestRunGraph {...defaultProps} limitExceeded={true} />
+      </DateTimeFormatProvider>);
     expect(screen.getByText(/Limit Exceeded/)).toBeInTheDocument();
   });
 
   it("navigates to the test run details page when a data point is clicked", async () => {
-    render(<TestRunGraph {...defaultProps} />);
+    render(   
+      <DateTimeFormatProvider>
+        <TestRunGraph {...defaultProps} />
+      </DateTimeFormatProvider>);
   
     const chartContainer = document.querySelector("[data-carbon-theme='white']");
     const mockDot = document.createElement("div");
