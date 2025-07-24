@@ -81,19 +81,18 @@ export default function TestRunsTable({runsList,limitExceeded, visibleColumns, o
     if (!runsList || runsList.length === 0) {
       return translations("noTestRunsFound");
     }
-
+      
     let text = translations("timeFrameText.default");
     const dates = runsList.map((run) =>
       new Date(run.submittedAt || 0).getTime(),
     );
-
     const earliestDate = new Date(Math.min(...dates));
     const latestDate = new Date(Math.max(...dates));
 
     if (earliestDate && latestDate) {
       text = translations('timeFrameText.range', {
-        from: earliest ? earliest.toLocaleString().replace(',', '') : '',
-        to: latest ? latest.toLocaleString().replace(',', '') : ''
+        from: formatDate(earliestDate),
+        to: formatDate(latestDate)
       });
     }
     return text;
