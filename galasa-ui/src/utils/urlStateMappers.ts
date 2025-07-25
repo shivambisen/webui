@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import { RUN_QUERY_PARAMS, TABS_IDS, TEST_RUNS_STATUS } from "./constants/common";
+import { TEST_RUNS_QUERY_PARAMS, TABS_IDS, TEST_RUNS_STATUS } from "./constants/common";
 
 const keyMap: Record<string, string> = {
   [RUN_QUERY_PARAMS.TAB]: 't',
