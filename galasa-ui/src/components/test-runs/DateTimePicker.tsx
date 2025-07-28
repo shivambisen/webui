@@ -7,7 +7,7 @@
 
 import { useDateTimeFormat } from '@/contexts/DateTimeFormatContext';
 import styles from '@/styles/TestRunsPage.module.css';
-import { SUPPORTED_LOCALES } from '@/utils/constants/common';
+import { LOCALE_TO_FLATPICKR_FORMAT_MAP, SUPPORTED_LOCALES } from '@/utils/constants/common';
 import { parseAndValidateTime } from '@/utils/timeOperations';
 import { FormGroup, DatePicker, DatePickerInput, TimePicker, TimePickerSelect, SelectItem } from '@carbon/react';
 import { useTranslations } from 'next-intl';
@@ -22,26 +22,6 @@ interface DateTimePickerProps {
   onTimeChange: (time: string) => void;
   onAmPmChange: (amPm: string) => void;
 }
-
-/**
- * Converts a display format string to a Flatpickr-compatible format used by the DatePicker component.
- * @param displayFormat The format string to convert, e.g., "MM/DD/YYYY".
- * @returns The Flatpickr format string, e.g., "m/d/Y".
- */
-const convertDisplayFormatToFlatpickr = (displayFormat: string): string => {
-  return displayFormat
-    .replace(/MM/g, 'm')
-    .replace(/DD/g, 'd')
-    .replace(/YYYY/g, 'Y');
-};
-
-// Dynamically generate the map from SUPPORTED_LOCALES.
-const LOCALE_TO_FLATPICKR_FORMAT_MAP = Object.fromEntries(
-  SUPPORTED_LOCALES.map(({ code, format }) => [
-    code,
-    convertDisplayFormatToFlatpickr(format)
-  ])
-);
 
 /**
  * A self-contained component for selecting a date and time.
