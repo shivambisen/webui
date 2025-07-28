@@ -23,7 +23,11 @@ interface DateTimePickerProps {
   onAmPmChange: (amPm: string) => void;
 }
 
-// Helper function to convert the display format to the Flatpickr format.
+/**
+ * Converts a display format string to a Flatpickr-compatible format used by the DatePicker component.
+ * @param displayFormat The format string to convert, e.g., "MM/DD/YYYY".
+ * @returns The Flatpickr format string, e.g., "m/d/Y".
+ */
 const convertDisplayFormatToFlatpickr = (displayFormat: string): string => {
   return displayFormat
     .replace(/MM/g, 'm')
