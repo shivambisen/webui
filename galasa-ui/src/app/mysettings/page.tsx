@@ -5,7 +5,7 @@
  */
 import AuthCookies from '@/utils/authCookies';
 import { cookies } from 'next/headers';
-import AccessTokensSection from '@/components/AccessTokensSection';
+import AccessTokensSection from '@/components/mysettings/AccessTokensSection';
 import TokenResponseModal from '@/components/tokens/TokenResponseModal';
 import PageTile from '@/components/PageTile';
 import { UsersAPIApi } from '@/generated/galasaapi';
@@ -14,10 +14,11 @@ import * as Constants from "@/utils/constants/common";
 import BreadCrumb from '@/components/common/BreadCrumb';
 import { fetchAccessTokens } from '../../actions/getUserAccessTokens';
 import ErrorPage from '../error/page';
-import ExperimentalFeaturesSection from '@/components/ExperimentalFeaturesSection';
+import ExperimentalFeaturesSection from '@/components/mysettings/ExperimentalFeaturesSection';
 import { HOME } from '@/utils/constants/breadcrumb';
 import { fetchUserFromApiServer } from '@/actions/userServerActions';
 import ProfileRole from '@/components/users/UserRole';
+import DateTimeFormatSection from '@/components/mysettings/DateTimeFormatSection';
 
 export default async function MySettings() {
   const apiConfig = createAuthenticatedApiConfiguration();
@@ -61,6 +62,7 @@ export default async function MySettings() {
       <ProfileRole userProfilePromise={fetchUserFromApiServer("me")} />
       <AccessTokensSection accessTokensPromise={fetchAccessTokens(userLoginId)} isAddBtnVisible={true}/>
       <TokenResponseModal refreshToken={refreshToken} clientId={clientId} onLoad={deleteCookies} />
+      <DateTimeFormatSection />
       <ExperimentalFeaturesSection />
     </main>
   );
