@@ -306,3 +306,16 @@
 .hidden {
   visibility: hidden;
 }
+
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.buttonContainer{
+  display: flex;
+  margin-right: 3rem;
+  flex-shrink: 0;
+}

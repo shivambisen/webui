@@ -253,6 +253,15 @@
       "artifacts": "Artefakte"
     }
   },
+  "TestRunsDetails": {
+    "title":  "Testläufe",
+    "errorTitle": "Fehler",
+    "successTitle": "Erfolg",
+    "copyMessage": "Seiten-URL kopieren",
+    "copiedTitle": "URL erfolgreich kopiert: ",
+    "copiedMessage": "Die URL dieser Seite wurde in die Zwischenablage kopiert.",
+    "copyFailedMessage": "Fehler beim Kopieren der Seiten-URL"
+  },
   "TestRunSkeleton": {
     "status": "Status",
     "result": "Ergebnis",
