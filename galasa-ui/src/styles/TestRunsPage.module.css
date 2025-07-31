@@ -307,7 +307,6 @@
   visibility: hidden;
 }
 
-
 .toolbar {
   display: flex;
   align-items: center;
@@ -319,3 +318,8 @@
   margin-right: 3rem;
   flex-shrink: 0;
 }
+
+.clickableRow {
+  cursor: pointer;
+}
+
