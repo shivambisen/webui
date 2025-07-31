@@ -13,8 +13,8 @@ import { useTranslations } from "next-intl";
 import { NotificationType } from "@/utils/types/common";
 import { Button } from "@carbon/react";
 import { Share } from "@carbon/icons-react";
-import { Tile } from "@carbon/react";
 import { InlineNotification } from "@carbon/react";
+import PageTile from "../PageTile";
 
 interface TestRunsDetailsProps {
     requestorNamesPromise: Promise<string[]>;
@@ -51,20 +51,16 @@ export default function TestRunsDetails({requestorNamesPromise, resultsNamesProm
   return(
     <main id="content">
       <BreadCrumb breadCrumbItems={breadCrumbItems} />
-      
-      <Tile className={styles.toolbar} id="tile">
-        {translations("title")}
-        <div className={styles.buttonContainer}>
-          <Button
-            kind="ghost"
-            hasIconOnly
-            renderIcon={Share}
-            iconDescription={translations("copyMessage")}
-            onClick={handleShare}
-            data-testid="share-button"
-          />
-        </div>
-      </Tile>
+      <PageTile translationKey="TestRun.title" className={styles.toolbar}>
+        <Button
+          kind="ghost"
+          hasIconOnly
+          renderIcon={Share}
+          iconDescription={translations("copyMessage")}
+          onClick={handleShare}
+          data-testid="share-button"
+        />
+      </PageTile>
       {notification && (
         <InlineNotification
           title={notification.title}
