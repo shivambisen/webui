@@ -41,8 +41,6 @@ export default function ProfileDetails({ userProfilePromise }: ProfileDetailsPro
     loadUserProfile();
   }, [userProfilePromise]);
 
-  const roleName = userProfile.synthetic?.role?.metadata?.name;
-
   return (
     <div className={styles.profileDetails}>
       { isLoading ?
@@ -52,7 +50,6 @@ export default function ProfileDetails({ userProfilePromise }: ProfileDetailsPro
           <div className={styles.userDetailsContainer}>
             <h3>{translations("title")}</h3>
             <p>{translations("loggedInAs")} {userProfile?.loginId}</p>
-            <p>{translations("role")}: {roleName}</p>
           </div>
 
           <div className={styles.loginActivityContainer}>
@@ -72,8 +69,8 @@ export default function ProfileDetails({ userProfilePromise }: ProfileDetailsPro
                     {
                       client.clientName === WEB_UI_CLIENT_NAME
                         ? translations("lastLoginWeb", { date: lastLoginDateStr })
-                        : translations("lastLoginToken", { date: lastLoginDateStr })}
-
+                        : translations("lastLoginToken", { date: lastLoginDateStr })
+                    }
                   </p>
                 );
               })

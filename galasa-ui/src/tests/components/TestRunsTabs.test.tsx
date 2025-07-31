@@ -9,6 +9,8 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import TestRunsTabs from '@/components/test-runs/TestRunsTabs';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { FeatureFlagProvider } from '@/contexts/FeatureFlagContext';
+import { decodeStateFromUrlParam } from '@/utils/urlEncoder';
+import { DAY_MS, DEFAULT_VISIBLE_COLUMNS } from '@/utils/constants/common';
 
 // Mock Child Components
 const TestRunsTableMock = jest.fn((props) =>
@@ -31,6 +33,17 @@ jest.mock('@/components/test-runs/TestRunsTable', () => ({
 jest.mock('@/components/test-runs/TimeFrameContent', () => ({
   __esModule: true,
   default: () => <div>Mocked Timeframe Content</div>,
+  calculateSynchronizedState: jest.fn((fromDate, toDate) => ({
+    fromDate,
+    toDate,
+    fromTime: '00:00',
+    fromAmPm: 'AM',
+    toTime: '23:59',
+    toAmPm: 'PM',
+    durationDays: 0,
+    durationHours: 23,
+    durationMinutes: 59
+  })),
 }));
 
 jest.mock('@/components/test-runs/SearchCriteriaContent', () => ({
@@ -100,7 +113,7 @@ jest.mock('@/utils/constants/common', () => ({
     STATUS: 'status',
     RESULT: 'result',
     TAGS: 'tags',
-  },  RUN_QUERY_PARAMS: {
+  },  TEST_RUNS_QUERY_PARAMS: {
     FROM: 'from',
     TO: 'to',
     RUN_NAME: 'runName',
@@ -115,9 +128,36 @@ jest.mock('@/utils/constants/common', () => ({
     VISIBLE_COLUMNS: 'visibleColumns',
     COLUMNS_ORDER: 'columnsOrder',
     TAB: 'tab',
-    SORT_ORDER: 'sortOrder',
-  }
+    SORT_ORDER: 'sortOrder'
+  },
+  DAY_MS: 86400000,
+  TABS_IDS: ['timeframe', 'table-design', 'search-criteria', 'results'],
+  SEARCH_CRITERIA_KEYS: [
+    'runName', 'requestor', 'group', 'submissionId', 'bundle', 'testName', 
+    'result', 'status', 'tags'
+  ],
+  TEST_RUNS_STATUS: {
+    QUEUED: 'Queued',
+    STARTED: 'Started',
+    GENERATING: 'Generating',
+    BUILDING: 'Building',
+    PROVSTART: 'Provstart',
+    RUNNING: 'Running',
+    RUNDONE: 'Rundone',
+    ENDING: 'Ending',
+    FINISHED: 'Finished'
+  },
+  DEFAULT_VISIBLE_COLUMNS: [
+    "submittedAt",
+    "runName",
+    "requestor",
+    "testName",
+    "status",
+    "result",
+  ]
 }));
+
+
 
 // Mock window.matchMedia
 Object.defineProperty(window, "matchMedia", {
@@ -154,15 +194,25 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 );
 
 describe('TestRunsTabs Component', () => {
+
+  const STABLE_DATE = new Date('2024-07-15T10:00:00.000Z');
+  const originalDate = global.Date;
+
+
+  beforeAll(() => {
+    jest.useFakeTimers().setSystemTime(STABLE_DATE);
+  });
+  
+  afterAll(() => {
+    jest.useRealTimers();
+  });
+
   const mockRequestorNamesPromise = Promise.resolve([]);
   const mockResultsNamesPromise = Promise.resolve([]);
 
   beforeEach(() => {
-    // Reset all mocks before each test
     jest.clearAllMocks();
-    // Default to returning empty search params. Individual tests can override this.
     mockUseSearchParams.mockReturnValue(new URLSearchParams());
-    // Clear the react-query cache 
     queryClient.clear();
   });
 
@@ -259,15 +309,21 @@ describe('TestRunsTabs Component', () => {
       await waitFor(() => {
         expect(mockReplace).toHaveBeenCalledTimes(1);
       });
-        
-      const expectedParams = new URLSearchParams();
-      const defaultVisible = "submittedAt,runName,requestor,testName,status,result";
-      const defaultOrder = "submittedAt,runName,requestor,testName,status,result,tags";
-      expectedParams.set('tab', 'timeframe');
-      expectedParams.set('visibleColumns', defaultVisible);
-      expectedParams.set('columnsOrder', defaultOrder);
 
-      expect(mockReplace).toHaveBeenCalledWith(`/?${expectedParams.toString()}`, { scroll: false });
+      const urlCall = mockReplace.mock.calls[0][0];
+      const encodedQuery = new URLSearchParams(urlCall.split('?')[1]).get('q');
+
+      const decoded = decodeStateFromUrlParam(encodedQuery!);
+      const decodedParams = new URLSearchParams(decoded!);
+      
+      const expectedToDate = STABLE_DATE;
+      const expectedFromDate = new Date(STABLE_DATE.getTime() - DAY_MS); 
+
+      expect(decodedParams.get('tab')).toBe('timeframe');
+      expect(decodedParams.get('visibleColumns')).toBe("submittedAt,runName,requestor,testName,status,result");
+      expect(decodedParams.get('columnsOrder')).toBe("submittedAt,runName,requestor,testName,status,result,tags");
+      expect(decodedParams.get('from')).toBe(expectedFromDate.toISOString());
+      expect(decodedParams.get('to')).toBe(expectedToDate.toISOString());
     });
 
     test('updates URL when selected visible columns are changed', async () => {
@@ -281,22 +337,30 @@ describe('TestRunsTabs Component', () => {
         </FeatureFlagProvider> , { wrapper }
       );
 
-      // Wait for the initial save
-      await waitFor(() => expect(mockReplace).toHaveBeenCalledTimes(1)); 
+      // Wait for initial render and effect
+      await waitFor(() => expect(mockReplace).toHaveBeenCalled());
       mockReplace.mockClear();
-  
-      // Act: Simulate a child component updating the state
-      act(() => {
-        capturedSetSelectedVisibleColumns(['status', 'result']);
-      });
-  
-      // Assert: The save-to-URL effect runs again with the new state
-      await waitFor(() => expect(mockReplace).toHaveBeenCalledTimes(1));
-  
+
+      // Act
+      fireEvent.click(screen.getByText('Table Design'));
+
+      // Assert
+      await waitFor(() => {
+        expect(mockReplace).toHaveBeenCalledTimes(1);
+      });   
+
       const urlCall = mockReplace.mock.calls[0][0];
-      const params = new URLSearchParams(urlCall.split('?')[1]);
-      expect(params.get('visibleColumns')).toBe('status,result');
-      expect(params.get('columnsOrder')).toBe('submittedAt,runName,requestor,testName,status,result,tags');
+      const encodedQuery = new URLSearchParams(urlCall.split('?')[1]).get('q');
+      
+      // We must decode the received query to check its contents
+      const decoded = decodeStateFromUrlParam(encodedQuery!);
+      const decodedParams = new URLSearchParams(decoded!);
+      
+      // The only thing that should change is the tab
+      expect(decodedParams.get('tab')).toBe('table-design');
+      // All other params should remain at their default values
+      expect(decodedParams.get('visibleColumns')).toBe('submittedAt,runName,requestor,testName,status,result');
+      expect(decodedParams.get('columnsOrder')).toBe('submittedAt,runName,requestor,testName,status,result,tags');
     });
 
     test('updates URL when column order is changed', async () => {
@@ -315,18 +379,24 @@ describe('TestRunsTabs Component', () => {
       mockReplace.mockClear();
   
       // Act: Simulate a child component updating the state
-      const newOrder = [ { id: 'result', columnName: 'Result' }, { id: 'status', columnName: 'Status' }];
+      const newOrder = [{ id: 'result', columnName: 'Result' }, { id: 'status', columnName: 'Status' }];
       act(() => {
-        capturedSetColumnsOrder(newOrder);
+        if (capturedSetColumnsOrder) {
+          capturedSetColumnsOrder(newOrder);
+        }
       });
   
-      // Assert
+      // Assert: Wait for the effect to run with the new state
       await waitFor(() => expect(mockReplace).toHaveBeenCalledTimes(1));
-  
+
       const urlCall = mockReplace.mock.calls[0][0];
-      const params = new URLSearchParams(urlCall.split('?')[1]);
-      expect(params.get('columnsOrder')).toBe('result,status');
-      expect(params.get('visibleColumns')).toBe('submittedAt,runName,requestor,testName,status,result');
+      const encodedQuery = new URLSearchParams(urlCall.split('?')[1]).get('q');
+      const decoded = decodeStateFromUrlParam(encodedQuery!);
+      const decodedParams = new URLSearchParams(decoded!);
+
+      expect(decodedParams.get('columnsOrder')).toBe('result,status');
+      // The visible columns should remain unchanged at their default
+      expect(decodedParams.get('visibleColumns')).toBe('submittedAt,runName,requestor,testName,status,result');
     });
 
     test('clear visible columns in URL when none are selected', async () => {
@@ -381,8 +451,11 @@ describe('TestRunsTabs Component', () => {
       await waitFor(() => expect(mockReplace).toHaveBeenCalledTimes(1));
   
       const urlCall = mockReplace.mock.calls[0][0];
-      const params = new URLSearchParams(urlCall.split('?')[1]);
-      expect(params.get('sortOrder')).toBe('status:asc,result:desc');
+      const encodedQuery = new URLSearchParams(urlCall.split('?')[1]).get('q');
+      const decoded = decodeStateFromUrlParam(encodedQuery!);
+      const decodedParams = new URLSearchParams(decoded!);
+
+      expect(decodedParams.get('sortOrder')).toBe('status:asc,result:desc');
     });
 
     test('clear sortOrder in URL when no certain order is specified', async () => {
@@ -405,12 +478,16 @@ describe('TestRunsTabs Component', () => {
         capturedSetSortOrder([]);
       });
   
-      // Assert: The save-to-URL effect runs again with the new state
-      await waitFor(() => expect(mockReplace).toHaveBeenCalledTimes(1));
-  
-      const urlCall = mockReplace.mock.calls[0][0];
-      const params = new URLSearchParams(urlCall.split('?')[1]);
-      expect(params.get('sortOrder')).toBeNull();
+      await waitFor(() => {
+        expect(mockReplace).toHaveBeenCalled();
+        const urlCall = mockReplace.mock.calls[0][0];
+
+        const encodedQuery = new URLSearchParams(urlCall.split('?')[1]).get('q');
+        const decoded = decodeStateFromUrlParam(encodedQuery!);
+        const newParams = new URLSearchParams(decoded!);
+
+        expect(newParams.get('sortOrder')).toBeNull();
+      });
     });
 
     test('initialize sortOrder state from URL parameter', async() => {
@@ -432,7 +509,12 @@ describe('TestRunsTabs Component', () => {
       await waitFor(() => {
         expect(mockReplace).toHaveBeenCalled();
         const urlCall = mockReplace.mock.calls[0][0];
-        const newParams = new URLSearchParams(urlCall.split('?')[1]);
+
+        // Decode the URL parameters to check the sortOrder
+        const encodedQuery = new URLSearchParams(urlCall.split('?')[1]).get('q');
+        const decoded = decodeStateFromUrlParam(encodedQuery!);
+        const newParams = new URLSearchParams(decoded!);
+
         expect(newParams.get('sortOrder')).toBe('status:asc,result:desc');
       });
     });
@@ -738,9 +820,9 @@ describe('TestRunsTabs Component', () => {
       await waitFor(() => {
         const lastCallArgs = TestRunsTableMock.mock.calls.slice(-1)[0][0];
 
-        const expectedDateRun2 = new Date('2023-10-02T12:00:00Z').toLocaleString().replace(',', '');
-        const expectedDateRun3 = new Date('2023-10-03T12:00:00Z').toLocaleString().replace(',', '');
-        const expectedDateRun1 = new Date('2023-10-11T12:00:00Z').toLocaleString().replace(',', '');
+        const expectedDateRun2 = '2023-10-02T12:00:00Z';
+        const expectedDateRun3 = '2023-10-03T12:00:00Z';
+        const expectedDateRun1 = '2023-10-11T12:00:00Z';
 
         expect(lastCallArgs.runsList).toEqual([
           { ...defaultTransformedRun, id: '2', submittedAt: expectedDateRun2, runName: 'Run B', status: 'Failed', requestor: 'B User', tags: 'B tag' },

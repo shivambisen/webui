@@ -31,8 +31,20 @@
     "description": "Früher Zugriff auf neue Funktionen. Diese Funktionen sind experimentell und können sich ändern oder entfernt werden.",
     "features": {
       "testRunSearch": "Testlauf-Suche und Anzeige",
-      "internationalization": "Internationalisierung/Mehrsprachige Unterstützung"
+      "internationalization": "Internationalisierung/Mehrsprachige Unterstützung",
+      "graph": "Testlauf-Diagramm"
     }
+  },
+  "DateTimeFormatSection": {
+    "title": "Datums-/Zeitformat",
+    "description": "Konfigurieren Sie das Format zur Anzeige von Datum und Uhrzeit.",
+    "dateTimeFormat": "Datums-/Zeitformat",
+    "showDatesInBrowserLocale": "Datum und Uhrzeit basierend auf der Browsersprache anzeigen",
+    "showDatesInCustomLocale": "Datum und Uhrzeit in einem benutzerdefinierten Format anzeigen",
+    "selectLocale": "Sprache auswählen",
+    "selectTimeFormat": "Zeitformat auswählen",
+    "12-hour": "12-Stunden-Format",
+    "24-hour": "24-Stunden-Format"
   },
   "AccessTokensSection": {
     "title": "Zugriffstoken",
@@ -107,11 +119,16 @@
   "ProfileDetails": {
     "title": "Benutzerdetails",
     "loggedInAs": "Angemeldet als:",
-    "role": "Rolle",
     "recentActivity": "Letzte Aktivitäten",
     "noLastLogin": "Kein letztes Login-Datum",
     "lastLoginWeb": "Letzte Anmeldung über Web (UTC): {date}",
     "lastLoginToken": "Letzte Anmeldung mit Token (UTC): {date}"
+  },
+  "ProfileRole": {
+    "userRoleTitle": "Benutzerrolle",
+    "changeRole" : "Benutzerrollen bestimmen, was Sie tun können und was nicht. Wenden Sie sich an Ihren lokalen Galasa-Administrator, wenn Sie Änderungen benötigen.",
+    "currentRole": "Sie haben derzeit die Rolle",
+    "roleDescription": "Details zur Rolle"
   },
   "EditUserBreadCrumb": {
     "home": "Startseite",
@@ -206,6 +223,9 @@
     "status": "Status",
     "copymessage": "Seiten-URL kopieren",
     "copiedmessage": "Kopiert",
+    "downloadArtifacts": "Alle Artefakte herunterladen",
+    "downloading": "Herunterladen...",
+    "downloadError": "Fehler beim Herunterladen der Artefakte. Bitte versuchen Sie es später erneut.",
     "result": "Ergebnis",
     "test": "Test",
     "tabs": {
@@ -213,7 +233,8 @@
       "methods": "Methoden",
       "runLog": "Laufprotokoll",
       "artifacts": "Artefakte"
-    }
+    },
+    "errorTitle": "Fehler"
   },
   "TestRunSkeleton": {
     "status": "Status",
@@ -270,7 +291,7 @@
   "status": "Status",
   "tags": "Tags",
   "result": "Ergebnis",
-
+  "noColumnsSelected": "Alle Spalten wurden im Tabellen-Design-Tab ausgeblendet, sodass keine Ergebniseinzelheiten sichtbar sein werden. Bitte passen Sie das Tabellen-Design an, um die gewünschten Spalten anzuzeigen.",
   "isloading": "Diagramm wird geladen...",
   "errorLoadingGraph": "Beim Laden des Diagramms ist ein Fehler aufgetreten.",
   "noTestRunsFound": "Keine Testläufe gefunden.",
@@ -405,7 +426,8 @@
     "showHideHeader": "Spalten ein-/ausblenden",
     "warning": "Warnung",
     "noColumnsSelected": "Keine Spalten ausgewählt – nichts anzuzeigen. Bitte wählen Sie eine oder mehrere Spalten aus",
-    "sortOrderHeader": "Sortierreihenfolge"
+    "sortOrderHeader": "Sortierreihenfolge",
+    "resetToDefaults": "Auf Standard zurücksetzen"
   },
   "TableDesignRow": {
     "dragAndDropLabel": "Ziehen zum Neuordnen",
