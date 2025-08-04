@@ -5,12 +5,12 @@
  */
 
 
-import { combineDateTime, extractDateTimeForUI } from '@/utils/timeOperations';
+import { dateTimeLocal2UTC, dateTimeUTC2Local } from '@/utils/timeOperations';
 import { AmPm } from '@/utils/types/common';
 
 describe('DateTime Timezone Utils', () => {
 
-  describe('combineDateTime', () => {
+  describe('dateTimeLocal2UTC', () => {
     test('should correctly handle a PM time during Daylight Saving Time', () => {
       // New York is in (UTC-4) in July. 9:55 PM EDT is 01:55 UTC on the next day.
       const date = new Date('2025-07-31T00:00:00Z'); // Day is 31st
@@ -18,7 +18,7 @@ describe('DateTime Timezone Utils', () => {
       const amPm: AmPm = 'PM';
       const timezone = 'America/New_York';
       
-      const result = combineDateTime(date, time, amPm, timezone);
+      const result = dateTimeLocal2UTC(date, time, amPm, timezone);
       
       // The universal time should be 01:55 on Aug 1st.
       expect(result.toISOString()).toBe('2025-08-01T01:55:00.000Z');
@@ -31,7 +31,7 @@ describe('DateTime Timezone Utils', () => {
       const amPm: AmPm = 'AM';
       const timezone = 'America/New_York';
       
-      const result = combineDateTime(date, time, amPm, timezone);
+      const result = dateTimeLocal2UTC(date, time, amPm, timezone);
       
       expect(result.toISOString()).toBe('2025-12-25T12:30:00.000Z');
     });
@@ -42,7 +42,7 @@ describe('DateTime Timezone Utils', () => {
       const amPm: AmPm = 'AM';
       const timezone = 'Europe/London'; // UTC+0 in winter
       
-      const result = combineDateTime(date, time, amPm, timezone);
+      const result = dateTimeLocal2UTC(date, time, amPm, timezone);
       
       // 12:15 AM on Jan 1st is 00:15 UTC on the same day.
       expect(result.toISOString()).toBe('2024-01-01T00:15:00.000Z');
@@ -54,7 +54,7 @@ describe('DateTime Timezone Utils', () => {
       const amPm: AmPm = 'PM';
       const timezone = 'Europe/London'; // UTC+0 in winter
       
-      const result = combineDateTime(date, time, amPm, timezone);
+      const result = dateTimeLocal2UTC(date, time, amPm, timezone);
       
       expect(result.toISOString()).toBe('2024-01-01T12:45:00.000Z');
     });
@@ -66,20 +66,20 @@ describe('DateTime Timezone Utils', () => {
       const amPm: AmPm = 'AM';
       const timezone = 'Asia/Tokyo';
       
-      const result = combineDateTime(date, time, amPm, timezone);
+      const result = dateTimeLocal2UTC(date, time, amPm, timezone);
 
       // The universal time should be 23:00 on Feb 9th.
       expect(result.toISOString()).toBe('2024-02-09T23:00:00.000Z');
     });
   });
 
-  describe('extractDateTimeForUI', () => {
+  describe('dateTimeUTC2Local', () => {
     test('should correctly extract PM time for a timezone during Daylight Saving Time', () => {
       // The universal time 2025-08-01T01:55:00.000Z corresponds to 9:55 PM in New York.
       const date = new Date('2025-08-01T01:55:00.000Z');
       const timezone = 'America/New_York';
 
-      const result = extractDateTimeForUI(date, timezone);
+      const result = dateTimeUTC2Local(date, timezone);
       
       expect(result).toEqual({ time: '09:55', amPm: 'PM' });
     });
@@ -89,7 +89,7 @@ describe('DateTime Timezone Utils', () => {
       const date = new Date('2025-12-25T12:30:00.000Z');
       const timezone = 'America/New_York';
 
-      const result = extractDateTimeForUI(date, timezone);
+      const result = dateTimeUTC2Local(date, timezone);
       
       expect(result).toEqual({ time: '07:30', amPm: 'AM' });
     });
@@ -99,7 +99,7 @@ describe('DateTime Timezone Utils', () => {
       const date = new Date('2024-01-01T00:15:00.000Z');
       const timezone = 'Europe/London';
 
-      const result = extractDateTimeForUI(date, timezone);
+      const result = dateTimeUTC2Local(date, timezone);
       
       expect(result).toEqual({ time: '12:15', amPm: 'AM' });
     });
@@ -109,7 +109,7 @@ describe('DateTime Timezone Utils', () => {
       const date = new Date('2024-01-01T12:45:00.000Z');
       const timezone = 'Europe/London';
 
-      const result = extractDateTimeForUI(date, timezone);
+      const result = dateTimeUTC2Local(date, timezone);
       
       expect(result).toEqual({ time: '12:45', amPm: 'PM' });
     });
@@ -119,7 +119,7 @@ describe('DateTime Timezone Utils', () => {
       const date = new Date('2024-02-09T23:00:00.000Z');
       const timezone = 'Asia/Tokyo';
 
-      const result = extractDateTimeForUI(date, timezone);
+      const result = dateTimeUTC2Local(date, timezone);
       
       expect(result).toEqual({ time: '08:00', amPm: 'AM' });
     });

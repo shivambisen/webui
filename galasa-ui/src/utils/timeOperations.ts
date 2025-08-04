@@ -117,10 +117,10 @@ const buildTimeDifference = (hours : number, minutes : number, seconds: number) 
  *
  * @example
  *  To create a Date for July 31, 2025, at 9:55 PM in New York (which is UTC-4):
- * combineDateTime(new Date('2025-07-31'), '09:55', 'PM', 'America/New_York');
+ * dateTimeLocal2UTC(new Date('2025-07-31'), '09:55', 'PM', 'America/New_York');
  *  The returned Date object's .toISOString() will be "2025-08-01T01:55:00.000Z"
 */
-export const combineDateTime = (date: Date, time: string, amPm: AmPm, timezone: string): Date => {
+export const dateTimeLocal2UTC = (date: Date, time: string, amPm: AmPm, timezone: string): Date => {
   const [hoursStr, minutesStr] = time.split(':');
   let hours = parseInt(hoursStr, 10);
   const minutes = parseInt(minutesStr, 10);
@@ -147,7 +147,7 @@ export const combineDateTime = (date: Date, time: string, amPm: AmPm, timezone: 
 
 /**
  * Deconstructs a universal Date object into UI parts (time and AM/PM)
- * for a specific timezone. This is the inverse of `combineDateTime`.
+ * for a specific timezone. This is the inverse of `dateTimeLocal2UTC`.
  *
  * It ensures UI components display the time correctly according to the
  * user's selected timezone, not their browser's local time.
@@ -158,10 +158,10 @@ export const combineDateTime = (date: Date, time: string, amPm: AmPm, timezone: 
  *
  * @example
  * What time was it in New York (UTC-4) at the moment '2025-08-01T01:55:00.000Z'?
- * extractDateTimeForUI(new Date('2025-08-01T01:55:00.000Z'), 'America/New_York');
+ * dateTimeUTC2Local(new Date('2025-08-01T01:55:00.000Z'), 'America/New_York');
  * returns -> { time: '09:55', amPm: 'PM' }
  */
-export const extractDateTimeForUI = (date: Date, timezone: string) => {
+export const dateTimeUTC2Local = (date: Date, timezone: string) => {
   // 1. Create a moment object from the universal Date and tell it
   //  to interpret that moment in the context of the desired timezone.
   const momentInZone = moment.tz(date, timezone);

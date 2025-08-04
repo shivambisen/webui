@@ -9,7 +9,7 @@ import styles from '@/styles/TestRunsPage.module.css';
 import { TimeFrameValues } from '@/utils/interfaces';
 import { useState, useCallback, useEffect } from 'react';
 import TimeFrameFilter from './TimeFrameFilter';
-import { addMonths, combineDateTime, extractDateTimeForUI } from '@/utils/timeOperations';
+import { addMonths, dateTimeLocal2UTC, dateTimeUTC2Local } from '@/utils/timeOperations';
 import { InlineNotification } from '@carbon/react';
 import { MAX_RANGE_MONTHS, DAY_MS, HOUR_MS, MINUTE_MS } from '@/utils/constants/common';
 import { useTranslations } from 'next-intl';
@@ -24,8 +24,8 @@ type Notification = {
  * Calculates the final, fully synchronized state object from two valid dates.
  */
 export const calculateSynchronizedState = (fromDate: Date, toDate: Date, timezone: string): TimeFrameValues => {
-  const fromUiParts = extractDateTimeForUI(fromDate, timezone);
-  const toUiParts = extractDateTimeForUI(toDate, timezone);
+  const fromUiParts = dateTimeUTC2Local(fromDate, timezone);
+  const toUiParts = dateTimeUTC2Local(toDate, timezone);
   let difference = toDate.getTime() - fromDate.getTime();
   if (difference < 0) difference = 0;
 
@@ -106,12 +106,12 @@ export default function TimeFrameContent({ values, setValues }: TimeFrameContent
     // Combine date and time into Date objects
     let fromDate: Date, toDate: Date;
     if (field.startsWith('duration')) {
-      fromDate = combineDateTime(draftValues.fromDate, draftValues.fromTime, draftValues.fromAmPm, timezone);
+      fromDate = dateTimeLocal2UTC(draftValues.fromDate, draftValues.fromTime, draftValues.fromAmPm, timezone);
       const durationInMs = draftValues.durationDays * DAY_MS + draftValues.durationHours * HOUR_MS + draftValues.durationMinutes * MINUTE_MS;
       toDate = new Date(fromDate.getTime() + durationInMs);
     } else {
-      fromDate = combineDateTime(draftValues.fromDate, draftValues.fromTime, draftValues.fromAmPm, timezone);
-      toDate = combineDateTime(draftValues.toDate, draftValues.toTime, draftValues.toAmPm, timezone);
+      fromDate = dateTimeLocal2UTC(draftValues.fromDate, draftValues.fromTime, draftValues.fromAmPm, timezone);
+      toDate = dateTimeLocal2UTC(draftValues.toDate, draftValues.toTime, draftValues.toAmPm, timezone);
     }
 
     const { correctedFrom, correctedTo, notification: validationNotification } = applyTimeFrameRules(fromDate, toDate, translations);

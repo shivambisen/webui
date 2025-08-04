@@ -36,17 +36,17 @@ The formatDate function automatically handles everything:
 ## UI-to-UTC Conversion Utilities
 In some cases, especially when a user is **inputting** a specific time, we need to perform the conversion in reverse: from UI-friendly parts into a single UTC Date object. Two utility functions exist for this purpose.
 
-#### `extractDateTimeForUI(date, timezone)`
+#### `dateTimeUTC2Local(date, timezone)`
 - This function performs UTC -> UI conversion. To deconstruct a universal UTC Date object into parts that can populate UI controls (like a time picker and an AM/PM dropdown).
 - Use this when you fetch something from the backend and need to display its time to the user for editing.
 ```typescript
 const utcDate = new Date('2025-08-01T01:55:00.000Z');
 const userTimezone = 'America/New_York';
 
-const uiParts = extractDateTimeForUI(utcDate, userTimezone);
+const uiParts = dateTimeUTC2Local(utcDate, userTimezone);
 // uiParts is now: { time: '09:55', amPm: 'PM' }
 ```
-#### `combineDateTime(date, time, amPm, timezone)`
+#### `dateTimeLocal2UTC(date, time, amPm, timezone)`
 - This function performs UI -> UTC conversion. To take the separate date, time, and AM/PM values from UI controls and combine them into a single UTC Date object that can be sent to the backend.
 - Use this when a user saves a form where they have entered or edited a specific time.
 ```typescript
@@ -56,7 +56,7 @@ const timeFromInput = '09:55';
 const amPmFromInput = 'PM'; 
 const userTimezone = 'America/New_York';  
 
-const utcDateToSend = combineDateTime(   dateFromCalendar,   timeFromInput,   amPmFromInput,   userTimezone );  
+const utcDateToSend = dateTimeLocal2UTC(   dateFromCalendar,   timeFromInput,   amPmFromInput,   userTimezone );  
 // utcDateToSend is now a Date object whose UTC value is '2025-08-01T01:55:00.000Z'.
 // We can now send utcDateToSend.toISOString() to the API.
 ```
