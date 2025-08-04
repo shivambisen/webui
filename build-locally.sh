@@ -149,7 +149,7 @@ function generate_rest_client {
 
     # Execute Gradle command with SOURCE_MAVEN passed as a Gradle property
     gradle --warning-mode all --info --debug \
-      -PsourceMaven="$SOURCE_MAVEN" \
+      -PsourceMaven=SOURCE_MAVEN \
       generateTypeScriptClient
       
     rc=$? 

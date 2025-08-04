@@ -54,7 +54,8 @@ jest.mock("next-intl", () => ({
       "testName": "Test Name",
       "status": "Status",
       "result": "Result",
-      "pagination.of": "of {total}"
+      "pagination.of": "of {total}",
+      "limitExceededSubtitle": "Your query returned more than 2000 results, please refine your search. Showing the first 2000 records."
     };
 
     let text = translations[key] || key;
