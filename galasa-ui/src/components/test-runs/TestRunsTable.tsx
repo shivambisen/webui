@@ -31,7 +31,7 @@ import StatusIndicator from "../common/StatusIndicator";
 import { useMemo, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ErrorPage from "@/app/error/page";
-import { MAX_RECORDS} from "@/utils/constants/common";
+import { MAX_RECORDS, WARNING_NOTIFICATION_DURATION } from "@/utils/constants/common";
 import { useTranslations } from "next-intl";
 import { InlineNotification } from "@carbon/react";
 import useHistoryBreadCrumbs from "@/hooks/useHistoryBreadCrumbs";
@@ -78,7 +78,7 @@ export default function TestRunsTable({runsList, limitExceeded, visibleColumns, 
       setShowNotification(true);
       const timer = setTimeout(() => {
         setShowNotification(false);
-      }, 6000); // 6 seconds
+      }, WARNING_NOTIFICATION_DURATION);
 
       // Cleanup function: This will clear the timer unmounts before the timeout.
       return () => clearTimeout(timer);

@@ -13,8 +13,8 @@ import { useTranslations } from "next-intl";
 import { InlineNotification } from "@carbon/react";
 import { ColumnDefinition } from "@/utils/interfaces";
 import { sortOrderType } from "@/utils/types/common";
-import { DEFAULT_VISIBLE_COLUMNS, RESULTS_TABLE_COLUMNS } from "@/utils/constants/common";
-import { Dispatch, SetStateAction } from "react";
+import { DEFAULT_VISIBLE_COLUMNS, RESULTS_TABLE_COLUMNS, WARNING_NOTIFICATION_DURATION } from "@/utils/constants/common";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 
 interface TableDesignContentProps {
@@ -63,6 +63,22 @@ export default function TableDesignContent({
       setSelectedRowIds(allSelected ? [] : rowIds); 
     }
   };
+
+  const [showNotification, setShowNotification] = useState(selectedRowIds.length === 0);
+
+  // Set a timer to hide the notification after 5 seconds
+  useEffect(() => {
+    // Only show the notification if the limit was exceeded
+    if (selectedRowIds.length === 0) {
+      setShowNotification(true);
+      const timer = setTimeout(() => {
+        setShowNotification(false);
+      }, WARNING_NOTIFICATION_DURATION);
+
+      // Cleanup function: This will clear the timer unmounts before the timeout.
+      return () => clearTimeout(timer);
+    }
+  }, [selectedRowIds.length]);
 
   const getRowPosition = (id: string) => tableRows.findIndex(row => row.id === id);
 
@@ -174,7 +190,7 @@ export default function TableDesignContent({
           }
         </SortableContext>
         {
-          selectedRowIds.length === 0 && 
+          selectedRowIds.length === 0 && showNotification &&
           <InlineNotification
             className={styles.notification}
             kind={"warning"} 
