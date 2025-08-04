@@ -37,7 +37,7 @@ export default function TestRunsDetails({requestorNamesPromise, resultsNamesProm
       });
 
       // Hide notification after 6 seconds
-      setTimeout(() => setNotification(null), 20000);
+      setTimeout(() => setNotification(null), 6000);
     } catch (err) {
       console.error('Failed to copy:', err);
       setNotification({
