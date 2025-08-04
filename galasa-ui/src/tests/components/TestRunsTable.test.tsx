@@ -163,7 +163,7 @@ describe('TestRunsTable Component', () => {
     render(<TestRunsTable runsList={mockRuns} {...defaultProps} limitExceeded={true}/>);
 
     // Assert
-    const warningMessage = await screen.findByText(`Your query returned more than ${MAX_RECORDS} results. Showing the first ${MAX_RECORDS} records.`);
+    const warningMessage = await screen.findByText(`Your query returned more than ${MAX_RECORDS} results, please refine your search. Showing the first ${MAX_RECORDS} records.`);
     expect(warningMessage).toBeInTheDocument();
   });
 

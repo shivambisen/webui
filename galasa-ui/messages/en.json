@@ -261,7 +261,7 @@
     "noTestRunsFound": "No test runs were found for the selected timeframe",
     "isloading":"Loading test results...",
     "limitExceededTitle": "Limit Exceeded",
-    "limitExceededSubtitle": "Your query returned more than {maxRecords} results. Showing the first {maxRecords} records.",
+    "limitExceededSubtitle": "Your query returned more than {maxRecords} results, please refine your search. Showing the first {maxRecords} records.",
     "timeFrameText": {
       "default": "Showing test runs submitted in the last 24 hours",
       "range": "Showing test runs submitted between {from} and {to}"
