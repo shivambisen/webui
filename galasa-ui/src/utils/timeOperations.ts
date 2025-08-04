@@ -289,4 +289,3 @@ export const parseAndValidateTime = (timeString: string) => {
 
   return parsedTime;
 };
-
