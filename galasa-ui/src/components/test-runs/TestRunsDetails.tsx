@@ -52,22 +52,25 @@ export default function TestRunsDetails({requestorNamesPromise, resultsNamesProm
     <main id="content">
       <BreadCrumb breadCrumbItems={breadCrumbItems} />
       <PageTile translationKey="TestRun.title" className={styles.toolbar}>
-        <Button
-          kind="ghost"
-          hasIconOnly
-          renderIcon={Share}
-          iconDescription={translations("copyMessage")}
-          onClick={handleShare}
-          data-testid="share-button"
-        />
+        <div className={styles.toolbarActions}>
+          <Button
+            kind="ghost"
+            hasIconOnly
+            renderIcon={Share}
+            iconDescription={translations("copyMessage")}
+            onClick={handleShare}
+            data-testid="share-button"
+          />
+        </div>
       </PageTile>
       {notification && (
-        <InlineNotification
-          title={notification.title}
-          subtitle={notification.subtitle}
-          className={styles.notification}
-          kind={notification.kind}
-        />
+        <div className={styles.notification}>
+          <InlineNotification
+            title={notification.title}
+            subtitle={notification.subtitle}
+            kind={notification.kind}
+          />
+        </div>
       )}
       <div className={styles.testRunsContentWrapper}>
         <Suspense fallback={<p>Loading...</p>}>

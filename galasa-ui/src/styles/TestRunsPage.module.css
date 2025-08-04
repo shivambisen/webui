@@ -308,12 +308,19 @@
 }
 
 .toolbar {
+  position: relative; 
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding-right: 3rem;
   height: 64px;
 }
+
+.toolbarActions {
+  position: absolute;
+  top: 50%;
+  right: 3rem; 
+  transform: translateY(-50%);
+}
+
 
 .clickableRow {
   cursor: pointer;
