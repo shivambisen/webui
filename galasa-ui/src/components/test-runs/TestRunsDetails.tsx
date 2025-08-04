@@ -36,8 +36,8 @@ export default function TestRunsDetails({requestorNamesPromise, resultsNamesProm
         subtitle: translations("copiedMessage")
       });
 
-      // Hide notification after 10 seconds
-      setTimeout(() => setNotification(null), 10000);
+      // Hide notification after 6 seconds
+      setTimeout(() => setNotification(null), 20000);
     } catch (err) {
       console.error('Failed to copy:', err);
       setNotification({
@@ -69,6 +69,7 @@ export default function TestRunsDetails({requestorNamesPromise, resultsNamesProm
             title={notification.title}
             subtitle={notification.subtitle}
             kind={notification.kind}
+            hideCloseButton={true}
           />
         </div>
       )}

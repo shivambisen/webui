@@ -120,8 +120,8 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
         subtitle: translations("copiedMessage")
       });
 
-      // Hide notification after 10 seconds
-      setTimeout(() => setNotification(null), 10000);
+      // Hide notification after 6 seconds
+      setTimeout(() => setNotification(null), 6000);
     } catch (err) {
       console.error('Failed to copy:', err);
       setNotification({
@@ -245,6 +245,7 @@ const TestRunDetails = ({ runId, runDetailsPromise, runLogPromise, runArtifactsP
           subtitle={notification.subtitle}
           className={styles.notification}
           kind={notification.kind}
+          hideCloseButton={true}
         />
       )}
       {isLoading ? (
