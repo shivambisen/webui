@@ -237,7 +237,7 @@
   "OverviewTab": {
     "bundle": "Bundle",
     "testName": "Testname",
-    "testShortName": "Testname (short)",
+    "testShortName": "Testname (kurz)",
     "package": "Paket",
     "group": "Gruppe",
     "submissionId": "Übermittlungs-ID",
