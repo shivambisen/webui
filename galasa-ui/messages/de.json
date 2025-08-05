@@ -31,7 +31,8 @@
     "description": "Früher Zugriff auf neue Funktionen. Diese Funktionen sind experimentell und können sich ändern oder entfernt werden.",
     "features": {
       "testRunSearch": "Testlauf-Suche und Anzeige",
-      "internationalization": "Internationalisierung/Mehrsprachige Unterstützung"
+      "internationalization": "Internationalisierung/Mehrsprachige Unterstützung",
+      "thirtyTwoSeventyTerminal": "Unterstützung für das Anzeigen und Herunterladen von 3270-Terminals"
     }
   },
   "DateTimeFormatSection": {
@@ -261,7 +262,7 @@
     "noTestRunsFound": "Für den ausgewählten Zeitraum wurden keine Testläufe gefunden",
     "isloading": "Testergebnisse werden geladen...",
     "limitExceededTitle": "Limit überschritten",
-    "limitExceededSubtitle": "Ihre Abfrage ergab mehr als {maxRecords} Ergebnisse. Es werden die ersten {maxRecords} Datensätze angezeigt.",
+    "limitExceededSubtitle": "Ihre Abfrage hat mehr als {maxRecords} Ergebnisse zurückgegeben. Bitte verfeinern Sie Ihre Suche. Die ersten {maxRecords} Datensätze werden angezeigt.",
     "timeFrameText": {
       "default": "Zeige Testläufe der letzten 24 Stunden",
       "range": "Zeige Testläufe von {from} bis {to}"
