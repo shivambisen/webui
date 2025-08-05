@@ -66,12 +66,15 @@ export default function DateTimePicker({
 
   // Look up the required Flatpickr format
   const datePickerFormat = LOCALE_TO_FLATPICKR_FORMAT_MAP[fullLocale] || 'm/d/Y';
-  
+
   // The `locale` prop in DatePicker expects a short language code (e.g., 'en', 'fr') for calendar translation.
   const languageCodeForPicker = fullLocale.split('-')[0];
 
   // Generate a placeholder from the Flatpickr format string.
-  const placeholder = datePickerFormat.replace(/Y/g, 'yyyy').replace(/m/g, 'mm').replace(/d/g, 'dd');
+  const placeholder = datePickerFormat
+    .replace(/Y/g, 'yyyy')
+    .replace(/m/g, 'mm')
+    .replace(/d/g, 'dd');
 
   return (
     <FormGroup legendText={legend} className={styles.TimeFrameFilterItem}>

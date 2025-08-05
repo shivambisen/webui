@@ -118,7 +118,6 @@ const DEFAULT_VISIBLE_COLUMNS: string[] = [
 
 const BATCH_SIZE = 100;
 
-
 // NOTE: To add a new locale, you need to:
 // 1. Add the locale code to the SUPPORTED_LOCALES array below.
 // 2. Add the locale's flatpickr date format to the LOCALE_TO_FLATPICKR_FORMAT_MAP object.
@@ -136,7 +135,6 @@ const LOCALE_TO_FLATPICKR_FORMAT_MAP: { [key: string]: string } = {
   'fr-FR': 'd/m/Y',
   'de-DE': 'd.m.Y',
 };
-
 
 const TIME_FORMATS = [
   { label: '12-hour', format: 'hh:mm:ss AM/PM' },
@@ -174,6 +172,5 @@ export {
   PREFERENCE_KEYS,
   TEST_RUN_PAGE_TABS,
   SINGLE_RUN_QUERY_PARAMS,
-  LOCALE_TO_FLATPICKR_FORMAT_MAP
+  LOCALE_TO_FLATPICKR_FORMAT_MAP,
 };
-
