@@ -5,7 +5,9 @@
  */
 'use client';
 
+import { useDateTimeFormat } from '@/contexts/DateTimeFormatContext';
 import styles from '@/styles/TestRunsPage.module.css';
+import { LOCALE_TO_FLATPICKR_FORMAT_MAP, SUPPORTED_LOCALES } from '@/utils/constants/common';
 import { parseAndValidateTime } from '@/utils/timeOperations';
 import {
   FormGroup,
@@ -16,7 +18,6 @@ import {
   SelectItem,
 } from '@carbon/react';
 import { useTranslations } from 'next-intl';
-
 import { useState, useEffect } from 'react';
 
 interface DateTimePickerProps {
@@ -42,6 +43,7 @@ export default function DateTimePicker({
   onAmPmChange,
 }: DateTimePickerProps) {
   const [localTime, setLocalTime] = useState(time);
+  const { preferences } = useDateTimeFormat();
   const translations = useTranslations('DateTimePicker');
   const invalidTimeText = translations('invalidTimeText');
 
@@ -60,9 +62,22 @@ export default function DateTimePicker({
     }
   };
 
+  const fullLocale = preferences?.locale || 'en-US';
+
+  // Look up the required Flatpickr format
+  const datePickerFormat = LOCALE_TO_FLATPICKR_FORMAT_MAP[fullLocale] || 'm/d/Y';
+  
+  // The `locale` prop in DatePicker expects a short language code (e.g., 'en', 'fr') for calendar translation.
+  const languageCodeForPicker = fullLocale.split('-')[0];
+
+  // Generate a placeholder from the Flatpickr format string.
+  const placeholder = datePickerFormat.replace(/Y/g, 'yyyy').replace(/m/g, 'mm').replace(/d/g, 'dd');
+
   return (
     <FormGroup legendText={legend} className={styles.TimeFrameFilterItem}>
       <DatePicker
+        locale={languageCodeForPicker}
+        dateFormat={datePickerFormat}
         datePickerType="single"
         value={date}
         maxDate={new Date()}
@@ -71,7 +86,7 @@ export default function DateTimePicker({
         <DatePickerInput
           id={`${legend}-date-picker`}
           labelText={translations('date')}
-          placeholder="mm/dd/yyyy"
+          placeholder={placeholder}
         />
       </DatePicker>
       <TimePicker
