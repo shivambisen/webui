@@ -38,18 +38,18 @@ jest.mock('@/utils/timeOperations', () => ({
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => {
     const translations: Record<string, string> = {
-      bundle: "Bundle",
-      testName: "Test",
-      package: "Package",
-      group: "Group",
-      submissionId: "Submission ID",
-      requestor: "Requestor",
-      submitted: "Submitted",
-      started: "Started",
-      finished: "Finished",
-      duration: "Duration",
-      tags: "Tags",
-      noTags: "No tags were associated with this test run.",
+      bundle: 'Bundle',
+      testName: 'Test',
+      package: 'Package',
+      group: 'Group',
+      submissionId: 'Submission ID',
+      requestor: 'Requestor',
+      submitted: 'Submitted',
+      started: 'Started',
+      finished: 'Finished',
+      duration: 'Duration',
+      tags: 'Tags',
+      noTags: 'No tags were associated with this test run.',
     };
     return translations[key] || key;
   },

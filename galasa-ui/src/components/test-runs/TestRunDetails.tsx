@@ -297,7 +297,7 @@ const TestRunDetails = ({
               </span>
             </div>
             <span className={styles.summaryStatus}>
-              {translations("test")}: {run?.testShortName}
+              {translations('test')}: {run?.testShortName}
             </span>
           </div>
           <Tabs selectedIndex={selectedTabIndex} onChange={handleTabChange}>

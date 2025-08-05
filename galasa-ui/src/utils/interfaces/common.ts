@@ -76,6 +76,6 @@ export interface DataPoint {
 }
 
 export interface ColumnDefinition {
-  id: keyof runStructure; 
+  id: keyof runStructure;
   columnName: string;
 }
