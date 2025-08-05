@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "jest --coverage --collectCoverageFrom='src/**/*.{ts,tsx}'"
+    "test": "jest --coverage --collectCoverageFrom='src/**/*.{ts,tsx}'",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
   },
   "dependencies": {
     "@carbon/charts-react": "^1.23.13",
