@@ -33,7 +33,7 @@
       "testRunSearch": "Testlauf-Suche und Anzeige",
       "internationalization": "Internationalisierung/Mehrsprachige Unterstützung",
       "thirtyTwoSeventyTerminal": "Unterstützung für das Anzeigen und Herunterladen von 3270-Terminals",
-      "graph": "Testlauf-Diagramm",
+      "graph": "Testlauf-Diagramm"
     }
   },
   "DateTimeSettings": {

@@ -33,7 +33,7 @@
       "testRunSearch": "Test Run searching and viewing",
       "internationalization": "Internationalization/Multiple language support",
       "thirtyTwoSeventyTerminal": "Support for viewing and downloading 3270 terminals",
-      "graph":" Test Run Graphs",
+      "graph":" Test Run Graphs"
     }
   },
   "DateTimeSettings": {
