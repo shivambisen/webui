@@ -18,8 +18,7 @@ export default function ExperimentalFeaturesSection() {
   const featureConfig = [
     {
       key: FEATURE_FLAGS.TEST_RUNS,
-      label: translations(`features.testRunSearch`)
-      ,
+      label: translations(`features.testRunSearch`),
     },
     {
       key: FEATURE_FLAGS.INTERNATIONALIZATION,
@@ -28,6 +27,10 @@ export default function ExperimentalFeaturesSection() {
     {
       key: FEATURE_FLAGS.THIRTY_TWO_SEVENTY_TERMINAL,
       label: translations('features.thirtyTwoSeventyTerminal'),
+    },
+    {
+      key: FEATURE_FLAGS.GRAPH,
+      label: translations('features.graph'),
     },
     // Add more features here when they are added to DEFAULT_FEATURE_FLAGS
   ];

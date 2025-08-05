@@ -14,8 +14,11 @@ const COLORS = {
   GREEN: "#24A148",
   NEUTRAL: "#6f6f6f",
   BLUE: "#0043ce",
-  YELLOW: "#f1c21b"
-
+  YELLOW: "#f1c21b",
+  PURPLE: "#ab47bc",
+  CYAN: "#00bcd4", 
+  GRAY: "#bdbdbd", 
+  BLUE_GRAY: "#607d8b"
 };
 
 // Maximum number of records to fetch in one go.
@@ -113,12 +116,25 @@ const DEFAULT_VISIBLE_COLUMNS: string[] = [
   
 const BATCH_SIZE = 100;
 
+
+// NOTE: To add a new locale, you need to:
+// 1. Add the locale code to the SUPPORTED_LOCALES array below.
+// 2. Add the locale's flatpickr date format to the LOCALE_TO_FLATPICKR_FORMAT_MAP object.
 const SUPPORTED_LOCALES = [
   { code: 'en-US', format: 'MM/DD/YYYY' },     
   { code: 'en-GB', format: 'DD/MM/YYYY' },
   { code: 'fr-FR', format: 'DD/MM/YYYY' },    
   { code: 'de-DE', format: 'DD.MM.YYYY' },     
 ];
+
+// Converts a display format string to a Flatpickr-compatible format used by the DatePicker component.
+const LOCALE_TO_FLATPICKR_FORMAT_MAP: { [key: string]: string } = {
+  'en-US': 'm/d/Y',
+  'en-GB': 'd/m/Y',
+  'fr-FR': 'd/m/Y',
+  'de-DE': 'd.m.Y',
+};
+
 
 const TIME_FORMATS = [
   { label: '12-hour', format: 'hh:mm:ss AM/PM' },
@@ -129,6 +145,8 @@ const PREFERENCE_KEYS = {
   DATE_TIME_FORMAT_TYPE: 'dateTimeFormatType' as const,
   LOCALE: 'locale' as const,
   TIME_FORMAT: 'timeFormat' as const,
+  TIME_ZONE_TYPE: 'timeZoneType' as const,
+  TIME_ZONE: 'timeZone' as const,
 } as const;
 
 const TEST_RUN_PAGE_TABS = ["overview", "methods", "runLog", "artifacts"];
@@ -138,4 +156,4 @@ export { CLIENT_API_VERSION,COLORS, MAX_RECORDS, MINUTE_MS,
   BATCH_SIZE, RESULTS_TABLE_COLUMNS, COLUMNS_IDS, TEST_RUNS_QUERY_PARAMS,
   TABS_IDS, SEARCH_CRITERIA_KEYS, DEFAULT_VISIBLE_COLUMNS, 
   SUPPORTED_LOCALES, TIME_FORMATS, PREFERENCE_KEYS, TEST_RUN_PAGE_TABS,
-  SINGLE_RUN_QUERY_PARAMS, WARNING_NOTIFICATION_DURATION};
+  SINGLE_RUN_QUERY_PARAMS, WARNING_NOTIFICATION_DURATION, LOCALE_TO_FLATPICKR_FORMAT_MAP};
