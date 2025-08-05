@@ -33,7 +33,6 @@ import { useDateTimeFormat } from '@/contexts/DateTimeFormatContext';
 import { useFeatureFlags } from '@/contexts/FeatureFlagContext';
 import { FEATURE_FLAGS } from '@/utils/featureFlags';
 import TestRunGraph from './TestRunGraph';
-import { TestStructure } from '@/generated/galasaapi';
 
 interface TabConfig {
   id: string;
