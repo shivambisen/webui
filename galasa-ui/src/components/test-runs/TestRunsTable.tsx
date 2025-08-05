@@ -198,7 +198,7 @@ export default function TestRunsTable({runsList, limitExceeded, visibleColumns, 
         <InlineNotification
           className={styles.notification}
           kind="warning" 
-          title="Limit Exceeded" 
+          title={translations('limitExceededTitle')} 
           subtitle={translations('limitExceededSubtitle', { maxRecords: MAX_RECORDS})}
         />
       }
