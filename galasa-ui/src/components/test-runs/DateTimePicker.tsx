@@ -7,7 +7,14 @@
 
 import styles from '@/styles/TestRunsPage.module.css';
 import { parseAndValidateTime } from '@/utils/timeOperations';
-import { FormGroup, DatePicker, DatePickerInput, TimePicker, TimePickerSelect, SelectItem } from '@carbon/react';
+import {
+  FormGroup,
+  DatePicker,
+  DatePickerInput,
+  TimePicker,
+  TimePickerSelect,
+  SelectItem,
+} from '@carbon/react';
 import { useTranslations } from 'next-intl';
 
 import { useState, useEffect } from 'react';
@@ -46,10 +53,10 @@ export default function DateTimePicker({
   const handleTimeBlur = () => {
     const formattedTime = parseAndValidateTime(localTime);
     if (formattedTime) {
-      onTimeChange(formattedTime); 
+      onTimeChange(formattedTime);
     } else {
       // Revert to last known valid time
-      setLocalTime(time); 
+      setLocalTime(time);
     }
   };
 
@@ -61,7 +68,11 @@ export default function DateTimePicker({
         maxDate={new Date()}
         onChange={(dates: Date[]) => onDateChange(dates?.[0] || null)}
       >
-        <DatePickerInput id={`${legend}-date-picker`} labelText={translations('date')} placeholder="mm/dd/yyyy" />
+        <DatePickerInput
+          id={`${legend}-date-picker`}
+          labelText={translations('date')}
+          placeholder="mm/dd/yyyy"
+        />
       </DatePicker>
       <TimePicker
         id={`${legend}-time-picker`}
@@ -75,7 +86,9 @@ export default function DateTimePicker({
         <TimePickerSelect
           id={`${legend}-time-picker-ampm`}
           value={amPm}
-          onChange={(event: React.ChangeEvent<HTMLSelectElement>) => onAmPmChange(event.target.value)}
+          onChange={(event: React.ChangeEvent<HTMLSelectElement>) =>
+            onAmPmChange(event.target.value)
+          }
         >
           <SelectItem text={translations('AM')} value="AM" />
           <SelectItem text={translations('PM')} value="PM" />
