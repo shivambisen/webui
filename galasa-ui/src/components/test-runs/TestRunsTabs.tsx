@@ -6,10 +6,10 @@
 'use client';
 import { Tabs, Tab, TabList, TabPanels, TabPanel } from '@carbon/react';
 import styles from '@/styles/TestRunsPage.module.css';
-import TimeframeContent, { calculateSynchronizedState } from './TimeFrameContent';
-import TestRunsTable from './TestRunsTable';
-import SearchCriteriaContent from './SearchCriteriaContent';
-import TableDesignContent from './TableDesignContent';
+import TimeframeContent, { calculateSynchronizedState } from './timeframe/TimeFrameContent';
+import TestRunsTable from './results/TestRunsTable';
+import SearchCriteriaContent from './search-criteria/SearchCriteriaContent';
+import TableDesignContent from './table-design/TableDesignContent';
 import { usePathname, useSearchParams, useRouter } from 'next/navigation';
 import { TestRunsData } from '@/utils/testRuns';
 import { useTranslations } from 'next-intl';
@@ -32,7 +32,7 @@ import { Run } from '@/generated/galasaapi';
 import { useDateTimeFormat } from '@/contexts/DateTimeFormatContext';
 import { useFeatureFlags } from '@/contexts/FeatureFlagContext';
 import { FEATURE_FLAGS } from '@/utils/featureFlags';
-import TestRunGraph from './TestRunGraph';
+import TestRunGraph from './graph/TestRunsGraph';
 
 interface TabConfig {
   id: string;

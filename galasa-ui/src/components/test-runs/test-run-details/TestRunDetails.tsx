@@ -26,7 +26,7 @@ import { ArtifactsTab } from './ArtifactsTab';
 import LogTab from './LogTab';
 import TestRunSkeleton from './TestRunSkeleton';
 import { useTranslations } from 'next-intl';
-import StatusIndicator from '../common/StatusIndicator';
+import StatusIndicator from '../../common/StatusIndicator';
 import { Tile } from '@carbon/react';
 import useHistoryBreadCrumbs from '@/hooks/useHistoryBreadCrumbs';
 import { handleDownload } from '@/utils/artifacts';

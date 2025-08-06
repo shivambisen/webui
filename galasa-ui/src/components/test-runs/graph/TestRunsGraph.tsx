@@ -20,7 +20,7 @@ import { TEST_RUNS } from '@/utils/constants/breadcrumb';
 import useHistoryBreadCrumbs from '@/hooks/useHistoryBreadCrumbs';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useDateTimeFormat } from '@/contexts/DateTimeFormatContext';
-import { getTooltipHTML } from '../../utils/generateTooltipHTML';
+import { getTooltipHTML } from '@/utils/generateTooltipHTML';
 
 interface TestRunGraphProps {
   runsList: runStructure[];

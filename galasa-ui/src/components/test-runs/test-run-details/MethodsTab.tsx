@@ -14,7 +14,7 @@ import TableRow, { TableRowProps } from '@carbon/react/lib/components/DataTable/
 import React, { useEffect, useState } from 'react';
 import { TableToolbarContent } from '@carbon/react';
 import { TableToolbarSearch } from '@carbon/react';
-import StatusIndicator from '../common/StatusIndicator';
+import StatusIndicator from '../../common/StatusIndicator';
 import styles from '@/styles/MethodsTab.module.css';
 import { useTranslations } from 'next-intl';
 

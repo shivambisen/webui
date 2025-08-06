@@ -27,7 +27,7 @@ import styles from '@/styles/TestRunsPage.module.css';
 import { TableRowProps } from '@carbon/react/lib/components/DataTable/TableRow';
 import { TableHeadProps } from '@carbon/react/lib/components/DataTable/TableHead';
 import { TableBodyProps } from '@carbon/react/lib/components/DataTable/TableBody';
-import StatusIndicator from '../common/StatusIndicator';
+import StatusIndicator from '../../common/StatusIndicator';
 import { useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import ErrorPage from '@/app/error/page';
