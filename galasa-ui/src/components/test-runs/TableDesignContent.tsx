@@ -81,7 +81,7 @@ export default function TableDesignContent({
   };
 
   const isNotificationVisible = useNotification(selectedRowIds.length === 0);
-  const getRowPosition = (id: string) => tableRows.findIndex((row) => row.id === id);
+  const getRowPosition = (id: string) => tableRows.findIndex(row => row.id === id);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -196,7 +196,7 @@ export default function TableDesignContent({
             subtitle={translations('noColumnsSelected')}
             hideCloseButton={true}
           />
-        )}
+        }
       </div>
     </DndContext>
   );

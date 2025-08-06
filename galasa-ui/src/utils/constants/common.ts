@@ -156,7 +156,8 @@ const TEST_RUN_PAGE_TABS = ['overview', 'methods', 'runLog', 'artifacts'];
 export {
   CLIENT_API_VERSION,
   COLORS,
-  MAX_RECORDS,
+  MAX_DISPLAYABLE_TEST_RUNS,
+  NOTIFICATION_VISIBLE_MILLISECS,
   MINUTE_MS,
   HOUR_MS,
   DAY_MS,
