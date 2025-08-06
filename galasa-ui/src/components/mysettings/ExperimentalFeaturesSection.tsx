@@ -5,12 +5,12 @@
  */
 'use client';
 
-import { useFeatureFlags } from "@/contexts/FeatureFlagContext";
-import styles from "@/styles/MySettings.module.css";
-import { FEATURE_FLAGS } from "@/utils/featureFlags";
-import { useTranslations } from "next-intl";
+import { useFeatureFlags } from '@/contexts/FeatureFlagContext';
+import styles from '@/styles/MySettings.module.css';
+import { FEATURE_FLAGS } from '@/utils/featureFlags';
+import { useTranslations } from 'next-intl';
 
-export default function ExperimentalFeaturesSection() { 
+export default function ExperimentalFeaturesSection() {
   const { isFeatureEnabled, toggleFeatureFlag } = useFeatureFlags();
   const translations = useTranslations('ExperimentalFeatures');
 
@@ -55,6 +55,6 @@ export default function ExperimentalFeaturesSection() {
           ))}
         </ul>
       </div>
-    </section>       
+    </section>
   );
 }
