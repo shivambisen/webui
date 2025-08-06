@@ -31,7 +31,7 @@ import StatusIndicator from "../common/StatusIndicator";
 import { useMemo, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ErrorPage from "@/app/error/page";
-import { MAX_DISPLAYABLE_TEST_RUNS, WARNING_NOTIFICATION_VISIBLE_MILLISECS } from "@/utils/constants/common";
+import { MAX_DISPLAYABLE_TEST_RUNS, NOTIFICATION_VISIBLE_MILLISECS } from "@/utils/constants/common";
 import { useTranslations } from "next-intl";
 import { InlineNotification } from "@carbon/react";
 import useHistoryBreadCrumbs from "@/hooks/useHistoryBreadCrumbs";

@@ -1,4 +1,4 @@
-import { WARNING_NOTIFICATION_VISIBLE_MILLISECS } from '@/utils/constants/common';
+import { NOTIFICATION_VISIBLE_MILLISECS } from '@/utils/constants/common';
 import { useEffect, useState } from 'react';
 
 export const useNotification = (initialState: boolean) => {
@@ -10,7 +10,7 @@ export const useNotification = (initialState: boolean) => {
       setShowNotification(true);
       const timer = setTimeout(() => {
         setShowNotification(false);
-      }, WARNING_NOTIFICATION_VISIBLE_MILLISECS);
+      }, NOTIFICATION_VISIBLE_MILLISECS);
 
       // Cleanup function: This will clear the timer on unmount.
       return () => clearTimeout(timer);

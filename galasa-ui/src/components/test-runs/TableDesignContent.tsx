@@ -13,7 +13,7 @@ import { useTranslations } from "next-intl";
 import { InlineNotification } from "@carbon/react";
 import { ColumnDefinition } from "@/utils/interfaces";
 import { sortOrderType } from "@/utils/types/common";
-import { DEFAULT_VISIBLE_COLUMNS, RESULTS_TABLE_COLUMNS, WARNING_NOTIFICATION_VISIBLE_MILLISECS } from "@/utils/constants/common";
+import { DEFAULT_VISIBLE_COLUMNS, RESULTS_TABLE_COLUMNS, NOTIFICATION_VISIBLE_MILLISECS } from "@/utils/constants/common";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useNotification } from "@/components/common/UseNotification";
 

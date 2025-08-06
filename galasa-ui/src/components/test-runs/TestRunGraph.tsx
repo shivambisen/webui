@@ -15,7 +15,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import styles from "@/styles/TestRunsGraph.module.css";
 import { runStructure, ColumnDefinition, DataPoint } from "@/utils/interfaces";
-import { COLORS, MAX_DISPLAYABLE_TEST_RUNS, WARNING_NOTIFICATION_VISIBLE_MILLISECS } from "@/utils/constants/common";
+import { COLORS, MAX_DISPLAYABLE_TEST_RUNS, NOTIFICATION_VISIBLE_MILLISECS } from "@/utils/constants/common";
 import { TEST_RUNS } from "@/utils/constants/breadcrumb";
 import useHistoryBreadCrumbs from "@/hooks/useHistoryBreadCrumbs";
 import { useTheme } from "@/contexts/ThemeContext";

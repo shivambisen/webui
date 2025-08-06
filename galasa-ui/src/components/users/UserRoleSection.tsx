@@ -14,7 +14,7 @@ import { InlineNotification } from '@carbon/react';
 import { updateUserRoleAction } from '@/actions/userServerActions';
 import { useRouter } from 'next/navigation';
 import { useTranslations } from 'next-intl';
-import { WARNING_NOTIFICATION_VISIBLE_MILLISECS } from '@/utils/constants/common';
+import { NOTIFICATION_VISIBLE_MILLISECS } from '@/utils/constants/common';
 
 interface DropdownItem {
   name?: string;
@@ -167,7 +167,7 @@ export default function UserRoleSection({ userProfilePromise, roleDetailsPromise
         // Set timeout to hide the toast.
         toastTimer.current = setTimeout(() => {
           setIsToastVisible(false);
-        }, WARNING_NOTIFICATION_VISIBLE_MILLISECS);
+        }, NOTIFICATION_VISIBLE_MILLISECS);
 
       }
     } catch (err) {
