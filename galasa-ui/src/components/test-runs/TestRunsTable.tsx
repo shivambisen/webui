@@ -31,7 +31,7 @@ import StatusIndicator from "../common/StatusIndicator";
 import { useMemo, useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import ErrorPage from "@/app/error/page";
-import { MAX_RECORDS, WARNING_NOTIFICATION_DURATION } from "@/utils/constants/common";
+import { MAX_DISPLAYABLE_TEST_RUNS, WARNING_NOTIFICATION_VISIBLE_MILLISECS } from "@/utils/constants/common";
 import { useTranslations } from "next-intl";
 import { InlineNotification } from "@carbon/react";
 import useHistoryBreadCrumbs from "@/hooks/useHistoryBreadCrumbs";
@@ -77,7 +77,7 @@ export default function TestRunsTable({runsList, limitExceeded, visibleColumns, 
       setShowNotification(true);
       const timer = setTimeout(() => {
         setShowNotification(false);
-      }, WARNING_NOTIFICATION_DURATION);
+      }, WARNING_NOTIFICATION_VISIBLE_MILLISECS);
 
       // Cleanup function: This will clear the timer unmounts before the timeout.
       return () => clearTimeout(timer);
@@ -198,7 +198,7 @@ export default function TestRunsTable({runsList, limitExceeded, visibleColumns, 
           className={styles.notification}
           kind="warning" 
           title={translations('limitExceededTitle')}
-          subtitle={translations('limitExceededSubtitle', { maxRecords: MAX_RECORDS})}
+          subtitle={translations('limitExceededSubtitle', { maxRecords: MAX_DISPLAYABLE_TEST_RUNS})}
         />
       }
       <p className={styles.timeFrameText}>{timeFrameText}</p>

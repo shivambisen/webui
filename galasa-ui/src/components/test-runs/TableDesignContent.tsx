@@ -13,7 +13,7 @@ import { useTranslations } from "next-intl";
 import { InlineNotification } from "@carbon/react";
 import { ColumnDefinition } from "@/utils/interfaces";
 import { sortOrderType } from "@/utils/types/common";
-import { DEFAULT_VISIBLE_COLUMNS, RESULTS_TABLE_COLUMNS, WARNING_NOTIFICATION_DURATION } from "@/utils/constants/common";
+import { DEFAULT_VISIBLE_COLUMNS, RESULTS_TABLE_COLUMNS, WARNING_NOTIFICATION_VISIBLE_MILLISECS } from "@/utils/constants/common";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 
 
@@ -66,14 +66,13 @@ export default function TableDesignContent({
 
   const [showNotification, setShowNotification] = useState(selectedRowIds.length === 0);
 
-  // Set a timer to hide the notification after 5 seconds
   useEffect(() => {
     // Only show the notification if the limit was exceeded
     if (selectedRowIds.length === 0) {
       setShowNotification(true);
       const timer = setTimeout(() => {
         setShowNotification(false);
-      }, WARNING_NOTIFICATION_DURATION);
+      }, WARNING_NOTIFICATION_VISIBLE_MILLISECS);
 
       // Cleanup function: This will clear the timer unmounts before the timeout.
       return () => clearTimeout(timer);

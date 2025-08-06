@@ -32,7 +32,7 @@
     "features": {
       "testRunSearch": "Test Run searching and viewing",
       "internationalization": "Internationalization/Multiple language support",
-      "thirtyTwoSeventyTerminal": "Support for viewing and downloading 3270 terminals",
+      "is3270ScreenEnabled": "Support for viewing and downloading 3270 terminals",
       "graph":" Test Run Graphs"
     }
   },

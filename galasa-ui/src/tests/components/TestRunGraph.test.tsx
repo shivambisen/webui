@@ -20,7 +20,7 @@ jest.mock("next-intl", () => ({
       "noTestRunsFound": "No test runs found",
       "submittedAt": "Submitted at",
       "limitExceeded.title": "Limit Exceeded",
-      "limitExceeded.subtitle": "Showing only the first {MAX_RECORDS} records.",
+      "limitExceeded.subtitle": "Showing only the first {MAX_DISPLAYABLE_TEST_RUNS} records.",
     };
     let text = translations[key] || key;
     if (vars) {

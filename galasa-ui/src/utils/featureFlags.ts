@@ -8,7 +8,7 @@
 export const FEATURE_FLAGS = {
   TEST_RUNS: 'testRuns',
   INTERNATIONALIZATION: 'internationalization',
-  THIRTY_TWO_SEVENTY_TERMINAL: 'thirtyTwoSeventyTerminal',
+  IS_3270_SCREEN_ENABLED: 'is3270ScreenEnabled',
   GRAPH: 'graph',
   // Add other feature flags here
 } as const;
@@ -16,7 +16,7 @@ export const FEATURE_FLAGS = {
 export const DEFAULT_FEATURE_FLAGS = {
   testRuns: false, 
   internationalization: false,
-  thirtyTwoSeventyTerminal: false,
+  is3270ScreenEnabled: false,
   graph: false,
   // Add other feature flags here
 } as const;

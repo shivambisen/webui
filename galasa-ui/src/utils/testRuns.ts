@@ -5,7 +5,7 @@
  */
 import { ArtifactIndexEntry, ResultArchiveStoreAPIApi, Run, RunResults, UserData } from "@/generated/galasaapi";
 import { createAuthenticatedApiConfiguration } from "@/utils/api";
-import { CLIENT_API_VERSION, MAX_RECORDS, BATCH_SIZE } from "@/utils/constants/common";
+import { CLIENT_API_VERSION, MAX_DISPLAYABLE_TEST_RUNS, BATCH_SIZE } from "@/utils/constants/common";
 import { fetchAllUsersFromApiServer } from "@/utils/users";
 
 /**
@@ -66,7 +66,7 @@ export const fetchAllTestRunsByPaging  = async ({fromDate, toDate, runName, requ
   const rasApiClient = getRasApiClient();
 
   try {
-    while (hasMorePages && allRuns.length < MAX_RECORDS) {
+    while (hasMorePages && allRuns.length < MAX_DISPLAYABLE_TEST_RUNS) {
       // Fetch runs based on the provided date range
       const response: RunResults = await rasApiClient.getRasSearchRuns(
         'from:desc',
@@ -96,11 +96,11 @@ export const fetchAllTestRunsByPaging  = async ({fromDate, toDate, runName, requ
       }
   
       // Check if the limit was exceeded
-      if (allRuns.length >= MAX_RECORDS) {
+      if (allRuns.length >= MAX_DISPLAYABLE_TEST_RUNS) {
         limitExceeded = true;
   
         // Trim to max records
-        allRuns = allRuns.slice(0, MAX_RECORDS);
+        allRuns = allRuns.slice(0, MAX_DISPLAYABLE_TEST_RUNS);
   
         // Stop fetching more runs
         hasMorePages = false; 

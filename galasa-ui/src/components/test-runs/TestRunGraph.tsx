@@ -15,7 +15,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import styles from "@/styles/TestRunsGraph.module.css";
 import { runStructure, ColumnDefinition, DataPoint } from "@/utils/interfaces";
-import { COLORS, MAX_RECORDS, WARNING_NOTIFICATION_DURATION } from "@/utils/constants/common";
+import { COLORS, MAX_DISPLAYABLE_TEST_RUNS, WARNING_NOTIFICATION_VISIBLE_MILLISECS } from "@/utils/constants/common";
 import { TEST_RUNS } from "@/utils/constants/breadcrumb";
 import useHistoryBreadCrumbs from "@/hooks/useHistoryBreadCrumbs";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -58,7 +58,7 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
       setShowNotification(true);
       const timer = setTimeout(() => {
         setShowNotification(false);
-      }, WARNING_NOTIFICATION_DURATION);
+      }, WARNING_NOTIFICATION_VISIBLE_MILLISECS);
 
       // Cleanup function: This will clear the timer unmounts before the timeout.
       return () => clearTimeout(timer);
@@ -257,7 +257,7 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
         <InlineNotification
           kind="warning"
           title={translations("limitExceeded.title")}
-          subtitle={translations("limitExceeded.subtitle", { maxRecords: MAX_RECORDS})}
+          subtitle={translations("limitExceeded.subtitle", { maxRecords: MAX_DISPLAYABLE_TEST_RUNS})}
           className={styles.notification}
         />
       )}

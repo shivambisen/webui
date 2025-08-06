@@ -8,7 +8,7 @@ import '@testing-library/jest-dom';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { fireEvent } from '@testing-library/react';
 import TestRunsTable from '@/components/test-runs/TestRunsTable';
-import { MAX_RECORDS, RESULTS_TABLE_COLUMNS } from '@/utils/constants/common';
+import { MAX_DISPLAYABLE_TEST_RUNS, RESULTS_TABLE_COLUMNS } from '@/utils/constants/common';
 import { useSearchParams, useRouter } from 'next/navigation';
 
 const mockRouterPush = jest.fn();
@@ -55,7 +55,7 @@ jest.mock("next-intl", () => ({
       "status": "Status",
       "result": "Result",
       "pagination.of": "of {total}",
-      "limitExceededSubtitle": "Your query returned more than 2000 results, please refine your search. Showing the first 2000 records."
+      "limitExceededSubtitle": "Your query returned more than {maxRecords} results. To avoid this in the future narrow your time frame or change your search criteria to return fewer results.",
     };
 
     let text = translations[key] || key;
@@ -164,7 +164,7 @@ describe('TestRunsTable Component', () => {
     render(<TestRunsTable runsList={mockRuns} {...defaultProps} limitExceeded={true}/>);
 
     // Assert
-    const warningMessage = await screen.findByText(`Your query returned more than ${MAX_RECORDS} results, please refine your search. Showing the first ${MAX_RECORDS} records.`);
+    const warningMessage = await screen.findByText(`Your query returned more than ` + MAX_DISPLAYABLE_TEST_RUNS + ` results. To avoid this in the future narrow your time frame or change your search criteria to return fewer results.`);
     expect(warningMessage).toBeInTheDocument();
   });
 
