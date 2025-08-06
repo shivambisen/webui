@@ -71,7 +71,6 @@ export default function TestRunsTable({runsList, limitExceeded, visibleColumns, 
     header: translations(column.id)
   })) || [];
 
-  // Set a timer to hide the notification after 5 seconds
   useEffect(() => {
     // Only show the notification if the limit was exceeded
     if (limitExceeded) {
@@ -198,7 +197,7 @@ export default function TestRunsTable({runsList, limitExceeded, visibleColumns, 
         <InlineNotification
           className={styles.notification}
           kind="warning" 
-          title="Limit Exceeded" 
+          title={translations('limitExceededTitle')}
           subtitle={translations('limitExceededSubtitle', { maxRecords: MAX_RECORDS})}
         />
       }
