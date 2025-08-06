@@ -19,7 +19,6 @@ import {
   COLUMNS_IDS,
   TEST_RUNS_QUERY_PARAMS,
   DAY_MS,
-  TABS_IDS,
   SEARCH_CRITERIA_KEYS,
   DEFAULT_VISIBLE_COLUMNS,
 } from '@/utils/constants/common';

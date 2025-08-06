@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import TestRunGraph from '../../components/test-runs/TestRunGraph';
+import TestRunGraph from '@/components/test-runs/graph/TestRunsGraph';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { RESULTS_TABLE_COLUMNS } from '@/utils/constants/common';
 import { DateTimeFormatProvider } from '@/contexts/DateTimeFormatContext';

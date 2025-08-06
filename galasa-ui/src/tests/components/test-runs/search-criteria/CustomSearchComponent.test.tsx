@@ -6,7 +6,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import CustomSearchComponent from '@/components/test-runs/CustomSearchComponent';
+import CustomSearchComponent from '@/components/test-runs/search-criteria/CustomSearchComponent';
 
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => {

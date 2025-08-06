@@ -9,7 +9,7 @@ import '@testing-library/jest-dom';
 import UsersPage from '@/app/users/page';
 import { UserData, UsersAPIApi } from '@/generated/galasaapi';
 import { createAuthenticatedApiConfiguration } from '@/utils/api';
-import { fetchUserFromApiServer } from '../../actions/userServerActions';
+import { fetchUserFromApiServer } from '@/actions/userServerActions';
 import * as Constants from '@/utils/constants/common';
 
 // Mock the dependencies
@@ -21,7 +21,7 @@ jest.mock('@/generated/galasaapi', () => ({
   UsersAPIApi: jest.fn(),
 }));
 
-jest.mock('../../actions/userServerActions', () => ({
+jest.mock('@/actions/userServerActions', () => ({
   fetchUserFromApiServer: jest.fn(),
 }));
 

@@ -22,12 +22,12 @@ const TestRunsTableMock = jest.fn((props) => (
     })}
   </div>
 ));
-jest.mock('@/components/test-runs/TestRunsTable', () => ({
+jest.mock('@/components/test-runs/results/TestRunsTable', () => ({
   __esModule: true,
   default: (props: any) => TestRunsTableMock(props),
 }));
 
-jest.mock('@/components/test-runs/TimeFrameContent', () => ({
+jest.mock('@/components/test-runs/timeframe/TimeFrameContent', () => ({
   __esModule: true,
   default: () => <div>Mocked Timeframe Content</div>,
   calculateSynchronizedState: jest.fn((fromDate, toDate) => ({
@@ -43,12 +43,12 @@ jest.mock('@/components/test-runs/TimeFrameContent', () => ({
   })),
 }));
 
-jest.mock('@/components/test-runs/SearchCriteriaContent', () => ({
+jest.mock('@/components/test-runs/search-criteria/SearchCriteriaContent', () => ({
   __esModule: true,
   default: () => <div>Mocked Search Criteria Content</div>,
 }));
 
-jest.mock('@/components/test-runs/TestRunGraph', () => ({
+jest.mock('@/components/test-runs/graph/TestRunsGraph', () => ({
   __esModule: true,
   default: jest.fn(() => <div>TestRunsGraphMock</div>),
 }));
@@ -57,7 +57,7 @@ let capturedSetSelectedVisibleColumns: (columns: string[]) => void;
 let capturedSetColumnsOrder: (order: { id: string; columnName: string }[]) => void;
 let capturedSetSortOrder: (sortOrder: { id: string; order: 'asc' | 'desc' | 'none' }[]) => void;
 
-jest.mock('@/components/test-runs/TableDesignContent', () => ({
+jest.mock('@/components/test-runs/table-design/TableDesignContent', () => ({
   __esModule: true,
   default: (props: any) => {
     capturedSetSelectedVisibleColumns = props.setSelectedRowIds;
@@ -197,7 +197,6 @@ const wrapper = ({ children }: { children: React.ReactNode }) => (
 
 describe('TestRunsTabs Component', () => {
   const STABLE_DATE = new Date('2024-07-15T10:00:00.000Z');
-  const originalDate = global.Date;
 
   beforeAll(() => {
     jest.useFakeTimers().setSystemTime(STABLE_DATE);

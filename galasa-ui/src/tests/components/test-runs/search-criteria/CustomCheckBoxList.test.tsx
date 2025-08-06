@@ -6,7 +6,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import CustomCheckBoxList from '@/components/test-runs/CustomCheckBoxList';
+import CustomCheckBoxList from '@/components/test-runs/search-criteria/CustomCheckBoxList';
 
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => {

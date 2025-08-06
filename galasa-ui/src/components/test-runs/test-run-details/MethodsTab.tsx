@@ -29,7 +29,7 @@ export interface MethodDetails {
 
 interface MethodsTabProps {
   methods: TestMethod[];
-  onMethodClick: (method: MethodDetails) => void;
+  onMethodClick?: (method: MethodDetails) => void;
 }
 
 function MethodsTab({ methods, onMethodClick }: MethodsTabProps) {
@@ -127,7 +127,9 @@ function MethodsTab({ methods, onMethodClick }: MethodsTabProps) {
                   return (
                     <TableRow
                       key={row.id}
-                      onClick={() => onMethodClick(methodDetails[parseInt(row.id)])}
+                      onClick={() =>
+                        onMethodClick && onMethodClick(methodDetails[parseInt(row.id)])
+                      }
                       className={styles.clickableRow}
                       {...getRowProps({ row })}
                     >

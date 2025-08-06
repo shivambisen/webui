@@ -6,7 +6,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import CustomTagsComponent from '@/components/test-runs/CustomTagsComponent';
+import CustomTagsComponent from '@/components/test-runs/search-criteria/CustomTagsComponent';
 
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => {

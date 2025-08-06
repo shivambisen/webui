@@ -6,7 +6,7 @@
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import { ArtifactsTab } from '@/components/test-runs/ArtifactsTab';
+import { ArtifactsTab } from '@/components/test-runs/test-run-details/ArtifactsTab';
 import { downloadArtifactFromServer } from '@/actions/runsAction';
 import { handleDownload } from '@/utils/artifacts';
 

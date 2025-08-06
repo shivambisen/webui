@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { render, screen } from '@testing-library/react';
-import OverviewTab from '@/components/test-runs/OverviewTab';
+import OverviewTab from '@/components/test-runs/test-run-details/OverviewTab';
 import { RunMetadata } from '@/utils/interfaces';
 import { getOneMonthAgo, getAWeekBeforeSubmittedTime } from '@/utils/timeOperations';
 

@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import { render, screen, act, fireEvent, waitFor } from '@testing-library/react';
-import TestRunDetails from '@/components/test-runs/TestRunDetails';
+import TestRunDetails from '@/components/test-runs/test-run-details/TestRunDetails';
 import { downloadArtifactFromServer } from '@/actions/runsAction';
 import { cleanArtifactPath, handleDownload } from '@/utils/artifacts';
 import { TEST_RUN_PAGE_TABS } from '@/utils/constants/common';
@@ -70,7 +70,7 @@ jest.mock('@/components/PageTile', () => {
   };
 });
 
-jest.mock('@/components/test-runs/OverviewTab', () => {
+jest.mock('@/components/test-runs/test-run-details/OverviewTab', () => {
   const OverviewTab = ({ metadata }: any) => <div>OverviewTab result={metadata?.result}</div>;
   OverviewTab.displayName = 'OverviewTab';
   return {
@@ -79,7 +79,7 @@ jest.mock('@/components/test-runs/OverviewTab', () => {
   };
 });
 
-jest.mock('@/components/test-runs/MethodsTab', () => {
+jest.mock('@/components/test-runs/test-run-details/MethodsTab', () => {
   const MethodsTab = ({ methods, onMethodClick }: any) => (
     <div>
       <p>MethodsTab count={methods?.length}</p>
@@ -98,7 +98,7 @@ jest.mock('@/components/test-runs/MethodsTab', () => {
   };
 });
 
-jest.mock('@/components/test-runs/LogTab', () => {
+jest.mock('@/components/test-runs/test-run-details/LogTab', () => {
   const LogTab = ({ logs }: any) => <div>LogTab logs={logs}</div>;
   LogTab.displayName = 'LogTab';
   return {
@@ -107,7 +107,7 @@ jest.mock('@/components/test-runs/LogTab', () => {
   };
 });
 
-jest.mock('@/components/test-runs/ArtifactsTab', () => {
+jest.mock('@/components/test-runs/test-run-details/ArtifactsTab', () => {
   const ArtifactsTab = ({ artifacts, runName, runId }: any) => (
     <div>
       ArtifactsTab count={artifacts.length} runName={runName} runId={runId}
@@ -129,7 +129,7 @@ jest.mock('@/app/error/page', () => {
   };
 });
 
-jest.mock('@/components/test-runs/TestRunSkeleton', () => {
+jest.mock('@/components/test-runs/test-run-details/TestRunSkeleton', () => {
   const TestRunSkeleton = () => <div>Skeleton</div>;
   TestRunSkeleton.displayName = 'TestRunSkeleton';
   return {

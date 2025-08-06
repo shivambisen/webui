@@ -4,13 +4,13 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import TableDesignContent from '@/components/test-runs/TableDesignContent';
+import TableDesignContent from '@/components/test-runs/table-design/TableDesignContent';
 import { DEFAULT_VISIBLE_COLUMNS, RESULTS_TABLE_COLUMNS } from '@/utils/constants/common';
 import { ColumnDefinition } from '@/utils/interfaces';
 import { render, screen, fireEvent } from '@testing-library/react';
 
 // Mock Child Components
-jest.mock('@/components/test-runs/TableDesignRow', () => ({
+jest.mock('@/components/test-runs/table-design/TableDesignRow', () => ({
   __esModule: true,
   default: ({ rowId, value, isSelected, onSelect, onClickArrowUp, onClickArrowDown }: any) => (
     <div data-testid={`row-${rowId}`}>

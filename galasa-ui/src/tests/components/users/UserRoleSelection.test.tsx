@@ -5,7 +5,7 @@
  */
 import React from 'react';
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
-import UserRoleSection from '../../components/users/UserRoleSection';
+import UserRoleSection from '@/components/users/UserRoleSection';
 import { RBACRole, UserData } from '@/generated/galasaapi';
 import { updateUserRoleAction } from '@/actions/userServerActions';
 import { useRouter } from 'next/navigation';

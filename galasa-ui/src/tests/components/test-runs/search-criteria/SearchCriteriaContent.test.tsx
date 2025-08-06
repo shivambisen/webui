@@ -4,14 +4,14 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 
-import SearchCriteriaContent from '@/components/test-runs/SearchCriteriaContent';
+import SearchCriteriaContent from '@/components/test-runs/search-criteria/SearchCriteriaContent';
 import { render, screen, fireEvent, waitFor, act, within } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
 
 // Mock child components
-jest.mock('@/components/test-runs/CustomSearchComponent', () => {
+jest.mock('@/components/test-runs/search-criteria/CustomSearchComponent', () => {
   return function MockCustomSearchComponent(props: any) {
     return (
       <div data-testid="mock-custom-search-component">
@@ -32,7 +32,7 @@ jest.mock('@/components/test-runs/CustomSearchComponent', () => {
   };
 });
 
-jest.mock('@/components/test-runs/CustomCheckBoxList', () => {
+jest.mock('@/components/test-runs/search-criteria/CustomCheckBoxList', () => {
   return function MockCustomCheckBoxList(props: any) {
     return (
       <div data-testid="mock-custom-checkbox-list">
