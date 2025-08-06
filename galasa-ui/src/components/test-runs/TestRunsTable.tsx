@@ -37,6 +37,7 @@ import { InlineNotification } from "@carbon/react";
 import useHistoryBreadCrumbs from "@/hooks/useHistoryBreadCrumbs";
 import { TEST_RUNS } from "@/utils/constants/breadcrumb";
 import { useDateTimeFormat } from "@/contexts/DateTimeFormatContext";
+import { useNotification } from "@/components/common/UseNotification";
 
 
 interface CustomCellProps {
@@ -64,25 +65,12 @@ export default function TestRunsTable({runsList, limitExceeded, visibleColumns, 
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const [showNotification, setShowNotification] = useState(limitExceeded);
+  const isNotificationVisible = useNotification(limitExceeded);
   
   const headers = orderedHeaders?.filter(column => visibleColumns.includes(column.id)).map(column => ({
     key: column.id,
     header: translations(column.id)
   })) || [];
-
-  useEffect(() => {
-    // Only show the notification if the limit was exceeded
-    if (limitExceeded) {
-      setShowNotification(true);
-      const timer = setTimeout(() => {
-        setShowNotification(false);
-      }, WARNING_NOTIFICATION_VISIBLE_MILLISECS);
-
-      // Cleanup function: This will clear the timer unmounts before the timeout.
-      return () => clearTimeout(timer);
-    }
-  }, [limitExceeded]);
 
   // Calculate the paginated rows based on the current page and page size
   const paginatedRows = useMemo(() => {
@@ -193,7 +181,7 @@ export default function TestRunsTable({runsList, limitExceeded, visibleColumns, 
 
   return (
     <div className={styles.resultsPageContainer}>
-      {limitExceeded && showNotification &&
+      {limitExceeded && isNotificationVisible &&
         <InlineNotification
           className={styles.notification}
           kind="warning" 

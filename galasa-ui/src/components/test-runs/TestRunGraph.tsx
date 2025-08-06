@@ -21,6 +21,8 @@ import useHistoryBreadCrumbs from "@/hooks/useHistoryBreadCrumbs";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useDateTimeFormat } from "@/contexts/DateTimeFormatContext";
 import { getTooltipHTML } from "../../utils/generateTooltipHTML";
+import { useNotification } from "@/components/common/UseNotification";
+
 
 interface TestRunGraphProps {
   runsList: runStructure[];
@@ -50,20 +52,7 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
   const { pushBreadCrumb } = useHistoryBreadCrumbs();
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
-  const [showNotification, setShowNotification] = useState(limitExceeded);
-
-  useEffect(() => {
-    // Only show the notification if the limit was exceeded
-    if (limitExceeded) {
-      setShowNotification(true);
-      const timer = setTimeout(() => {
-        setShowNotification(false);
-      }, WARNING_NOTIFICATION_VISIBLE_MILLISECS);
-
-      // Cleanup function: This will clear the timer unmounts before the timeout.
-      return () => clearTimeout(timer);
-    }
-  }, [limitExceeded]);
+  const isNotificationVisible = useNotification(limitExceeded);
 
   const headerDefinitions = useMemo(() => {
     if (!runsList.length) return [];
@@ -253,7 +242,7 @@ export default function TestRunGraph({runsList, limitExceeded, visibleColumns=[]
 
   return (
     <div className={styles.resultsPageContainer}>
-      {limitExceeded && showNotification && (
+      {limitExceeded && isNotificationVisible && (
         <InlineNotification
           kind="warning"
           title={translations("limitExceeded.title")}

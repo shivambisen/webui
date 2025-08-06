@@ -15,6 +15,7 @@ import { ColumnDefinition } from "@/utils/interfaces";
 import { sortOrderType } from "@/utils/types/common";
 import { DEFAULT_VISIBLE_COLUMNS, RESULTS_TABLE_COLUMNS, WARNING_NOTIFICATION_VISIBLE_MILLISECS } from "@/utils/constants/common";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useNotification } from "@/components/common/UseNotification";
 
 
 interface TableDesignContentProps {
@@ -64,20 +65,7 @@ export default function TableDesignContent({
     }
   };
 
-  const [showNotification, setShowNotification] = useState(selectedRowIds.length === 0);
-
-  useEffect(() => {
-    // Only show the notification if the limit was exceeded
-    if (selectedRowIds.length === 0) {
-      setShowNotification(true);
-      const timer = setTimeout(() => {
-        setShowNotification(false);
-      }, WARNING_NOTIFICATION_VISIBLE_MILLISECS);
-
-      // Cleanup function: This will clear the timer unmounts before the timeout.
-      return () => clearTimeout(timer);
-    }
-  }, [selectedRowIds.length]);
+  const isNotificationVisible = useNotification(selectedRowIds.length === 0);
 
   const getRowPosition = (id: string) => tableRows.findIndex(row => row.id === id);
 
@@ -189,7 +177,7 @@ export default function TableDesignContent({
           }
         </SortableContext>
         {
-          selectedRowIds.length === 0 && showNotification &&
+          selectedRowIds.length === 0 && isNotificationVisible &&
           <InlineNotification
             className={styles.notification}
             kind={"warning"} 
