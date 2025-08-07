@@ -7,7 +7,7 @@
 
 import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react';
 import { Search, OverflowMenu, Button } from '@carbon/react';
-import styles from '@/styles/LogTab.module.css';
+import styles from '@/styles/test-runs/test-run-details/LogTab.module.css';
 import { Checkbox } from '@carbon/react';
 import { Filter, ChevronUp, ChevronDown, CloudDownload, Term, LetterAa } from '@carbon/icons-react';
 import { handleDownload } from '@/utils/artifacts';

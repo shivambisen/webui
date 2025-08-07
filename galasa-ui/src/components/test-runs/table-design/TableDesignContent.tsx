@@ -20,7 +20,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import styles from '@/styles/TestRunsPage.module.css';
+import styles from '@/styles/test-runs/TestRunsPage.module.css';
 import TableDesignRow from './TableDesignRow';
 import { Checkbox, Button } from '@carbon/react';
 import { useTranslations } from 'next-intl';

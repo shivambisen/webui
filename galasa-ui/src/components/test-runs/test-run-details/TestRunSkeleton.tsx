@@ -14,8 +14,8 @@ import {
   TabPanel,
 } from '@carbon/react';
 import { Dashboard, Code, CloudLogging, RepoArtifact } from '@carbon/icons-react';
-import styles from '@/styles/TestRun.module.css';
-import skeletonStyles from '@/styles/TestRunSkeleton.module.css';
+import styles from '@/styles/test-runs/test-run-details/TestRun.module.css';
+import skeletonStyles from '@/styles/test-runs/test-run-details/TestRunSkeleton.module.css';
 import { useTranslations } from 'next-intl';
 
 const TestRunSkeleton = () => {

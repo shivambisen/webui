@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 'use client';
-import styles from '@/styles/TestRunsPage.module.css';
+import styles from '@/styles/test-runs/TestRunsPage.module.css';
 import {
   StructuredListWrapper,
   StructuredListHead,

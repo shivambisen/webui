@@ -5,7 +5,7 @@
  */
 'use client';
 import React, { useEffect, useState } from 'react';
-import styles from '@/styles/OverviewTab.module.css';
+import styles from '@/styles/test-runs/test-run-details/OverviewTab.module.css';
 import InlineText from './InlineText';
 import { Tag } from '@carbon/react';
 import { RunMetadata } from '@/utils/interfaces';

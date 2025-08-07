@@ -15,7 +15,7 @@ import React, { useEffect, useState } from 'react';
 import { TableToolbarContent } from '@carbon/react';
 import { TableToolbarSearch } from '@carbon/react';
 import StatusIndicator from '../../common/StatusIndicator';
-import styles from '@/styles/MethodsTab.module.css';
+import styles from '@/styles/test-runs/test-run-details/MethodsTab.module.css';
 import { useTranslations } from 'next-intl';
 
 export interface MethodDetails {

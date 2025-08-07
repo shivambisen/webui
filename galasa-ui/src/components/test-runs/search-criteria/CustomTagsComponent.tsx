@@ -6,7 +6,7 @@
 'use client';
 import { useState, FormEvent } from 'react';
 import { Button, TextInput } from '@carbon/react';
-import styles from '@/styles/TestRunsPage.module.css';
+import styles from '@/styles/test-runs/TestRunsPage.module.css';
 import { useTranslations } from 'next-intl';
 
 interface CustomTagsComponentProps {

@@ -5,7 +5,7 @@
  */
 'use client';
 
-import styles from '@/styles/TestRunsPage.module.css';
+import styles from '@/styles/test-runs/TestRunsPage.module.css';
 import { TimeFrameValues } from '@/utils/interfaces';
 import { FormGroup, NumberInput } from '@carbon/react';
 import DateTimePicker from './DateTimePicker';

@@ -7,7 +7,7 @@
 import BreadCrumb from '@/components/common/BreadCrumb';
 import { Tab, Tabs, TabList, TabPanels, TabPanel, Loading } from '@carbon/react';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import styles from '@/styles/TestRun.module.css';
+import styles from '@/styles/test-runs/test-run-details/TestRun.module.css';
 import {
   Dashboard,
   Code,

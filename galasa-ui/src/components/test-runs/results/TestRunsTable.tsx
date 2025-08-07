@@ -23,7 +23,7 @@ import {
   DataTableCell as IDataTableCell,
   runStructure,
 } from '@/utils/interfaces';
-import styles from '@/styles/TestRunsPage.module.css';
+import styles from '@/styles/test-runs/TestRunsPage.module.css';
 import { TableRowProps } from '@carbon/react/lib/components/DataTable/TableRow';
 import { TableHeadProps } from '@carbon/react/lib/components/DataTable/TableHead';
 import { TableBodyProps } from '@carbon/react/lib/components/DataTable/TableBody';
