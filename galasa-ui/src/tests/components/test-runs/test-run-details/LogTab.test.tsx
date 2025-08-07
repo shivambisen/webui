@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: EPL-2.0
  */
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import LogTab from '@/components/test-runs/test-run-details/LogTab';
 import { handleDownload } from '@/utils/artifacts';
@@ -13,11 +13,13 @@ import { handleDownload } from '@/utils/artifacts';
 jest.mock('@/utils/artifacts', () => ({
   handleDownload: jest.fn(),
 }));
+
+// Mock the next-intl translations
 jest.mock('next-intl', () => ({
   useTranslations: () => {
     return (key: string, vars?: Record<string, any>) => {
-      // For match_counter, return formatted "current of total"
-      if (key === 'match_counter' && vars) {
+      // For matchCounter, return formatted "current of total"
+      if (key === 'matchCounter' && vars) {
         return `${vars.current} of ${vars.total}`;
       }
       // Provide dummy translations for other keys used in LogTab:
@@ -25,20 +27,20 @@ jest.mock('next-intl', () => ({
         title: 'Run Log',
         description:
           'A step-by-step log of what happened over time when the Run was preparing a TestClass for execution, what happened when the TestClass was executed, and when the test environment was cleaned up. The RunLog is an Artifact, which can be downloaded and viewed.',
-        search_placeholder: 'Find in run log',
-        no_matches: 'No matches',
-        match_counter: '{current} of {total}',
-        match_previous: 'Previous match',
-        match_next: 'Next match',
-        match_case: 'Match case',
-        match_whole_word: 'Match whole word',
-        filters_menu_title: 'Hide / Show Content',
-        filter_error: 'Error',
-        filter_warn: 'Warning',
-        filter_info: 'Info',
-        filter_debug: 'Debug',
-        filter_trace: 'Trace',
-        download_button: 'Download Run Log',
+        searchPlaceholder: 'Find in run log',
+        noMatches: 'No matches',
+        matchCounter: '{current} of {total}',
+        matchPrevious: 'Previous match',
+        matchNext: 'Next match',
+        matchCase: 'Match case',
+        matchWholeWord: 'Match whole word',
+        filtersMenuTitle: 'Hide / Show Content',
+        filterError: 'Error',
+        filterWarn: 'Warning',
+        filterInfo: 'Info',
+        filterDebug: 'Debug',
+        filterTrace: 'Trace',
+        downloadButton: 'Download Run Log',
       };
       return dummy[key] ?? key;
     };
@@ -108,6 +110,23 @@ jest.mock('@carbon/icons-react', () => ({
   CloudDownload: () => <div>CloudDownload</div>,
 }));
 
+// Mock window.getSelection API
+const mockSelection = (startNode: Node, endNode: Node, startOffset = 0, endOffset = 0) => {
+  const selection = {
+    anchorNode: startNode,
+    focusNode: endNode,
+    anchorOffset: startOffset,
+    focusOffset: endOffset,
+    isCollapse: startNode === endNode,
+    removeAllRanges: jest.fn(),
+    addRange: jest.fn(),
+  };
+
+  // Override the global window.getSelection method
+  window.getSelection = jest.fn().mockReturnValue(selection as unknown as Selection);
+  return selection;
+};
+
 const sampleLogs = `2024-01-01 10:00:00 INFO Starting application
 2024-01-01 10:00:01 DEBUG Initializing database connection
 2024-01-01 10:00:02 ERROR Failed to connect to database
@@ -118,11 +137,16 @@ Multi-line continuation
 2024-01-01 10:00:06 ERROR Another error occurred`;
 
 describe('LogTab', () => {
+  const scrollIntoViewMock = jest.fn();
   beforeEach(() => {
     jest.clearAllMocks();
 
     // Mock scrollIntoView
-    Element.prototype.scrollIntoView = jest.fn();
+    Element.prototype.scrollIntoView = scrollIntoViewMock;
+  });
+
+  afterAll(() => {
+    jest.resetAllMocks();
   });
 
   describe('Rendering', () => {
@@ -441,6 +465,201 @@ Line with $dollar and ^caret`;
           expect(screen.getByText('No matches')).toBeInTheDocument();
         });
       });
+    });
+  });
+
+  describe('Selection and Permalink Functionality', () => {
+    beforeEach(() => {
+      // Mock the clipboard API for permalink tests
+      Object.assign(navigator, {
+        clipboard: {
+          writeText: jest.fn(),
+        },
+      });
+    });
+
+    it('copies permalink button is initially disabled', () => {
+      render(<LogTab logs={sampleLogs} />);
+
+      const copyPermalinkButton = screen.getByTestId('icon-button-copy-permalink');
+      expect(copyPermalinkButton).toHaveClass('buttonDisabled');
+    });
+
+    it('enables permalink button when a log line is selected', async () => {
+      render(<LogTab logs={sampleLogs} />);
+
+      // Wait for the lines to be rendered
+      await waitFor(() => {
+        expect(screen.getByText(/Starting application/)).toBeInTheDocument();
+        expect(screen.getByText(/Failed to connect to database/)).toBeInTheDocument();
+      });
+
+      // Get lines selected nodes
+      const startLineNode = screen.getByText(/Starting application/);
+      const endLineNode = screen.getByText(/Failed to connect to database/);
+
+      // Simulate selection
+      mockSelection(startLineNode, endLineNode);
+
+      // Trigger onMouseUp event on the container to process the selection
+      fireEvent(document, new Event('selectionchange'));
+
+      // Check if the permalink button is enabled
+      await waitFor(() => {
+        const copyPermalinkButton = screen.getByTestId('icon-button-copy-permalink');
+        expect(copyPermalinkButton).not.toHaveClass('buttonDisabled');
+      });
+    });
+
+    it('copies the correct permalink to the clipboard and disables the button', async () => {
+      render(<LogTab logs={sampleLogs} />);
+      await screen.findByText(/Initializing database connection/);
+
+      const startLineNode = screen.getByText(/Initializing database connection/); // Line 2
+      const endLineNode = screen.getByText(/Connection retry attempt 1/); // Line 4
+
+      act(() => {
+        // Simulate selection with offsets
+        mockSelection(startLineNode, endLineNode, 5, 10);
+        fireEvent(document, new Event('selectionchange'));
+      });
+
+      const copyButton = await screen.findByTestId('icon-button-copy-permalink');
+      expect(copyButton).not.toHaveClass('buttonDisabled');
+
+      // Click the button
+
+      act(() => {
+        fireEvent.click(copyButton);
+      });
+
+      // Verify the clipboard was called with the correct URL hash.
+      expect(navigator.clipboard.writeText).toHaveBeenCalledWith(
+        expect.stringContaining('#log-2-5-4-10')
+      );
+      // The button should become disabled again after copying.
+      await waitFor(() => {
+        expect(copyButton).toHaveClass('buttonDisabled');
+      });
+    });
+  });
+
+  describe('URL Hash Handling', () => {
+    beforeEach(() => {
+      // Clear any existing hash
+      window.history.replaceState({}, 'Test page', '/');
+      scrollIntoViewMock.mockClear();
+
+      // Mock document.getElementById to return mock elements
+      const mockElement = {
+        scrollIntoView: scrollIntoViewMock,
+        querySelector: jest.fn().mockReturnValue({
+          firstChild: {
+            textContent: 'mock text content',
+          },
+        }),
+      };
+
+      jest.spyOn(document, 'getElementById').mockImplementation((id) => {
+        if (id.startsWith('log-line-')) {
+          return mockElement as any;
+        }
+        return null;
+      });
+
+      // Mock document.createRange and window.getSelection for the hash selection logic
+      const mockRange = {
+        setStart: jest.fn(),
+        setEnd: jest.fn(),
+      };
+
+      const mockSelection = {
+        removeAllRanges: jest.fn(),
+        addRange: jest.fn(),
+      };
+
+      document.createRange = jest.fn().mockReturnValue(mockRange as any);
+      window.getSelection = jest.fn().mockReturnValue(mockSelection as any);
+    });
+
+    afterEach(() => {
+      jest.restoreAllMocks();
+    });
+
+    it('scrolls to the line specified in the URL hash and highlights it', async () => {
+      // Set the URL hash before rendering
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          hash: '#log-3-0-3-5',
+        },
+        writable: true,
+      });
+
+      render(<LogTab logs={sampleLogs} />);
+
+      // Wait for the target line to be rendered and processed
+      await waitFor(() => {
+        expect(screen.getByText(/Failed to connect to database/)).toBeInTheDocument();
+      });
+
+      // Wait for all effects to complete, including hash handling
+      await waitFor(
+        () => {
+          expect(scrollIntoViewMock).toHaveBeenCalledWith({
+            behavior: 'auto',
+            block: 'center',
+          });
+        },
+        { timeout: 2000 }
+      );
+    });
+
+    it('scrolls to a new line when the hash changes', async () => {
+      // Start with no hash
+      Object.defineProperty(window, 'location', {
+        value: {
+          ...window.location,
+          hash: '',
+        },
+        writable: true,
+      });
+
+      render(<LogTab logs={sampleLogs} />);
+
+      // Wait for the content to be rendered
+      await waitFor(() => {
+        expect(screen.getByText(/Starting application/)).toBeInTheDocument();
+        expect(screen.getByText(/Application started successfully/)).toBeInTheDocument();
+      });
+
+      // Clear any previous scroll calls
+      scrollIntoViewMock.mockClear();
+
+      // Change the URL hash and trigger the event
+      act(() => {
+        Object.defineProperty(window, 'location', {
+          value: {
+            ...window.location,
+            hash: '#log-5-0-5-5',
+          },
+          writable: true,
+        });
+
+        // Dispatch the hashchange event
+        window.dispatchEvent(new HashChangeEvent('hashchange'));
+      });
+
+      // Wait for the hash change to be processed and scroll to occur
+      await waitFor(
+        () => {
+          expect(scrollIntoViewMock).toHaveBeenCalledWith({
+            behavior: 'auto',
+            block: 'center',
+          });
+        },
+        { timeout: 2000 }
+      );
     });
   });
 });
