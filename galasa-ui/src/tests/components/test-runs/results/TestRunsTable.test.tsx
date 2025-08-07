@@ -100,6 +100,7 @@ const generateMockRuns = (count: number) => {
       group: `group${i}`,
       bundle: `bundle${i}`,
       package: `package${i}`,
+      testShortName: `shortTest${i}`,
       testName: `test${i}`,
       status: 'finished',
       result: i % 2 === 0 ? 'Failed' : 'Passed',
