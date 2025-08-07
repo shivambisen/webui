@@ -9,7 +9,15 @@ import React, { useEffect, useState, useRef, useMemo, useCallback } from 'react'
 import { Search, OverflowMenu, Button } from '@carbon/react';
 import styles from '@/styles/LogTab.module.css';
 import { Checkbox } from '@carbon/react';
-import { Filter, ChevronUp, ChevronDown, CloudDownload, Term, LetterAa } from '@carbon/icons-react';
+import {
+  Filter,
+  ChevronUp,
+  ChevronDown,
+  CloudDownload,
+  Term,
+  LetterAa,
+  Copy,
+} from '@carbon/icons-react';
 import { handleDownload } from '@/utils/artifacts';
 import { useTranslations } from 'next-intl';
 
@@ -37,6 +45,16 @@ interface LogTabProps {
   initialLine?: number;
 }
 
+interface selectedRange {
+  startLine: number;
+  endLine: number;
+  startOffset: number;
+  endOffset: number;
+}
+
+const SELECTION_CHANGE_EVENT = 'selectionchange';
+const HASH_CHANGE_EVENT = 'hashchange';
+
 export default function LogTab({ logs, initialLine }: LogTabProps) {
   const translations = useTranslations('LogTab');
 
@@ -55,12 +73,19 @@ export default function LogTab({ logs, initialLine }: LogTabProps) {
     INFO: true,
     TRACE: true,
   });
+  const [selectedRange, setSelectedRange] = useState<selectedRange | null>(null);
 
   // Cache for search results to avoid recomputation
   const [searchCache, setSearchCache] = useState<Map<string, MatchInfo[]>>(new Map());
 
+  // State to track the URL hash, initialized to the value of the first render
+  const [currentHash, setCurrentHash] = useState<string>(
+    typeof window !== 'undefined' ? window.location.hash : ''
+  );
+
   const logContainerRef = useRef<HTMLDivElement>(null);
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   const DEBOUNCE_DELAY_MILLISECONDS = 300;
 
   const handleSearchChange = (e: any) => {
@@ -87,6 +112,23 @@ export default function LogTab({ logs, initialLine }: LogTabProps) {
       ...prev,
       [level]: !prev[level as keyof typeof prev],
     }));
+  };
+
+  const handleCopyPermalink = () => {
+    if (!selectedRange) return;
+
+    // Use the stored logical start/end from the state
+    const { startLine, endLine, startOffset, endOffset } = selectedRange;
+
+    // Construct the base URL from its parts to explicitly exclude any existing hash
+    const baseUrl = window.location.origin + window.location.pathname + window.location.search;
+
+    const permalink = `${baseUrl}#log-${startLine}-${startOffset}-${endLine}-${endOffset}`;
+
+    navigator.clipboard.writeText(permalink);
+
+    // Clear selection after copying
+    setSelectedRange(null);
   };
 
   const toggleMatchCase = () => {
@@ -290,11 +332,17 @@ export default function LogTab({ logs, initialLine }: LogTabProps) {
         const levelClass = logLine.level.toLowerCase();
         const colorClass = styles[levelClass as keyof typeof styles] || '';
 
+        // Add a background highlight to all lines in the selected range
+        const isLineSelected =
+          selectedRange &&
+          logLine.lineNumber >= selectedRange.startLine &&
+          logLine.lineNumber <= selectedRange.endLine;
+
         return (
           <div
             key={logLine.lineNumber}
             id={`log-line-${logLine.lineNumber}`}
-            className={`${colorClass} ${styles.logEntry}`}
+            className={`${colorClass} ${styles.logEntry} ${isLineSelected ? styles.lineSelected : ''}`}
           >
             <span className={styles.lineNumberCol}>{logLine.lineNumber}.</span>
             <pre>{highlightText(logLine.content, processedLines.indexOf(logLine))}</pre>
@@ -305,6 +353,107 @@ export default function LogTab({ logs, initialLine }: LogTabProps) {
 
     return result;
   };
+
+  // Effect to select/deselect lines based on user selection
+  useEffect(() => {
+    const handleSelectionChange = () => {
+      const selected = window.getSelection();
+
+      // Ignore if no selection or just a single click
+      if (!selected || selected.isCollapsed) {
+        setSelectedRange(null);
+        return;
+      }
+
+      // Set the selection state with start and end lines
+      const startLineEl = selected.anchorNode?.parentElement?.closest('[id^="log-line-"]');
+      const endLineEl = selected.focusNode?.parentElement?.closest('[id^="log-line-"]');
+
+      if (startLineEl && endLineEl) {
+        const anchorLineNum = parseInt(startLineEl.id.split('-')[2]);
+        const focusLineNum = parseInt(endLineEl.id.split('-')[2]);
+
+        // Determine the true start/end regardless of selection direction
+        const isSelectingForward =
+          anchorLineNum < focusLineNum ||
+          (anchorLineNum === focusLineNum && selected.anchorOffset <= selected.focusOffset);
+
+        const startLine = isSelectingForward ? anchorLineNum : focusLineNum;
+        const endLine = isSelectingForward ? focusLineNum : anchorLineNum;
+        const startOffset = isSelectingForward ? selected.anchorOffset : selected.focusOffset;
+        const endOffset = isSelectingForward ? selected.focusOffset : selected.anchorOffset;
+
+        setSelectedRange({ startLine, endLine, startOffset, endOffset });
+      }
+    };
+
+    document.addEventListener(SELECTION_CHANGE_EVENT, handleSelectionChange);
+
+    return () => {
+      document.removeEventListener(SELECTION_CHANGE_EVENT, handleSelectionChange);
+    };
+  }, []);
+
+  // Effect to listen to the browser hash changes and updates the state that runs only on mount
+  useEffect(() => {
+    const handleHashChange = () => {
+      setCurrentHash(window.location.hash);
+    };
+
+    window.addEventListener(HASH_CHANGE_EVENT, handleHashChange);
+    return () => {
+      window.removeEventListener(HASH_CHANGE_EVENT, handleHashChange);
+    };
+  }, []);
+
+  // Effect to scroll to selected lines
+  useEffect(() => {
+    // Exit if logs aren't processed
+    if (processedLines.length === 0) {
+      return;
+    }
+
+    const hash = currentHash || window.location.hash;
+
+    // Check for a line range in the URL hash
+    if (hash.startsWith('#log-')) {
+      const parts = hash.substring(5).split('-');
+      if (parts.length === 4) {
+        const [startLine, startOffset, endLine, endOffset] = parts.map((p) => parseInt(p, 10));
+
+        if (![startLine, startOffset, endLine, endOffset].some(isNaN)) {
+          // Set the selection state
+          setSelectedRange({ startLine, startOffset, endLine, endOffset });
+
+          // Find the elements and text nodes to create the selection
+          const startElement = document.getElementById(`log-line-${startLine}`);
+          const endElement = document.getElementById(`log-line-${endLine}`);
+          const startNode = startElement?.querySelector('pre')?.firstChild;
+          const endNode = endElement?.querySelector('pre')?.firstChild;
+
+          if (startNode && endNode) {
+            // Validate offsets
+            const validStartOffset = Math.min(startOffset, startNode.textContent?.length || 0);
+            const validEndOffset = Math.min(endOffset, endNode.textContent?.length || 0);
+
+            // Create the highlighted range
+            const range = document.createRange();
+            range.setStart(startNode, validStartOffset);
+            range.setEnd(endNode, validEndOffset);
+
+            // Override any existing selection
+            const selection = window.getSelection();
+            if (selection) {
+              selection.removeAllRanges();
+              selection.addRange(range);
+            }
+
+            startElement.scrollIntoView({ behavior: 'auto', block: 'center' });
+          }
+        }
+      }
+    }
+  }, [processedLines, currentHash]);
 
   // Effect to scroll to the initial line
   useEffect(() => {
@@ -412,6 +561,10 @@ export default function LogTab({ logs, initialLine }: LogTabProps) {
     };
   }, []);
 
+  const copyPermalinkText = selectedRange?.startLine
+    ? translations('copyPermalinkButton')
+    : translations('selectLinesToCreatePermalink');
+
   return (
     <div className={styles.tabContent}>
       <h3>{translations('title')}</h3>
@@ -419,7 +572,7 @@ export default function LogTab({ logs, initialLine }: LogTabProps) {
       <div className={styles.logContainer}>
         <div className={styles.searchContainer}>
           <Search
-            placeholder={translations('search_placeholder')}
+            placeholder={translations('searchPlaceholder')}
             size="lg"
             value={searchTerm}
             onChange={handleSearchChange}
@@ -428,11 +581,11 @@ export default function LogTab({ logs, initialLine }: LogTabProps) {
             <div className={styles.findControls}>
               <span className={styles.matchCounter} data-testid="match-counter">
                 {totalMatches > 0
-                  ? translations('match_counter', {
+                  ? translations('matchCounter', {
                       current: currentMatchIndex + 1,
                       total: totalMatches,
                     })
-                  : translations('no_matches')}
+                  : translations('noMatches')}
               </span>
               <Button
                 kind="ghost"
@@ -440,7 +593,7 @@ export default function LogTab({ logs, initialLine }: LogTabProps) {
                 onClick={goToPreviousMatch}
                 disabled={totalMatches === 0}
                 renderIcon={ChevronUp}
-                iconDescription={translations('match_previous')}
+                iconDescription={translations('matchPrevious')}
                 hasIconOnly
               />
               <Button
@@ -449,7 +602,7 @@ export default function LogTab({ logs, initialLine }: LogTabProps) {
                 onClick={goToNextMatch}
                 disabled={totalMatches === 0}
                 renderIcon={ChevronDown}
-                iconDescription={translations('match_next')}
+                iconDescription={translations('matchNext')}
                 hasIconOnly
               />
               <Button
@@ -457,7 +610,7 @@ export default function LogTab({ logs, initialLine }: LogTabProps) {
                 size="sm"
                 onClick={toggleMatchCase}
                 renderIcon={LetterAa}
-                iconDescription={translations('match_case')}
+                iconDescription={translations('matchCase')}
                 hasIconOnly
               />
               <Button
@@ -465,7 +618,7 @@ export default function LogTab({ logs, initialLine }: LogTabProps) {
                 size="sm"
                 onClick={toggleMatchWholeWord}
                 renderIcon={Term}
-                iconDescription={translations('match_whole_word')}
+                iconDescription={translations('matchWholeWord')}
                 hasIconOnly
               />
             </div>
@@ -474,37 +627,37 @@ export default function LogTab({ logs, initialLine }: LogTabProps) {
         <div className={styles.filterBtn}>
           <OverflowMenu
             size="lg"
-            iconDescription={translations('filters_menu_title')}
+            iconDescription={translations('filtersMenuTitle')}
             renderIcon={Filter}
             flipped={true}
           >
             <Checkbox
               id="checkbox-error"
-              labelText={translations('filter_error')}
+              labelText={translations('filterError')}
               checked={filters.ERROR}
               onChange={() => handleFilterChange('ERROR')}
             />
             <Checkbox
               id="checkbox-warn"
-              labelText={translations('filter_warn')}
+              labelText={translations('filterWarn')}
               checked={filters.WARN}
               onChange={() => handleFilterChange('WARN')}
             />
             <Checkbox
               id="checkbox-info"
-              labelText={translations('filter_info')}
+              labelText={translations('filterInfo')}
               checked={filters.INFO}
               onChange={() => handleFilterChange('INFO')}
             />
             <Checkbox
               id="checkbox-debug"
-              labelText={translations('filter_debug')}
+              labelText={translations('filterDebug')}
               checked={filters.DEBUG}
               onChange={() => handleFilterChange('DEBUG')}
             />
             <Checkbox
               id="checkbox-trace"
-              labelText={translations('filter_trace')}
+              labelText={translations('filterTrace')}
               checked={filters.TRACE}
               onChange={() => handleFilterChange('TRACE')}
             />
@@ -514,8 +667,18 @@ export default function LogTab({ logs, initialLine }: LogTabProps) {
           kind="ghost"
           renderIcon={CloudDownload}
           hasIconOnly
-          iconDescription={translations('download_button')}
+          iconDescription={translations('downloadButton')}
           onClick={() => handleDownload(logContent, 'run.log')}
+        />
+        <Button
+          kind="ghost"
+          renderIcon={Copy}
+          hasIconOnly
+          aria-label={copyPermalinkText}
+          iconDescription={copyPermalinkText}
+          onClick={selectedRange?.startLine ? handleCopyPermalink : undefined}
+          className={!selectedRange?.startLine ? styles.buttonDisabled : ''}
+          data-testid="icon-button-copy-permalink"
         />
       </div>
       <div className={styles.runLog}>
