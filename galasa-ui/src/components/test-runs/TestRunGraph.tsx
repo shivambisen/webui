@@ -21,7 +21,7 @@ import useHistoryBreadCrumbs from '@/hooks/useHistoryBreadCrumbs';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useDateTimeFormat } from '@/contexts/DateTimeFormatContext';
 import { getTooltipHTML } from '../../utils/generateTooltipHTML';
-import { useDisappearingNotification } from '@/components/common/UseDisappearingNotification';
+import { useDisappearingNotification } from '@/hooks/useDisappearingNotification';
 
 interface TestRunGraphProps {
   runsList: runStructure[];

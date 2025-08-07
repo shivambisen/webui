@@ -30,7 +30,7 @@ import { ColumnDefinition } from '@/utils/interfaces';
 import { sortOrderType } from '@/utils/types/common';
 import { DEFAULT_VISIBLE_COLUMNS, RESULTS_TABLE_COLUMNS } from '@/utils/constants/common';
 import { Dispatch, SetStateAction } from 'react';
-import { useDisappearingNotification } from '@/components/common/UseDisappearingNotification';
+import { useDisappearingNotification } from '@/hooks/useDisappearingNotification';
 
 interface TableDesignContentProps {
   selectedRowIds: string[];

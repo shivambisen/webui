@@ -37,7 +37,7 @@ import { InlineNotification } from '@carbon/react';
 import useHistoryBreadCrumbs from '@/hooks/useHistoryBreadCrumbs';
 import { TEST_RUNS } from '@/utils/constants/breadcrumb';
 import { useDateTimeFormat } from '@/contexts/DateTimeFormatContext';
-import { useDisappearingNotification } from '@/components/common/UseDisappearingNotification';
+import { useDisappearingNotification } from '@/hooks/useDisappearingNotification';
 
 interface CustomCellProps {
   header: string;
