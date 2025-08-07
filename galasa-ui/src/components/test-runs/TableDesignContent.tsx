@@ -32,7 +32,6 @@ import { DEFAULT_VISIBLE_COLUMNS, RESULTS_TABLE_COLUMNS } from '@/utils/constant
 import { Dispatch, SetStateAction } from 'react';
 import { useNotification } from '@/components/common/UseNotification';
 
-
 interface TableDesignContentProps {
   selectedRowIds: string[];
   setSelectedRowIds: React.Dispatch<React.SetStateAction<string[]>>;
@@ -81,7 +80,7 @@ export default function TableDesignContent({
   };
 
   const isNotificationVisible = useNotification(selectedRowIds.length === 0);
-  const getRowPosition = (id: string) => tableRows.findIndex(row => row.id === id);
+  const getRowPosition = (id: string) => tableRows.findIndex((row) => row.id === id);
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
@@ -188,7 +187,7 @@ export default function TableDesignContent({
             );
           })}
         </SortableContext>
-        {selectedRowIds.length === 0 && isNotificationVisible &&
+        {selectedRowIds.length === 0 && isNotificationVisible && (
           <InlineNotification
             className={styles.notification}
             kind={'warning'}
@@ -196,7 +195,7 @@ export default function TableDesignContent({
             subtitle={translations('noColumnsSelected')}
             hideCloseButton={true}
           />
-        }
+        )}
       </div>
     </DndContext>
   );

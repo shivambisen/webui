@@ -34,7 +34,11 @@ import { InlineNotification } from '@carbon/react';
 import { Button } from '@carbon/react';
 import { useDateTimeFormat } from '@/contexts/DateTimeFormatContext';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { SINGLE_RUN_QUERY_PARAMS, TEST_RUN_PAGE_TABS, NOTIFICATION_VISIBLE_MILLISECS } from '@/utils/constants/common';
+import {
+  SINGLE_RUN_QUERY_PARAMS,
+  TEST_RUN_PAGE_TABS,
+  NOTIFICATION_VISIBLE_MILLISECS,
+} from '@/utils/constants/common';
 import { NotificationType } from '@/utils/types/common';
 
 interface TestRunDetailsProps {

@@ -39,7 +39,6 @@ import { TEST_RUNS } from '@/utils/constants/breadcrumb';
 import { useDateTimeFormat } from '@/contexts/DateTimeFormatContext';
 import { useNotification } from '@/components/common/UseNotification';
 
-
 interface CustomCellProps {
   header: string;
   value: any;
@@ -73,7 +72,7 @@ export default function TestRunsTable({
   const [pageSize, setPageSize] = useState(10);
 
   const isNotificationVisible = useNotification(limitExceeded);
-  
+
   const headers =
     orderedHeaders
       ?.filter((column) => visibleColumns.includes(column.id))
@@ -184,14 +183,16 @@ export default function TestRunsTable({
 
   return (
     <div className={styles.resultsPageContainer}>
-      {limitExceeded && isNotificationVisible &&
+      {limitExceeded && isNotificationVisible && (
         <InlineNotification
           className={styles.notification}
-          kind='warning'
+          kind="warning"
           title={translations('limitExceededTitle')}
-          subtitle={translations('limitExceededSubtitle', { maxRecords: MAX_DISPLAYABLE_TEST_RUNS})}
+          subtitle={translations('limitExceededSubtitle', {
+            maxRecords: MAX_DISPLAYABLE_TEST_RUNS,
+          })}
         />
-      }
+      )}
       <p className={styles.timeFrameText}>{timeFrameText}</p>
       <div className={styles.testRunsTableContainer}>
         <DataTable rows={paginatedRows} headers={headers}>

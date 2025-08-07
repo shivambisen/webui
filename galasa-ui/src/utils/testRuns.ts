@@ -11,7 +11,11 @@ import {
   UserData,
 } from '@/generated/galasaapi';
 import { createAuthenticatedApiConfiguration } from '@/utils/api';
-import { CLIENT_API_VERSION, MAX_DISPLAYABLE_TEST_RUNS, BATCH_SIZE } from '@/utils/constants/common';
+import {
+  CLIENT_API_VERSION,
+  MAX_DISPLAYABLE_TEST_RUNS,
+  BATCH_SIZE,
+} from '@/utils/constants/common';
 import { fetchAllUsersFromApiServer } from '@/utils/users';
 
 /**
@@ -118,7 +122,7 @@ export const fetchAllTestRunsByPaging = async ({
 
         // Trim to max records
         allRuns = allRuns.slice(0, MAX_DISPLAYABLE_TEST_RUNS);
-  
+
         // Stop fetching more runs
         hasMorePages = false;
         break;

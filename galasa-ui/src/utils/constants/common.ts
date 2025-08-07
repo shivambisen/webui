@@ -20,7 +20,7 @@ const COLORS = {
   BLUE_GRAY: '#607d8b',
 };
 
-const MAX_DISPLAYABLE_TEST_RUNS = 2000; 
+const MAX_DISPLAYABLE_TEST_RUNS = 2000;
 
 const NOTIFICATION_VISIBLE_MILLISECS = 6000;
 
@@ -149,7 +149,6 @@ const PREFERENCE_KEYS = {
   TIME_ZONE_TYPE: 'timeZoneType' as const,
   TIME_ZONE: 'timeZone' as const,
 } as const;
-
 
 const TEST_RUN_PAGE_TABS = ['overview', 'methods', 'runLog', 'artifacts'];
 

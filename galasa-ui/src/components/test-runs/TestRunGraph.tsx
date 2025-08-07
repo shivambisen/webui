@@ -242,7 +242,9 @@ export default function TestRunGraph({
         <InlineNotification
           kind="warning"
           title={translations('limitExceeded.title')}
-          subtitle={translations('limitExceeded.subtitle', { maxRecords: MAX_DISPLAYABLE_TEST_RUNS })}
+          subtitle={translations('limitExceeded.subtitle', {
+            maxRecords: MAX_DISPLAYABLE_TEST_RUNS,
+          })}
           className={styles.notification}
         />
       )}
