@@ -30,7 +30,7 @@ import { ColumnDefinition } from '@/utils/interfaces';
 import { sortOrderType } from '@/utils/types/common';
 import { DEFAULT_VISIBLE_COLUMNS, RESULTS_TABLE_COLUMNS } from '@/utils/constants/common';
 import { Dispatch, SetStateAction } from 'react';
-import { useNotification } from '@/components/common/UseNotification';
+import { useDisappearingNotification } from '@/components/common/UseDisappearingNotification';
 
 interface TableDesignContentProps {
   selectedRowIds: string[];
@@ -79,7 +79,7 @@ export default function TableDesignContent({
     }
   };
 
-  const isNotificationVisible = useNotification(selectedRowIds.length === 0);
+  const isNotificationVisible = useDisappearingNotification(selectedRowIds.length === 0);
   const getRowPosition = (id: string) => tableRows.findIndex((row) => row.id === id);
 
   const handleDragEnd = (event: DragEndEvent) => {

@@ -21,7 +21,7 @@ import useHistoryBreadCrumbs from '@/hooks/useHistoryBreadCrumbs';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useDateTimeFormat } from '@/contexts/DateTimeFormatContext';
 import { getTooltipHTML } from '../../utils/generateTooltipHTML';
-import { useNotification } from '@/components/common/UseNotification';
+import { useDisappearingNotification } from '@/components/common/UseDisappearingNotification';
 
 interface TestRunGraphProps {
   runsList: runStructure[];
@@ -58,7 +58,7 @@ export default function TestRunGraph({
   const { pushBreadCrumb } = useHistoryBreadCrumbs();
   const chartContainerRef = useRef<HTMLDivElement>(null);
 
-  const isNotificationVisible = useNotification(limitExceeded);
+  const isNotificationVisible = useDisappearingNotification(limitExceeded);
 
   const headerDefinitions = useMemo(() => {
     if (!runsList.length) return [];

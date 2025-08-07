@@ -37,7 +37,7 @@ import { InlineNotification } from '@carbon/react';
 import useHistoryBreadCrumbs from '@/hooks/useHistoryBreadCrumbs';
 import { TEST_RUNS } from '@/utils/constants/breadcrumb';
 import { useDateTimeFormat } from '@/contexts/DateTimeFormatContext';
-import { useNotification } from '@/components/common/UseNotification';
+import { useDisappearingNotification } from '@/components/common/UseDisappearingNotification';
 
 interface CustomCellProps {
   header: string;
@@ -71,7 +71,7 @@ export default function TestRunsTable({
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
 
-  const isNotificationVisible = useNotification(limitExceeded);
+  const isNotificationVisible = useDisappearingNotification(limitExceeded);
 
   const headers =
     orderedHeaders

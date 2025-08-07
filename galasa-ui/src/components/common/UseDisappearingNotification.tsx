@@ -1,7 +1,7 @@
 import { NOTIFICATION_VISIBLE_MILLISECS } from '@/utils/constants/common';
 import { useEffect, useState } from 'react';
 
-export const useNotification = (initialState: boolean) => {
+export const useDisappearingNotification = (initialState: boolean) => {
   const [showNotification, setShowNotification] = useState(initialState);
 
   useEffect(() => {
