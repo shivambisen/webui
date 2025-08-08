@@ -23,6 +23,8 @@ import { Tile } from '@carbon/react';
 import { cleanArtifactPath, handleDownload } from '@/utils/artifacts';
 import { useTranslations } from 'next-intl';
 import { Button } from '@carbon/react';
+import { useFeatureFlags } from '@/contexts/FeatureFlagContext';
+import { FEATURE_FLAGS } from '@/utils/featureFlags';
 
 interface FileNode {
   name: string;
@@ -54,10 +56,12 @@ export function ArtifactsTab({
   artifacts,
   runId,
   runName,
+  setZos3270TerminalFolderExists,
 }: {
   artifacts: ArtifactIndexEntry[];
   runId: string;
   runName: string;
+  setZos3270TerminalFolderExists: (exists: boolean) => void;
 }) {
   const translations = useTranslations('Artifacts');
   const [treeData, setTreeData] = useState<FolderNode>({
@@ -79,6 +83,9 @@ export function ArtifactsTab({
 
   const ZIP_EXTENSIONS = ['zip', 'gz', 'jar', 'rar', '7z'];
   const IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'svg'];
+
+  // const [folderExists, setFolderExists] = useState<Boolean>(false);
+  const { isFeatureEnabled } = useFeatureFlags();
 
   function formatFileSize(bytes: number) {
     let fileSize = '';
@@ -201,19 +208,32 @@ export function ArtifactsTab({
         let currentNode: FolderNode = root;
         createFolderSegments(segments, currentNode, artifact);
       }
-
-      // Check for zos3270/terminals folder
-      if (segments[0] === 'zos3270' && segments[1] === 'terminals') {
-        // const folderExists = Object.values(currentNode.children).some(child => child.isFile === false);
-        console.log(`zos3270/terminals folder exists:`);
-        // You can add additional logic here if needed, e.g., highlight or mark this folder
-      } else {
-        console.log(`zos3270/terminals DOESN'T EXIST`);
-      }
     });
 
     setTreeData(root);
+
+    checkForZosTerminalFolderStructure(root);
   }, [artifacts]);
+
+  const checkForZosTerminalFolderStructure = (root: FolderNode) => {
+    if (isFeatureEnabled(FEATURE_FLAGS.IS_3270_SCREEN_ENABLED) && root.children) {
+      for (const key in root.children) {
+        const childNode = root.children[key];
+        if (
+          childNode.name === 'zos3270' &&
+          childNode.isFile === false &&
+          'terminals' in childNode.children
+        ) {
+          const terminalsFolder = childNode.children['terminals'];
+          if (terminalsFolder.isFile === false && Object.keys(terminalsFolder.children).length > 0) {
+            setZos3270TerminalFolderExists(true);
+            return;
+          }
+        }
+      }
+    }
+    setZos3270TerminalFolderExists(false);
+  };
 
   const createFolderSegments = (
     segments: string[],

@@ -23,6 +23,7 @@ import { RunMetadata } from '@/utils/interfaces';
 import { getIsoTimeDifference } from '@/utils/timeOperations';
 import MethodsTab, { MethodDetails } from './MethodsTab';
 import { ArtifactsTab } from './ArtifactsTab';
+import ThirtyTwoSeventyTab from "./ThirtyTwoSeventyTab"; 
 import LogTab from './LogTab';
 import TestRunSkeleton from './TestRunSkeleton';
 import { useTranslations } from 'next-intl';
@@ -71,6 +72,11 @@ const TestRunDetails = ({
   const [copied, setCopied] = useState(false);
   const [notification, setNotification] = useState<NotificationType | null>(null);
   const { formatDate } = useDateTimeFormat();
+
+  const [zos3270TerminalFolderExists, setZos3270TerminalFolderExists] = useState<Boolean>(false);
+  const handleZos3270TerminalFolderCheck = (newZos3270TerminalFolderExists: boolean) => {
+    setZos3270TerminalFolderExists(newZos3270TerminalFolderExists);
+  };
 
   // Get the selected tab index from the URL or default to the first tab
   const [selectedTabIndex, setSelectedTabIndex] = useState(
@@ -317,6 +323,11 @@ const TestRunDetails = ({
               <Tab renderIcon={RepoArtifact} href="#">
                 {translations('tabs.artifacts')}
               </Tab>
+              { zos3270TerminalFolderExists &&
+                <Tab renderIcon={RepoArtifact} href="#">
+                  3270
+                </Tab>
+              }
             </TabList>
             <TabPanels>
               <TabPanel>
@@ -329,8 +340,13 @@ const TestRunDetails = ({
                 <LogTab logs={logs} initialLine={initialLine} />
               </TabPanel>
               <TabPanel>
-                <ArtifactsTab artifacts={artifacts} runId={runId} runName={run?.runName!} />
+                <ArtifactsTab artifacts={artifacts} runId={runId} runName={run?.runName!} setZos3270TerminalFolderExists={handleZos3270TerminalFolderCheck} />
               </TabPanel>
+              { zos3270TerminalFolderExists &&
+                <TabPanel>
+                  <ThirtyTwoSeventyTab />
+                </TabPanel>
+              }
             </TabPanels>
           </Tabs>
         </div>
