@@ -9,6 +9,7 @@ import '@testing-library/jest-dom';
 import { ArtifactsTab } from '@/components/test-runs/ArtifactsTab';
 import { downloadArtifactFromServer } from '@/actions/runsAction';
 import { handleDownload } from '@/utils/artifacts';
+import { FeatureFlagProvider } from '@/contexts/FeatureFlagContext';
 
 // Mock dependencies
 jest.mock('@/actions/runsAction');
@@ -20,6 +21,8 @@ jest.mock('@/utils/artifacts', () => ({
 jest.mock('next-intl', () => ({
   useTranslations: jest.fn(),
 }));
+
+const mockSetZos3270TerminalFolderExists = jest.fn();
 
 // Mock Carbon components
 jest.mock('@carbon/react', () => ({
@@ -138,7 +141,16 @@ describe('ArtifactsTab', () => {
 
   describe('Component Rendering', () => {
     test('renders the component with title and description', () => {
-      render(<ArtifactsTab artifacts={[]} runId="test-run" runName="Test Run" />);
+      render(
+        <FeatureFlagProvider>
+          <ArtifactsTab
+            artifacts={[]}
+            runId="test-run"
+            runName="Test Run"
+            setZos3270TerminalFolderExists={mockSetZos3270TerminalFolderExists}
+          />
+        </FeatureFlagProvider>
+      );
 
       expect(screen.getByText('Artifacts')).toBeInTheDocument();
       expect(screen.getByText('Test artifacts description')).toBeInTheDocument();
@@ -146,7 +158,16 @@ describe('ArtifactsTab', () => {
     });
 
     test('renders empty tree when no artifacts provided', () => {
-      render(<ArtifactsTab artifacts={[]} runId="test-run" runName="Test Run" />);
+      render(
+        <FeatureFlagProvider>
+          <ArtifactsTab
+            artifacts={[]}
+            runId="test-run"
+            runName="Test Run"
+            setZos3270TerminalFolderExists={mockSetZos3270TerminalFolderExists}
+          />
+        </FeatureFlagProvider>
+      );
 
       const treeView = screen.getByTestId('tree-view');
       expect(treeView).toBeInTheDocument();
@@ -154,7 +175,16 @@ describe('ArtifactsTab', () => {
     });
 
     test('displays default message when no file is selected', () => {
-      render(<ArtifactsTab artifacts={mockArtifacts} runId="test-run" runName="Test Run" />);
+      render(
+        <FeatureFlagProvider>
+          <ArtifactsTab
+            artifacts={mockArtifacts}
+            runId="test-run"
+            runName="Test Run"
+            setZos3270TerminalFolderExists={mockSetZos3270TerminalFolderExists}
+          />
+        </FeatureFlagProvider>
+      );
 
       expect(screen.getByText('Select a file to display its content')).toBeInTheDocument();
     });
@@ -162,7 +192,16 @@ describe('ArtifactsTab', () => {
 
   describe('Tree Structure Building', () => {
     test('builds correct tree structure from artifacts', () => {
-      render(<ArtifactsTab artifacts={mockArtifacts} runId="test-run" runName="Test Run" />);
+      render(
+        <FeatureFlagProvider>
+          <ArtifactsTab
+            artifacts={mockArtifacts}
+            runId="test-run"
+            runName="Test Run"
+            setZos3270TerminalFolderExists={mockSetZos3270TerminalFolderExists}
+          />
+        </FeatureFlagProvider>
+      );
 
       // Check for folder nodes
       expect(screen.getByTestId('tree-node-framework')).toBeInTheDocument();
@@ -183,7 +222,14 @@ describe('ArtifactsTab', () => {
       ];
 
       render(
-        <ArtifactsTab artifacts={artifactsWithVariousPaths} runId="test-run" runName="Test Run" />
+        <FeatureFlagProvider>
+          <ArtifactsTab
+            artifacts={artifactsWithVariousPaths}
+            runId="test-run"
+            runName="Test Run"
+            setZos3270TerminalFolderExists={mockSetZos3270TerminalFolderExists}
+          />
+        </FeatureFlagProvider>
       );
 
       expect(screen.getByTestId('tree-node-framework')).toBeInTheDocument();
@@ -197,7 +243,16 @@ describe('ArtifactsTab', () => {
         { path: '/artifacts/data/config.json', runId: 'run-123' },
       ];
 
-      render(<ArtifactsTab artifacts={artifactsWithPrefix} runId="test-run" runName="Test Run" />);
+      render(
+        <FeatureFlagProvider>
+          <ArtifactsTab
+            artifacts={artifactsWithPrefix}
+            runId="test-run"
+            runName="Test Run"
+            setZos3270TerminalFolderExists={mockSetZos3270TerminalFolderExists}
+          />
+        </FeatureFlagProvider>
+      );
 
       expect(screen.getByTestId('tree-node-framework')).toBeInTheDocument();
       expect(screen.getByTestId('tree-node-data')).toBeInTheDocument();
@@ -206,7 +261,16 @@ describe('ArtifactsTab', () => {
 
   describe('Folder Expansion', () => {
     test('toggles folder expansion state', async () => {
-      render(<ArtifactsTab artifacts={mockArtifacts} runId="test-run" runName="Test Run" />);
+      render(
+        <FeatureFlagProvider>
+          <ArtifactsTab
+            artifacts={mockArtifacts}
+            runId="test-run"
+            runName="Test Run"
+            setZos3270TerminalFolderExists={mockSetZos3270TerminalFolderExists}
+          />
+        </FeatureFlagProvider>
+      );
 
       const frameworkToggle = screen.getByTestId('toggle-framework');
       const frameworkNode = screen.getByTestId('tree-node-framework');
@@ -237,7 +301,16 @@ describe('ArtifactsTab', () => {
 
       mockDownloadArtifactFromServer.mockResolvedValue(mockDownloadResult);
 
-      render(<ArtifactsTab artifacts={mockArtifacts} runId="test-run" runName="Test Run" />);
+      render(
+        <FeatureFlagProvider>
+          <ArtifactsTab
+            artifacts={mockArtifacts}
+            runId="test-run"
+            runName="Test Run"
+            setZos3270TerminalFolderExists={mockSetZos3270TerminalFolderExists}
+          />
+        </FeatureFlagProvider>
+      );
 
       const fileNode = screen.getByTestId('tree-node-test.txt');
 
@@ -269,7 +342,16 @@ describe('ArtifactsTab', () => {
 
       mockDownloadArtifactFromServer.mockResolvedValue(mockDownloadResult);
 
-      render(<ArtifactsTab artifacts={mockArtifacts} runId="test-run" runName="Test Run" />);
+      render(
+        <FeatureFlagProvider>
+          <ArtifactsTab
+            artifacts={mockArtifacts}
+            runId="test-run"
+            runName="Test Run"
+            setZos3270TerminalFolderExists={mockSetZos3270TerminalFolderExists}
+          />
+        </FeatureFlagProvider>
+      );
 
       const fileNode = screen.getByTestId('tree-node-config.json');
 
@@ -292,7 +374,16 @@ describe('ArtifactsTab', () => {
 
       mockDownloadArtifactFromServer.mockResolvedValue(mockDownloadResult);
 
-      render(<ArtifactsTab artifacts={mockArtifacts} runId="test-run" runName="Test Run" />);
+      render(
+        <FeatureFlagProvider>
+          <ArtifactsTab
+            artifacts={mockArtifacts}
+            runId="test-run"
+            runName="Test Run"
+            setZos3270TerminalFolderExists={mockSetZos3270TerminalFolderExists}
+          />
+        </FeatureFlagProvider>
+      );
 
       const fileNode = screen.getByTestId('tree-node-screenshot.png');
 
@@ -310,7 +401,16 @@ describe('ArtifactsTab', () => {
         () => new Promise((resolve) => setTimeout(resolve, 100))
       );
 
-      render(<ArtifactsTab artifacts={mockArtifacts} runId="test-run" runName="Test Run" />);
+      render(
+        <FeatureFlagProvider>
+          <ArtifactsTab
+            artifacts={mockArtifacts}
+            runId="test-run"
+            runName="Test Run"
+            setZos3270TerminalFolderExists={mockSetZos3270TerminalFolderExists}
+          />
+        </FeatureFlagProvider>
+      );
 
       const fileNode = screen.getByTestId('tree-node-test.txt');
 
@@ -325,7 +425,16 @@ describe('ArtifactsTab', () => {
     test('displays error state on download failure', async () => {
       mockDownloadArtifactFromServer.mockRejectedValue(new Error('Download failed'));
 
-      render(<ArtifactsTab artifacts={mockArtifacts} runId="test-run" runName="Test Run" />);
+      render(
+        <FeatureFlagProvider>
+          <ArtifactsTab
+            artifacts={mockArtifacts}
+            runId="test-run"
+            runName="Test Run"
+            setZos3270TerminalFolderExists={mockSetZos3270TerminalFolderExists}
+          />
+        </FeatureFlagProvider>
+      );
 
       const fileNode = screen.getByTestId('tree-node-test.txt');
 
@@ -351,7 +460,16 @@ describe('ArtifactsTab', () => {
 
       mockDownloadArtifactFromServer.mockResolvedValue(mockDownloadResult);
 
-      render(<ArtifactsTab artifacts={mockArtifacts} runId="test-run" runName="Test Run" />);
+      render(
+        <FeatureFlagProvider>
+          <ArtifactsTab
+            artifacts={mockArtifacts}
+            runId="test-run"
+            runName="Test Run"
+            setZos3270TerminalFolderExists={mockSetZos3270TerminalFolderExists}
+          />
+        </FeatureFlagProvider>
+      );
 
       const fileNode = screen.getByTestId('tree-node-test.txt');
 
@@ -374,7 +492,16 @@ describe('ArtifactsTab', () => {
 
       mockDownloadArtifactFromServer.mockResolvedValue(mockDownloadResult);
 
-      render(<ArtifactsTab artifacts={mockArtifacts} runId="test-run" runName="Test Run" />);
+      render(
+        <FeatureFlagProvider>
+          <ArtifactsTab
+            artifacts={mockArtifacts}
+            runId="test-run"
+            runName="Test Run"
+            setZos3270TerminalFolderExists={mockSetZos3270TerminalFolderExists}
+          />
+        </FeatureFlagProvider>
+      );
 
       const fileNode = screen.getByTestId('tree-node-test.txt');
 
@@ -399,7 +526,16 @@ describe('ArtifactsTab', () => {
 
       mockDownloadArtifactFromServer.mockResolvedValue(mockDownloadResult);
 
-      render(<ArtifactsTab artifacts={mockArtifacts} runId="test-run" runName="Test Run" />);
+      render(
+        <FeatureFlagProvider>
+          <ArtifactsTab
+            artifacts={mockArtifacts}
+            runId="test-run"
+            runName="Test Run"
+            setZos3270TerminalFolderExists={mockSetZos3270TerminalFolderExists}
+          />
+        </FeatureFlagProvider>
+      );
 
       const fileNode = screen.getByTestId('tree-node-test.txt');
 
@@ -432,7 +568,14 @@ describe('ArtifactsTab', () => {
       ];
 
       render(
-        <ArtifactsTab artifacts={artifactsWithUndefinedPaths} runId="test-run" runName="Test Run" />
+        <FeatureFlagProvider>
+          <ArtifactsTab
+            artifacts={artifactsWithUndefinedPaths}
+            runId="test-run"
+            runName="Test Run"
+            setZos3270TerminalFolderExists={mockSetZos3270TerminalFolderExists}
+          />
+        </FeatureFlagProvider>
       );
 
       // Should only render the valid path
@@ -443,7 +586,14 @@ describe('ArtifactsTab', () => {
       const artifactsWithEmptyRunId = [{ path: '/test/file.txt', runId: undefined }];
 
       render(
-        <ArtifactsTab artifacts={artifactsWithEmptyRunId} runId="test-run" runName="Test Run" />
+        <FeatureFlagProvider>
+          <ArtifactsTab
+            artifacts={artifactsWithEmptyRunId}
+            runId="test-run"
+            runName="Test Run"
+            setZos3270TerminalFolderExists={mockSetZos3270TerminalFolderExists}
+          />
+        </FeatureFlagProvider>
       );
 
       expect(screen.getByTestId('tree-node-file.txt')).toBeInTheDocument();
@@ -459,7 +609,16 @@ describe('ArtifactsTab', () => {
 
       mockDownloadArtifactFromServer.mockResolvedValue(mockDownloadResult);
 
-      render(<ArtifactsTab artifacts={mockArtifacts} runId="test-run" runName="Test Run" />);
+      render(
+        <FeatureFlagProvider>
+          <ArtifactsTab
+            artifacts={mockArtifacts}
+            runId="test-run"
+            runName="Test Run"
+            setZos3270TerminalFolderExists={mockSetZos3270TerminalFolderExists}
+          />
+        </FeatureFlagProvider>
+      );
 
       const fileNode = screen.getByTestId('tree-node-config.json');
 

@@ -15,6 +15,7 @@ import {
   RepoArtifact,
   Share,
   CloudDownload,
+  Terminal_3270,
 } from '@carbon/icons-react';
 import OverviewTab from './OverviewTab';
 import { ArtifactIndexEntry, Run, TestMethod } from '@/generated/galasaapi';
@@ -23,7 +24,7 @@ import { RunMetadata } from '@/utils/interfaces';
 import { getIsoTimeDifference } from '@/utils/timeOperations';
 import MethodsTab, { MethodDetails } from './MethodsTab';
 import { ArtifactsTab } from './ArtifactsTab';
-import ThirtyTwoSeventyTab from "./ThirtyTwoSeventyTab"; 
+import ThirtyTwoSeventyTab from './ThirtyTwoSeventyTab';
 import LogTab from './LogTab';
 import TestRunSkeleton from './TestRunSkeleton';
 import { useTranslations } from 'next-intl';
@@ -323,11 +324,11 @@ const TestRunDetails = ({
               <Tab renderIcon={RepoArtifact} href="#">
                 {translations('tabs.artifacts')}
               </Tab>
-              { zos3270TerminalFolderExists &&
-                <Tab renderIcon={RepoArtifact} href="#">
+              {zos3270TerminalFolderExists && (
+                <Tab renderIcon={Terminal_3270} href="#">
                   3270
                 </Tab>
-              }
+              )}
             </TabList>
             <TabPanels>
               <TabPanel>
@@ -340,13 +341,18 @@ const TestRunDetails = ({
                 <LogTab logs={logs} initialLine={initialLine} />
               </TabPanel>
               <TabPanel>
-                <ArtifactsTab artifacts={artifacts} runId={runId} runName={run?.runName!} setZos3270TerminalFolderExists={handleZos3270TerminalFolderCheck} />
+                <ArtifactsTab
+                  artifacts={artifacts}
+                  runId={runId}
+                  runName={run?.runName!}
+                  setZos3270TerminalFolderExists={handleZos3270TerminalFolderCheck}
+                />
               </TabPanel>
-              { zos3270TerminalFolderExists &&
+              {zos3270TerminalFolderExists && (
                 <TabPanel>
                   <ThirtyTwoSeventyTab />
                 </TabPanel>
-              }
+              )}
             </TabPanels>
           </Tabs>
         </div>

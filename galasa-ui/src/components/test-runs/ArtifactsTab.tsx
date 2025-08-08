@@ -84,8 +84,8 @@ export function ArtifactsTab({
   const ZIP_EXTENSIONS = ['zip', 'gz', 'jar', 'rar', '7z'];
   const IMAGE_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'svg'];
 
-  // const [folderExists, setFolderExists] = useState<Boolean>(false);
   const { isFeatureEnabled } = useFeatureFlags();
+  const is3270ScreenEnabled = isFeatureEnabled(FEATURE_FLAGS.IS_3270_SCREEN_ENABLED);
 
   function formatFileSize(bytes: number) {
     let fileSize = '';
@@ -216,7 +216,7 @@ export function ArtifactsTab({
   }, [artifacts]);
 
   const checkForZosTerminalFolderStructure = (root: FolderNode) => {
-    if (isFeatureEnabled(FEATURE_FLAGS.IS_3270_SCREEN_ENABLED) && root.children) {
+    if (is3270ScreenEnabled && root.children) {
       for (const key in root.children) {
         const childNode = root.children[key];
         if (
@@ -225,7 +225,10 @@ export function ArtifactsTab({
           'terminals' in childNode.children
         ) {
           const terminalsFolder = childNode.children['terminals'];
-          if (terminalsFolder.isFile === false && Object.keys(terminalsFolder.children).length > 0) {
+          if (
+            terminalsFolder.isFile === false &&
+            Object.keys(terminalsFolder.children).length > 0
+          ) {
             setZos3270TerminalFolderExists(true);
             return;
           }

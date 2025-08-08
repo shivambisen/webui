@@ -7,19 +7,15 @@
 
 import React, { useEffect, useState } from 'react';
 // import styles from '@/styles/Artifacts.module.css';
-import { } from '@carbon/icons-react';
-import {  } from '@carbon/react';
+import {} from '@carbon/icons-react';
+import {} from '@carbon/react';
 import { useTranslations } from 'next-intl';
-import {  } from '@carbon/react';
+import {} from '@carbon/react';
 
 export default function ThirtyTwoSeventyTab() {
-  
-
   return (
     <>
-      <div>
-        Hello
-      </div>
+      <div>Hello</div>
     </>
   );
 }
