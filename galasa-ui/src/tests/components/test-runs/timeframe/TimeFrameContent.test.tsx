@@ -18,15 +18,35 @@ import { useState } from 'react';
 jest.mock('next-intl', () => ({
   useTranslations: () => (key: string) => {
     const translations: Record<string, string> = {
-      toBeforeFrom: "'To' date cannot be before 'From' date.",
+      toBeforeFromWarningOnly:
+        "'From' time is set to the future. Current query will return no results.",
       dateRangeCapped: 'Date range was capped at the current time.',
       dateRangeExceeded: "Date range cannot exceed 3 months; 'To' date has been adjusted.",
       invalidTimeFrame: 'Invalid Time Frame',
       autoCorrection: 'Auto-Correction',
+      specificTimeTitle: 'A specific time',
+      durationTitle: "Duration before 'To' time",
+      nowTitle: 'Now',
+      nowDescription: 'The time the query results are viewed or refreshed',
     };
     return translations[key] || key;
   },
 }));
+
+// Mock the DurationFilter component
+jest.mock('@/components/test-runs/timeframe/DurationFilter', () => {
+  const DurationFilterMock = (props: any) => {
+    return (
+      <div data-testid="duration-filter">
+        <p>duration</p>
+        <input type="number" value={props.values.durationDays} aria-label="days" />
+        <input type="number" value={props.values.durationHours} aria-label="hours" />
+        <input type="number" value={props.values.durationMinutes} aria-label="minutes" />
+      </div>
+    );
+  };
+  return DurationFilterMock;
+});
 
 const mockTranslator = (key: string, values?: Record<string, any>) => {
   if (key === 'toBeforeFrom') return "'To' date cannot be before 'From' date.";
@@ -60,6 +80,13 @@ jest.mock('@/components/test-runs/timeframe/TimeFrameFilter', () => {
         id="duration-hours"
         value={props.values.durationHours}
         onChange={(e) => props.handleValueChange('durationHours', parseInt(e.target.value, 10))}
+      />
+      <label htmlFor="duration-minutes">Minutes</label>
+      <input
+        type="number"
+        id="duration-minutes"
+        value={props.values.durationMinutes}
+        onChange={(e) => props.handleValueChange('durationMinutes', parseInt(e.target.value, 10))}
       />
       <label htmlFor="to-date">To Date</label>
       <input
@@ -97,7 +124,12 @@ describe('applyTimeFrameRules', () => {
     jest.setSystemTime(MOCK_NOW);
     const fromDate = new Date('2025-08-15T10:00:00.000Z');
     const toDate = new Date('2025-08-17T10:00:00.000Z');
-    const { notification, correctedTo } = applyTimeFrameRules(fromDate, toDate, mockTranslator);
+    const { notification, correctedTo } = applyTimeFrameRules(
+      fromDate,
+      toDate,
+      false,
+      mockTranslator
+    );
 
     expect(notification).toBeNull();
     expect(correctedTo).toEqual(toDate);
@@ -106,37 +138,43 @@ describe('applyTimeFrameRules', () => {
   test('should return null notification if "To" date is exactly "now"', () => {
     jest.setSystemTime(MOCK_NOW);
     const fromDate = new Date('2025-08-15T10:00:00.000Z');
-    const { notification } = applyTimeFrameRules(fromDate, MOCK_NOW, mockTranslator);
+    const { notification } = applyTimeFrameRules(fromDate, MOCK_NOW, false, mockTranslator);
 
     expect(notification).toBeNull();
   });
 
-  test('should return a warning and cap the "To" date if it is in the future', () => {
-    jest.setSystemTime(MOCK_NOW);
-    const fromDate = new Date('2025-08-15T10:00:00.000Z');
-    // Set a date 5 minutes into the future from our mocked "now"
-    const futureDate = new Date(MOCK_NOW.getTime() + 5 * 60 * 1000);
-    const { correctedTo, notification } = applyTimeFrameRules(fromDate, futureDate, mockTranslator);
-
-    expect(notification?.kind).toEqual('warning');
-    expect(notification?.text).toEqual('Date range was capped at the current time.');
-    // Ensure the date is capped exactly to our mocked "now"
-    expect(correctedTo.toISOString()).toEqual(MOCK_NOW.toISOString());
-  });
-
-  test('should return an error if "From" date is after "To" date', () => {
+  test('should return a warning if "From" date is after "To" date and adjust "To" date one minute after the "From" date when isRelativeToNow prop is false', () => {
     const fromDate = new Date('2025-08-15T10:00:00.000Z');
     const toDate = new Date('2025-08-14T10:00:00.000Z');
     const { correctedFrom, correctedTo, notification } = applyTimeFrameRules(
       fromDate,
       toDate,
+      false,
       mockTranslator
     );
 
-    expect(notification?.kind).toEqual('error');
-    expect(notification?.text).toEqual("'To' date cannot be before 'From' date.");
+    expect(notification?.kind).toEqual('warning');
+    expect(notification?.text).toEqual('toBeforeFromAutoAdjust');
 
-    // Ensure dates are not modified on a hard error
+    // Ensure 'To' date is adjusted to be one minute after 'From' date
+    expect(correctedFrom).toEqual(fromDate);
+    expect(correctedTo).toEqual(new Date(fromDate.getTime() + 60 * 1000));
+  });
+
+  test('should return a warning if "From" date is after the current time when isRelativeToNow prop is true', () => {
+    const fromDate = new Date('2025-08-15T10:00:00.000Z');
+    const toDate = new Date('2025-08-14T10:00:00.000Z');
+    const { correctedFrom, correctedTo, notification } = applyTimeFrameRules(
+      fromDate,
+      toDate,
+      true,
+      mockTranslator
+    );
+
+    expect(notification?.kind).toEqual('warning');
+    expect(notification?.text).toEqual('toBeforeFromWarningOnly');
+
+    // Ensure nothing changes
     expect(correctedFrom).toEqual(fromDate);
     expect(correctedTo).toEqual(toDate);
   });
@@ -144,7 +182,7 @@ describe('applyTimeFrameRules', () => {
   test('should return null notification if "From" and "To" dates are the same', () => {
     jest.setSystemTime(new Date('2025-09-01T00:00:00.000Z'));
     const sameDate = new Date('2025-08-15T10:00:00.000Z');
-    const { notification } = applyTimeFrameRules(sameDate, sameDate, mockTranslator);
+    const { notification } = applyTimeFrameRules(sameDate, sameDate, false, mockTranslator);
 
     expect(notification).toBeNull();
   });
@@ -154,7 +192,12 @@ describe('applyTimeFrameRules', () => {
 
     const fromDate = new Date('2025-05-15T10:00:00.000Z');
     const toDate = new Date('2025-08-16T10:00:00.000Z');
-    const { correctedTo, notification } = applyTimeFrameRules(fromDate, toDate, mockTranslator);
+    const { correctedTo, notification } = applyTimeFrameRules(
+      fromDate,
+      toDate,
+      false,
+      mockTranslator
+    );
 
     expect(notification?.kind).toEqual('warning');
     expect(notification?.text).toContain('Date range cannot exceed 3 months');
@@ -307,7 +350,7 @@ describe('TimeFrameContent Tests', () => {
     expect(screen.getByLabelText('Hours')).toHaveValue(mockValues.durationHours);
   });
 
-  test('should update the `To` date when the duration is increased', async () => {
+  test('should update the `From` date when the duration is increased', async () => {
     const TestWrapper = () => {
       const [values, setValues] = useState<TimeFrameValues>(() => {
         const initialFromDate = new Date('2025-08-15T00:00:00.000Z');
@@ -323,6 +366,7 @@ describe('TimeFrameContent Tests', () => {
 
     const daysInput = screen.getByLabelText('Days');
     const toDateInput = screen.getByLabelText('To Date');
+    const fromDateInput = screen.getByLabelText('From Date');
 
     // Initial state check
     expect(daysInput).toHaveValue(1);
@@ -334,12 +378,17 @@ describe('TimeFrameContent Tests', () => {
     // Act: Change the duration to 3 days
     fireEvent.change(daysInput, { target: { value: 3 } });
 
+    // Assert: 'To' date is not changed
+    expect(toDateInput).toHaveValue(
+      new Date('2025-08-16T00:00:00.000Z').toLocaleDateString('en-US', { timeZone: 'UTC' })
+    );
+
     // Assert: Wait for the re-render and check the new values
     await waitFor(() => {
       expect(daysInput).toHaveValue(3);
-      const expectedToDate = new Date('2025-08-18T00:00:00.000Z');
-      expect(toDateInput).toHaveValue(
-        expectedToDate.toLocaleDateString('en-US', { timeZone: 'UTC' })
+      const expectedFromDate = new Date('2025-08-13T00:00:00.000Z');
+      expect(fromDateInput).toHaveValue(
+        expectedFromDate.toLocaleDateString('en-US', { timeZone: 'UTC' })
       );
     });
   });
@@ -380,7 +429,7 @@ describe('TimeFrameContent Tests', () => {
     });
   });
 
-  test('should display an error and not update state if the date range becomes inverted', async () => {
+  test('should display a warning and update state of the "To" date to be after the "From" date by one minute, if the date range becomes inverted', async () => {
     const initialFrom = '2025-08-10T12:00:00.000Z';
     const initialTo = '2025-08-12T12:00:00.000Z';
 
@@ -400,17 +449,50 @@ describe('TimeFrameContent Tests', () => {
     const fromDateInput = screen.getByLabelText('From Date');
     const toDateInput = screen.getByLabelText('To Date');
     const daysInput = screen.getByLabelText('Days');
+    const minutesInput = screen.getByLabelText('Minutes');
 
     // Change "From" date to be after "To" date
+    const newFromDate = '2025-08-15T12:00:00.000Z';
     fireEvent.change(fromDateInput, { target: { value: '08/15/2025' } });
 
-    // Check that the error notification is displayed
-    const errorNotification = await screen.findByText("'To' date cannot be before 'From' date.");
-    expect(errorNotification).toBeInTheDocument();
+    // Check that the warning notification is displayed
+    const warningNotification = await screen.findByText('toBeforeFromAutoAdjust');
+    expect(warningNotification).toBeInTheDocument();
 
-    // Ensure the dates are not modified
-    expect(fromDateInput).toHaveValue(new Date(initialFrom).toLocaleDateString('en-US'));
+    // Ensure the To date is adjusted to be after the From date by one minute
+    expect(toDateInput).toHaveValue(
+      new Date(new Date(newFromDate).getTime() + 60 * 1000).toLocaleDateString('en-US')
+    );
+    expect(daysInput).toHaveValue(0);
+    expect(minutesInput).toHaveValue(1);
+  });
+
+  test('To Date should jump to the current time when Now is selected', async () => {
+    const initialFrom = '2025-08-10T12:00:00.000Z';
+    const initialTo = '2025-08-13T12:00:00.000Z';
+
+    const TestWrapper = () => {
+      const [values, setValues] = useState<TimeFrameValues>(() => {
+        const initialFromDate = new Date(initialFrom);
+        const initialToDate = new Date(initialTo);
+
+        return calculateSynchronizedState(initialFromDate, initialToDate, timezone);
+      });
+
+      return <TimeFrameContent values={values} setValues={setValues} />;
+    };
+
+    render(<TestWrapper />);
+    const toDateInput = screen.getByLabelText('To Date');
+    const nowRadio = screen.getByLabelText('Now');
+    // Check the initial value before the click
     expect(toDateInput).toHaveValue(new Date(initialTo).toLocaleDateString('en-US'));
-    expect(daysInput).toHaveValue(2);
+
+    // Act: Click the radio button
+    fireEvent.click(nowRadio);
+
+    await waitFor(() => {
+      expect(toDateInput).toHaveValue(MOCK_NOW.toLocaleDateString('en-US'));
+    });
   });
 });

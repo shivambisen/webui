@@ -5,20 +5,39 @@
  */
 'use client';
 
-import styles from '@/styles/test-runs/TestRunsPage.module.css';
+import styles from '@/styles/test-runs/timeframe/TimeFrameContent.module.css';
 import { TimeFrameValues } from '@/utils/interfaces';
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import TimeFrameFilter from './TimeFrameFilter';
 import { addMonths, dateTimeLocal2UTC, dateTimeUTC2Local } from '@/utils/timeOperations';
 import { InlineNotification } from '@carbon/react';
 import { MAX_RANGE_MONTHS, DAY_MS, HOUR_MS, MINUTE_MS } from '@/utils/constants/common';
 import { useTranslations } from 'next-intl';
 import { useDateTimeFormat } from '@/contexts/DateTimeFormatContext';
+import DurationFilter from './DurationFilter';
+import { RadioButton, FormGroup } from '@carbon/react';
 
 type Notification = {
   text: string;
   kind: 'error' | 'warning';
 };
+
+export enum FromSelectionOptions {
+  specificFromTime = 'specificFromTime',
+  duration = 'duration',
+}
+
+export enum ToSelectionOptions {
+  specificToTime = 'specificToTime',
+  now = 'now',
+}
+
+export enum fromToSelectionEnum {
+  FromSelectionOptions,
+  ToSelectionOptions,
+}
+
+const ONE_MINUTE = 60 * 1000;
 
 /*
  * Calculates the final, fully synchronized state object from two valid dates.
@@ -61,18 +80,32 @@ export const calculateSynchronizedState = (
 export function applyTimeFrameRules(
   fromDate: Date,
   toDate: Date,
+  isRelativeToNow: boolean | undefined,
   translations: (key: string, values?: Record<string, any>) => string
-): { correctedFrom: Date; correctedTo: Date; notification: Notification | null } {
+): {
+  correctedFrom: Date;
+  correctedTo: Date;
+  notification: Notification | null;
+} {
   let correctedFrom = new Date(fromDate.getTime());
   let correctedTo = new Date(toDate.getTime());
   let notification: Notification | null = null;
+
+  /*
+   If the 'from' date is after the 'to' date:
+   - If the query is relative to now, show a warning without adjusting the 'to' time,
+       since the user may want to save a query for the future.
+   - Otherwise, set the 'to' time to one minute after the 'from' time.
+  */
   if (correctedFrom > correctedTo) {
     return {
       correctedFrom: fromDate,
-      correctedTo: toDate,
+      correctedTo: isRelativeToNow ? toDate : new Date(fromDate.getTime() + ONE_MINUTE),
       notification: {
-        text: translations('toBeforeFrom'),
-        kind: 'error',
+        text: isRelativeToNow
+          ? translations('toBeforeFromWarningOnly')
+          : translations('toBeforeFromAutoAdjust'),
+        kind: 'warning',
       },
     };
   }
@@ -86,21 +119,12 @@ export function applyTimeFrameRules(
     };
   }
 
-  const now = new Date();
-  if (correctedTo > now) {
-    correctedTo = now;
-    notification = {
-      text: translations('dateRangeCapped'),
-      kind: 'warning',
-    };
-  }
-
   return { correctedFrom, correctedTo, notification };
 }
 
 interface TimeFrameContentProps {
   values: TimeFrameValues;
-  setValues: (values: TimeFrameValues) => void;
+  setValues: React.Dispatch<React.SetStateAction<TimeFrameValues>>;
 }
 
 export default function TimeFrameContent({ values, setValues }: TimeFrameContentProps) {
@@ -108,6 +132,12 @@ export default function TimeFrameContent({ values, setValues }: TimeFrameContent
   const { getResolvedTimeZone } = useDateTimeFormat();
 
   const [notification, setNotification] = useState<Notification | null>(null);
+  const [selectedFromOption, setSelectedFromOption] = useState<FromSelectionOptions>(
+    values.isRelativeToNow ? FromSelectionOptions.duration : FromSelectionOptions.specificFromTime
+  );
+  const [selectedToOption, setSelectedToOption] = useState<ToSelectionOptions>(
+    values.isRelativeToNow ? ToSelectionOptions.now : ToSelectionOptions.specificToTime
+  );
 
   const handleValueChange = useCallback(
     (field: keyof TimeFrameValues, value: any) => {
@@ -121,39 +151,44 @@ export default function TimeFrameContent({ values, setValues }: TimeFrameContent
       const timezone = getResolvedTimeZone();
 
       // Combine date and time into Date objects
-      let fromDate: Date, toDate: Date;
+      let fromDate = dateTimeLocal2UTC(
+        draftValues.fromDate,
+        draftValues.fromTime,
+        draftValues.fromAmPm,
+        timezone
+      );
+
+      let toDate = dateTimeLocal2UTC(
+        draftValues.toDate,
+        draftValues.toTime,
+        draftValues.toAmPm,
+        timezone
+      );
+
+      const durationInMs =
+        draftValues.durationDays * DAY_MS +
+        draftValues.durationHours * HOUR_MS +
+        draftValues.durationMinutes * MINUTE_MS;
+
       if (field.startsWith('duration')) {
-        fromDate = dateTimeLocal2UTC(
-          draftValues.fromDate,
-          draftValues.fromTime,
-          draftValues.fromAmPm,
-          timezone
-        );
-        const durationInMs =
-          draftValues.durationDays * DAY_MS +
-          draftValues.durationHours * HOUR_MS +
-          draftValues.durationMinutes * MINUTE_MS;
-        toDate = new Date(fromDate.getTime() + durationInMs);
-      } else {
-        fromDate = dateTimeLocal2UTC(
-          draftValues.fromDate,
-          draftValues.fromTime,
-          draftValues.fromAmPm,
-          timezone
-        );
-        toDate = dateTimeLocal2UTC(
-          draftValues.toDate,
-          draftValues.toTime,
-          draftValues.toAmPm,
-          timezone
-        );
+        // Adjust 'from' date according to 'to' date and duration
+        fromDate = new Date(toDate.getTime() - durationInMs);
+      } else if (field.startsWith('to')) {
+        // If the 'from' options is "duration", then change the "from" time
+        if (selectedFromOption === FromSelectionOptions.duration) {
+          fromDate = new Date(toDate.getTime() - durationInMs);
+        }
+      } else if (field.startsWith('isRelativeToNow')) {
+        // If the 'now' option is selected, set the 'to' date to the current date
+        toDate = new Date();
       }
 
+      const isisRelativeToNow = field === 'isRelativeToNow' ? value : values.isRelativeToNow;
       const {
         correctedFrom,
         correctedTo,
         notification: validationNotification,
-      } = applyTimeFrameRules(fromDate, toDate, translations);
+      } = applyTimeFrameRules(fromDate, toDate, isisRelativeToNow, translations);
 
       // Set the notification if there is one
       setNotification(validationNotification);
@@ -161,19 +196,116 @@ export default function TimeFrameContent({ values, setValues }: TimeFrameContent
       // Update the state with the corrected values
       if (validationNotification?.kind !== 'error') {
         const finalState = calculateSynchronizedState(correctedFrom, correctedTo, timezone);
-        setValues(finalState);
+        setValues((prevValues) => ({ ...prevValues, ...finalState }));
       }
     },
-    [values, translations, setValues, getResolvedTimeZone]
+    [values, translations, setValues, getResolvedTimeZone, selectedFromOption]
   );
 
+  // Update the isRelativeToNow state when the selectedToOption changes
+  useEffect(() => {
+    const isRelativeToNow = selectedToOption === ToSelectionOptions.now;
+    setValues((prevValues) => ({ ...prevValues, isRelativeToNow }));
+  }, [selectedToOption, setValues]);
+
   return (
-    <div className={styles.TimeFrameContainer}>
+    <div className={styles.timeFrameContainer}>
       <div>
         <p>{translations('selectEnvelope')}</p>
         <p>{translations('envelopeDescription')}</p>
       </div>
-      <TimeFrameFilter values={values} handleValueChange={handleValueChange} />
+
+      <FormGroup className={styles.formGroup} legendText="" role="radiogroup">
+        <div className={styles.fromContainer}>
+          <h3 className={styles.heading}>{translations('from')}</h3>
+          <div className={styles.optionRow}>
+            <RadioButton
+              labelText={translations('specificTimeTitle')}
+              value={FromSelectionOptions.specificFromTime}
+              id="from-specific-time"
+              name="from-timeframe-options"
+              checked={selectedFromOption === FromSelectionOptions.specificFromTime}
+              onChange={() => setSelectedFromOption(FromSelectionOptions.specificFromTime)}
+            />
+            <div className={styles.filterWrapper}>
+              <TimeFrameFilter
+                values={values}
+                handleValueChange={handleValueChange}
+                fromToSelection={fromToSelectionEnum.FromSelectionOptions}
+                disabled={selectedFromOption !== FromSelectionOptions.specificFromTime}
+              />
+            </div>
+          </div>
+          <div className={styles.optionRow}>
+            <RadioButton
+              labelText={
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: translations('durationTitle').replace(
+                      '{boldTo}',
+                      `<strong>${translations('boldTo')}</strong>`
+                    ),
+                  }}
+                />
+              }
+              value={FromSelectionOptions.duration}
+              id="from-duration"
+              name="from-timeframe-options"
+              checked={selectedFromOption === FromSelectionOptions.duration}
+              onChange={() => setSelectedFromOption(FromSelectionOptions.duration)}
+            />
+            <div className={styles.filterWrapper}>
+              <DurationFilter
+                values={values}
+                handleValueChange={handleValueChange}
+                disabled={selectedFromOption !== FromSelectionOptions.duration}
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className={styles.divider}></div>
+
+        <div className={styles.toContainer}>
+          <h3 className={styles.heading}>{translations('to')}</h3>
+          <div className={styles.optionRow}>
+            <RadioButton
+              labelText={translations('specificTimeTitle')}
+              value={ToSelectionOptions.specificToTime}
+              id="to-specific-time"
+              name="to-timeframe-options"
+              checked={selectedToOption === ToSelectionOptions.specificToTime}
+              onChange={() => {
+                setSelectedToOption(ToSelectionOptions.specificToTime);
+                handleValueChange('isRelativeToNow', false);
+              }}
+            />
+            <div className={styles.filterWrapper}>
+              <TimeFrameFilter
+                values={values}
+                fromToSelection={fromToSelectionEnum.ToSelectionOptions}
+                handleValueChange={handleValueChange}
+                disabled={selectedToOption !== ToSelectionOptions.specificToTime}
+              />
+            </div>
+          </div>
+          <div className={styles.optionRow}>
+            <RadioButton
+              labelText={translations('nowTitle')}
+              value={ToSelectionOptions.now}
+              id="to-now"
+              name="to-timeframe-options"
+              checked={selectedToOption === ToSelectionOptions.now}
+              onChange={() => {
+                setSelectedToOption(ToSelectionOptions.now);
+                handleValueChange('isRelativeToNow', true);
+              }}
+            />
+            <p className={styles.nowDescription}>{translations('nowDescription')}</p>
+          </div>
+        </div>
+      </FormGroup>
+
       {notification && (
         <InlineNotification
           className={styles.notification}
@@ -184,7 +316,6 @@ export default function TimeFrameContent({ values, setValues }: TimeFrameContent
               : translations('autoCorrection')
           }
           subtitle={notification.text}
-          hideCloseButton={true}
         />
       )}
     </div>
