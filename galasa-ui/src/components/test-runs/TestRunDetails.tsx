@@ -24,7 +24,7 @@ import { RunMetadata } from '@/utils/interfaces';
 import { getIsoTimeDifference } from '@/utils/timeOperations';
 import MethodsTab, { MethodDetails } from './MethodsTab';
 import { ArtifactsTab } from './ArtifactsTab';
-import ThirtyTwoSeventyTab from './ThirtyTwoSeventyTab';
+import TabFor3270 from './TabFor3270';
 import LogTab from './LogTab';
 import TestRunSkeleton from './TestRunSkeleton';
 import { useTranslations } from 'next-intl';
@@ -350,7 +350,7 @@ const TestRunDetails = ({
               </TabPanel>
               {zos3270TerminalFolderExists && (
                 <TabPanel>
-                  <ThirtyTwoSeventyTab />
+                  <TabFor3270 />
                 </TabPanel>
               )}
             </TabPanels>

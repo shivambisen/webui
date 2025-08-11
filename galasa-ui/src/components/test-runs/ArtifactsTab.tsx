@@ -1,9 +1,9 @@
-'use client';
 /*
  * Copyright contributors to the Galasa project
  *
  * SPDX-License-Identifier: EPL-2.0
  */
+'use client';
 
 import { ArtifactIndexEntry } from '@/generated/galasaapi';
 import { TreeView, TreeNode, InlineLoading, InlineNotification } from '@carbon/react';
@@ -191,7 +191,12 @@ export function ArtifactsTab({
     if (is3270ScreenEnabled) {
       checkForZosTerminalFolderStructure(root, setZos3270TerminalFolderExists);
     }
-  }, [artifacts]);
+  }, [
+    artifacts,
+    checkForZosTerminalFolderStructure,
+    is3270ScreenEnabled,
+    setZos3270TerminalFolderExists,
+  ]);
 
   const createFolderSegments = (
     segments: string[],
