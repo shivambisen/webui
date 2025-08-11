@@ -28,55 +28,6 @@ import { FEATURE_FLAGS } from '@/utils/featureFlags';
 import { FolderNode, ArtifactDetails, TreeNodeData, DownloadResult } from '@/utils/types/artifacts';
 import { checkForZosTerminalFolderStructure } from '@/utils/checkFor3270FolderStructure';
 
-// interface FileNode {
-//   name: string;
-//   runId: string;
-//   url: string;
-//   isFile: true;
-//   children: {};
-// }
-
-// interface FolderNode {
-//   name: string;
-//   isFile: false;
-//   children: { [key: string]: TreeNodeData };
-// }
-
-// interface ArtifactDetails {
-//   artifactFile: string;
-//   fileSize: string;
-//   fileName: string;
-//   base64Data: string;
-//   contentType: string;
-// }
-
-// export type TreeNodeData = FileNode | FolderNode;
-
-// type DownloadResult = { contentType: string; data: string; size: number; base64: string };
-
-// export const checkForZosTerminalFolderStructure = (
-//   root: FolderNode,
-//   setZos3270TerminalFolderExists: (exists: boolean) => void
-// ) => {
-//   if (root.children) {
-//     for (const key in root.children) {
-//       const childNode = root.children[key];
-//       if (
-//         childNode.name === 'zos3270' &&
-//         childNode.isFile === false &&
-//         'terminals' in childNode.children
-//       ) {
-//         const terminalsFolder = childNode.children['terminals'];
-//         if (terminalsFolder.isFile === false && Object.keys(terminalsFolder.children).length > 0) {
-//           setZos3270TerminalFolderExists(true);
-//           return;
-//         }
-//       }
-//     }
-//   }
-//   setZos3270TerminalFolderExists(false);
-// };
-
 export function ArtifactsTab({
   artifacts,
   runId,
