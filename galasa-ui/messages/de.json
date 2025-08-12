@@ -401,16 +401,10 @@
     "date": "Datum",
     "time": "Uhrzeit"
   },
-  "TimeFrameFilter": {
-    "from": "Von",
-    "to": "Bis"
-  },
   "DurationFilter": {
     "days": "Tage",
     "hours": "Stunden",
-    "minutes": "Minuten",
-
-    "duration": "Dauer"
+    "minutes": "Minuten"
   },
   "SearchCriteriaContent": {
     "description": "Bearbeiten Sie die Suchkriterien, um die gewünschten Testergebnisse anzuzeigen. Vergessen Sie nicht, auf 'Speichern' zu klicken, um Ihre Änderungen an der Abfrage zu übernehmen.",

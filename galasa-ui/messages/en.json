@@ -379,15 +379,10 @@
     "date": "Date",
     "time": "Time"
   },
-  "TimeFrameFilter": {
-    "from": "From",
-    "to": "To"
-  },
   "DurationFilter": {
     "days": "Days",
     "hours": "Hours",
-    "minutes": "Minutes",
-    "duration": "Duration"
+    "minutes": "Minutes"
   },
   "SearchCriteriaContent": {
     "description": "Edit search criteria to describe the test results you wish to view. Remember to click 'Save' to preserve your changes to the query.",
