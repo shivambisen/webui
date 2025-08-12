@@ -75,9 +75,6 @@ const TestRunDetails = ({
   const { formatDate } = useDateTimeFormat();
 
   const [zos3270TerminalFolderExists, setZos3270TerminalFolderExists] = useState<Boolean>(false);
-  const handleZos3270TerminalFolderCheck = (newZos3270TerminalFolderExists: boolean) => {
-    setZos3270TerminalFolderExists(newZos3270TerminalFolderExists);
-  };
 
   // Get the selected tab index from the URL or default to the first tab
   const [selectedTabIndex, setSelectedTabIndex] = useState(
@@ -85,6 +82,10 @@ const TestRunDetails = ({
       ? TEST_RUN_PAGE_TABS.indexOf(searchParams.get(SINGLE_RUN_QUERY_PARAMS.TAB)!)
       : 0
   );
+
+  const handleZos3270TerminalFolderCheck = (newZos3270TerminalFolderExists: boolean) => {
+    setZos3270TerminalFolderExists(newZos3270TerminalFolderExists);
+  };
 
   const extractRunDetails = useCallback(
     (runDetails: Run) => {
