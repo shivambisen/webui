@@ -320,8 +320,7 @@
     "limitExceededSubtitle": "Ihre Abfrage hat mehr als {maxRecords} Ergebnisse zurückgegeben. Es werden die ersten {maxRecords} Datensätze angezeigt. Um dies in Zukunft zu vermeiden, schränken Sie Ihren Zeitrahmen ein oder ändern Sie Ihre Suchkriterien, um weniger Ergebnisse zu erhalten.",
     "timeFrameText": {
       "default": "Zeige Testläufe der letzten 24 Stunden",
-      "range": "Zeige Testläufe von {from} bis {to}",
-      "isRelativeToNow": "Zeige die neuesten Testläufe von vor {days} Tagen, {hours} Stunden und {minutes} Minuten"
+      "range": "Zeige Testläufe von {from} bis {to}"
     },
     "noColumnsSelected": "Alle Spalten wurden im Tabellen-Design-Tab ausgeblendet, sodass keine Ergebniseinzelheiten sichtbar sein werden. Bitte passen Sie das Tabellen-Design an, um die gewünschten Spalten anzuzeigen.",
     "pagination": {
@@ -359,8 +358,7 @@
     },
 
     "timeFrameText": {
-      "range": "Zeige Testläufe von {from} bis {to}",
-      "isRelativeToNow": "Zeige die neuesten Testläufe von vor {days} Tagen, {hours} Stunden und {minutes} Minuten"
+      "range": "Zeige Testläufe von {from} bis {to}"
     }
   },
   "TestRunsTabs": {
