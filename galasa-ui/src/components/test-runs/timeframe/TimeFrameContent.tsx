@@ -9,9 +9,9 @@ import styles from '@/styles/test-runs/timeframe/TimeFrameContent.module.css';
 import { TimeFrameValues } from '@/utils/interfaces';
 import { useState, useCallback, useEffect } from 'react';
 import TimeFrameFilter from './TimeFrameFilter';
-import { addMonths, dateTimeLocal2UTC, dateTimeUTC2Local } from '@/utils/timeOperations';
+import { dateTimeLocal2UTC, dateTimeUTC2Local } from '@/utils/timeOperations';
 import { InlineNotification } from '@carbon/react';
-import { MAX_RANGE_MONTHS, DAY_MS, HOUR_MS, MINUTE_MS } from '@/utils/constants/common';
+import { DAY_MS, HOUR_MS, MINUTE_MS } from '@/utils/constants/common';
 import { useTranslations } from 'next-intl';
 import { useDateTimeFormat } from '@/contexts/DateTimeFormatContext';
 import DurationFilter from './DurationFilter';
@@ -207,24 +207,7 @@ export default function TimeFrameContent({ values, setValues }: TimeFrameContent
       <FormGroup className={styles.formGroup} legendText="" role="radiogroup">
         <div className={styles.fromContainer}>
           <h3 className={styles.heading}>{translations('from')}</h3>
-          <div className={styles.optionRow}>
-            <RadioButton
-              labelText={translations('specificTimeTitle')}
-              value={FromSelectionOptions.specificFromTime}
-              id="from-specific-time"
-              name="from-timeframe-options"
-              checked={selectedFromOption === FromSelectionOptions.specificFromTime}
-              onChange={() => setSelectedFromOption(FromSelectionOptions.specificFromTime)}
-            />
-            <div className={styles.filterWrapper}>
-              <TimeFrameFilter
-                values={values}
-                handleValueChange={handleValueChange}
-                fromToSelection={fromToSelectionEnum.FromSelectionOptions}
-                disabled={selectedFromOption !== FromSelectionOptions.specificFromTime}
-              />
-            </div>
-          </div>
+
           <div className={styles.optionRow}>
             <RadioButton
               labelText={
@@ -251,12 +234,44 @@ export default function TimeFrameContent({ values, setValues }: TimeFrameContent
               />
             </div>
           </div>
+          <div className={styles.optionRow}>
+            <RadioButton
+              labelText={translations('specificTimeTitle')}
+              value={FromSelectionOptions.specificFromTime}
+              id="from-specific-time"
+              name="from-timeframe-options"
+              checked={selectedFromOption === FromSelectionOptions.specificFromTime}
+              onChange={() => setSelectedFromOption(FromSelectionOptions.specificFromTime)}
+            />
+            <div className={styles.filterWrapper}>
+              <TimeFrameFilter
+                values={values}
+                handleValueChange={handleValueChange}
+                fromToSelection={fromToSelectionEnum.FromSelectionOptions}
+                disabled={selectedFromOption !== FromSelectionOptions.specificFromTime}
+              />
+            </div>
+          </div>
         </div>
 
         <div className={styles.divider}></div>
 
         <div className={styles.toContainer}>
           <h3 className={styles.heading}>{translations('to')}</h3>
+          <div className={styles.optionRow}>
+            <RadioButton
+              labelText={translations('nowTitle')}
+              value={ToSelectionOptions.now}
+              id="to-now"
+              name="to-timeframe-options"
+              checked={selectedToOption === ToSelectionOptions.now}
+              onChange={() => {
+                setSelectedToOption(ToSelectionOptions.now);
+                handleValueChange('isRelativeToNow', true);
+              }}
+            />
+            <p className={styles.nowDescription}>{translations('nowDescription')}</p>
+          </div>
           <div className={styles.optionRow}>
             <RadioButton
               labelText={translations('specificTimeTitle')}
@@ -277,20 +292,6 @@ export default function TimeFrameContent({ values, setValues }: TimeFrameContent
                 disabled={selectedToOption !== ToSelectionOptions.specificToTime}
               />
             </div>
-          </div>
-          <div className={styles.optionRow}>
-            <RadioButton
-              labelText={translations('nowTitle')}
-              value={ToSelectionOptions.now}
-              id="to-now"
-              name="to-timeframe-options"
-              checked={selectedToOption === ToSelectionOptions.now}
-              onChange={() => {
-                setSelectedToOption(ToSelectionOptions.now);
-                handleValueChange('isRelativeToNow', true);
-              }}
-            />
-            <p className={styles.nowDescription}>{translations('nowDescription')}</p>
           </div>
         </div>
       </FormGroup>
