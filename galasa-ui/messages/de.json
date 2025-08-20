@@ -13,7 +13,7 @@
     "logout": "Abmelden"
   },
   "LanguageSelector": {
-    "label": "Sprache"
+    "tooltip": "Sprache auswählen"
   },
   "ThemeSelector": {
     "label": "Thema"
@@ -369,7 +369,7 @@
       "tableDesign": "Tabellendesign",
       "searchCriteria": "Suchkriterien",
       "results": "Ergebnisse",
-      "graphs": "Diagramme"
+      "graph": "Diagramme"
     },
     "content": {
       "timeframe": "Diese Seite befindet sich im Aufbau. Derzeit werden alle Ergebnisse der letzten 24 Stunden angezeigt.",
