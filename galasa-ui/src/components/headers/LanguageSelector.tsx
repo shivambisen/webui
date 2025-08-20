@@ -22,7 +22,6 @@ const languages = [
 ];
 
 export default function LanguageSelector() {
-  
   const { theme } = useTheme();
   const locale = useLocale();
   const [selectedLanguage, setSelectedLanguage] = useState(
